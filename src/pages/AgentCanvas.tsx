@@ -194,8 +194,8 @@ export default function AgentCanvas() {
           }
           if (nextStep === 4 && msg.role === 'assistant' && i === 0) {
             setShowRecords(true)
-            // Animate records one by one
-            for (let r = 0; r < governanceRecords.length; r++) {
+            // Animate records one by one (limit to 4)
+            for (let r = 0; r < 4; r++) {
               setTimeout(() => setVisibleRecords(r + 1), r * 200)
             }
           }
@@ -292,43 +292,33 @@ export default function AgentCanvas() {
                   className="mb-8"
                 >
                   <div className="flex items-center gap-2 mb-4">
-                    <h2 className="text-sm font-semibold text-gray-900">Copilot suggestions</h2>
+                    <h2 className="text-sm font-semibold text-gray-900">Governance Records</h2>
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-purple-50 text-purple-700 rounded-full border border-purple-100">
                       AI
                     </span>
                   </div>
 
-                  <div className="bg-white border border-gray-200 rounded-xl p-5">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <p className="text-sm font-semibold text-gray-900">Governance Records</p>
-                        <p className="text-xs text-gray-500 mt-0.5">Created from your conversation</p>
-                      </div>
-                      <ExternalLink className="w-4 h-4 text-gray-400" />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      {governanceRecords.slice(0, visibleRecords).map((record, i) => {
-                        const Icon = iconMap[record.icon] || Database
-                        return (
-                          <motion.div
-                            key={record.id}
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.25, ease: 'easeOut' }}
-                            className="flex items-start gap-2.5 p-3 bg-gray-50 rounded-lg"
-                          >
-                            <div className="w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                              <Icon className="w-3.5 h-3.5 text-primary" />
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{record.label}</p>
-                              <p className="text-xs text-gray-800 font-medium mt-0.5 truncate">{record.values.join(', ')}</p>
-                            </div>
-                          </motion.div>
-                        )
-                      })}
-                    </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {governanceRecords.slice(0, Math.min(visibleRecords, 4)).map((record, i) => {
+                      const Icon = iconMap[record.icon] || Database
+                      return (
+                        <motion.div
+                          key={record.id}
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ duration: 0.25, ease: 'easeOut' }}
+                          className="flex items-start gap-2.5 p-3 bg-white border border-gray-200 rounded-lg"
+                        >
+                          <div className="w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <Icon className="w-3.5 h-3.5 text-primary" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{record.label}</p>
+                            <p className="text-xs text-gray-800 font-medium mt-0.5 truncate">{record.values.join(', ')}</p>
+                          </div>
+                        </motion.div>
+                      )
+                    })}
                   </div>
                 </motion.div>
               )}
