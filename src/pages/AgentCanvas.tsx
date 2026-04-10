@@ -162,46 +162,48 @@ export default function AgentCanvas() {
     const nextStep = step + 1
     if (nextStep >= conversationSteps.length) return
 
-    const newMessages = conversationSteps[nextStep]
+    const newMessages = [...conversationSteps[nextStep]]
 
     if (userInput && newMessages[0]?.role === 'user') {
       newMessages[0] = { ...newMessages[0], content: userInput }
     }
 
-    // Show user message immediately
-    const userMsg = newMessages.find(m => m.role === 'user')
-    if (userMsg) {
-      setMessages(prev => [...prev, userMsg])
+    // Show first user message immediately
+    const firstUserMsg = newMessages.find(m => m.role === 'user')
+    if (firstUserMsg) {
+      setMessages(prev => [...prev, firstUserMsg])
     }
 
-    // Show typing then assistant messages
+    // Get remaining messages (excluding the first user message we already added)
+    const remainingMessages = newMessages.filter(m => m !== firstUserMsg)
+
+    // Show typing then remaining messages
     setIsTyping(true)
     setTimeout(() => {
       setIsTyping(false)
-      const assistantMsgs = newMessages.filter(m => m.role === 'assistant')
-      assistantMsgs.forEach((msg, i) => {
+      let delay = 0
+      remainingMessages.forEach((msg, i) => {
         setTimeout(() => {
           setMessages(prev => [...prev, msg])
           // Side effects per step
-          if (nextStep === 1) {
+          if (nextStep === 1 && msg.role === 'assistant' && i === 0) {
             setProjectTitle('Support Copilot Rollout')
             setProjectSummary(
               'This initiative deploys an AI-powered assistant to help support agents summarize tickets, draft customer replies, and search internal knowledge bases. Personal data including ticket content, customer identifiers, and account metadata will be processed by the system.'
             )
           }
-          if (nextStep === 4 && i === 0) {
+          if (nextStep === 4 && msg.role === 'assistant' && i === 0) {
             setShowRecords(true)
-          }
-          if (nextStep === 4) {
             // Animate records one by one
             for (let r = 0; r < governanceRecords.length; r++) {
               setTimeout(() => setVisibleRecords(r + 1), r * 200)
             }
           }
-          if (nextStep === 5) {
+          if (nextStep === 5 && msg.role === 'assistant') {
             setShowAssessments(true)
           }
-        }, i * 800)
+        }, delay)
+        delay += 800
       })
       setStep(nextStep)
     }, 1200)
