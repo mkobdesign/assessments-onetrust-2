@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   DndContext,
@@ -39,6 +39,12 @@ import {
   Folder,
   File,
   Trash2,
+  ArrowUp,
+  Paperclip,
+  Menu,
+  X,
+  Bookmark,
+  ChevronDown,
 } from 'lucide-react'
 import { dataSources } from '@/data/mockFlow'
 
@@ -224,10 +230,30 @@ function FileBrowser({ onClose }: { onClose: () => void }) {
   )
 }
 
+// Previous work items (bookmarks)
+const previousWorkItems = [
+  { id: 'pw1', title: 'Privacy Review - Support Bot v1', date: '2 weeks ago' },
+  { id: 'pw2', title: 'DPIA - Customer Analytics', date: '1 month ago' },
+  { id: 'pw3', title: 'Vendor Assessment - Slack', date: '2 months ago' },
+]
+
+// Chat messages for the copilot
+const initialCopilotMessages = [
+  {
+    id: 'm1',
+    role: 'assistant' as const,
+    content: "I've identified 5 relevant sources for this assessment based on your organization's documents and previous reviews. You can reorder or remove sources before starting.",
+  },
+]
+
 export default function AssessmentPreLaunch() {
   const navigate = useNavigate()
   const [sources, setSources] = useState(dataSources)
   const [fileBrowserOpen, setFileBrowserOpen] = useState(false)
+  const [copilotMessages, setCopilotMessages] = useState(initialCopilotMessages)
+  const [inputValue, setInputValue] = useState('')
+  const [previousWorkExpanded, setPreviousWorkExpanded] = useState(false)
+  const chatBottomRef = useRef<HTMLDivElement>(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -249,6 +275,34 @@ export default function AssessmentPreLaunch() {
     setSources(items => items.filter(item => item.id !== id))
   }
 
+  const handleSendMessage = () => {
+    if (!inputValue.trim()) return
+    const userMsg = { id: `u${Date.now()}`, role: 'user' as const, content: inputValue }
+    setCopilotMessages(prev => [...prev, userMsg])
+    setInputValue('')
+    
+    // Simulate AI response
+    setTimeout(() => {
+      const aiMsg = {
+        id: `a${Date.now()}`,
+        role: 'assistant' as const,
+        content: "I can help you with that. Let me know if you'd like me to add more sources or adjust the priority of existing ones.",
+      }
+      setCopilotMessages(prev => [...prev, aiMsg])
+    }, 1000)
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSendMessage()
+    }
+  }
+
+  useEffect(() => {
+    chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [copilotMessages])
+
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
       <Sidebar />
@@ -263,66 +317,191 @@ export default function AssessmentPreLaunch() {
           }
         />
 
-        <main className="flex-1 overflow-y-auto">
-          <div className="max-w-2xl mx-auto px-6 py-10">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <h2 className="text-xl font-bold text-gray-900 mb-2">
-                Review sources used to generate answers
-              </h2>
-              <p className="text-sm text-gray-500 mb-8 leading-relaxed">
-                Drag to reorder. Items at the top are given maximum priority.
-              </p>
-
-              {/* Source list */}
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext items={sources.map(s => s.id)} strategy={verticalListSortingStrategy}>
-                  <div className="space-y-3 mb-6">
-                    {sources.map((source, index) => (
-                      <SortableSourceCard 
-                        key={source.id} 
-                        source={source} 
-                        rank={index + 1}
-                        onDelete={handleDeleteSource}
-                      />
-                    ))}
-                  </div>
-                </SortableContext>
-              </DndContext>
-
-              {/* Add files button */}
-              <Button
-                variant="outline"
-                onClick={() => setFileBrowserOpen(true)}
-                className="w-full border-dashed text-gray-500 hover:text-gray-800 hover:border-gray-400 mb-10"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Add Files
-              </Button>
-
-              {/* CTA */}
-              <div className="bg-white border border-gray-200 rounded-xl p-6">
-                <h3 className="text-sm font-semibold text-gray-900 mb-1">Ready to start?</h3>
-                <p className="text-xs text-gray-500 mb-4 leading-relaxed">
-                  Copilot will use these sources to pre-fill answers across the assessment. You'll be able to review and confirm each one.
-                </p>
-                <Button
-                  onClick={() => navigate('/questionnaire')}
-                  className="w-full"
-                  size="lg"
+        <main className="flex-1 overflow-hidden">
+          <div className="flex h-full">
+            {/* Main content area */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="max-w-2xl mx-auto px-6 py-10">
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
                 >
-                  Start Assessment
-                  <ChevronRight className="w-4 h-4 ml-1" />
+                  <h2 className="text-xl font-bold text-gray-900 mb-2">
+                    Review sources used to generate answers
+                  </h2>
+                  <p className="text-sm text-gray-500 mb-8 leading-relaxed">
+                    Drag to reorder. Items at the top are given maximum priority.
+                  </p>
+
+                  {/* Source list */}
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext items={sources.map(s => s.id)} strategy={verticalListSortingStrategy}>
+                      <div className="space-y-3 mb-6">
+                        {sources.map((source, index) => (
+                          <SortableSourceCard 
+                            key={source.id} 
+                            source={source} 
+                            rank={index + 1}
+                            onDelete={handleDeleteSource}
+                          />
+                        ))}
+                      </div>
+                    </SortableContext>
+                  </DndContext>
+
+                  {/* Add files button */}
+                  <Button
+                    variant="outline"
+                    onClick={() => setFileBrowserOpen(true)}
+                    className="w-full border-dashed text-gray-500 hover:text-gray-800 hover:border-gray-400 mb-10"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Files
+                  </Button>
+
+                  {/* CTA */}
+                  <div className="bg-white border border-gray-200 rounded-xl p-6">
+                    <h3 className="text-sm font-semibold text-gray-900 mb-1">Ready to start?</h3>
+                    <p className="text-xs text-gray-500 mb-4 leading-relaxed">
+                      Copilot will use these sources to pre-fill answers across the assessment. You&apos;ll be able to review and confirm each one.
+                    </p>
+                    <Button
+                      onClick={() => navigate('/questionnaire')}
+                      className="w-full"
+                      size="lg"
+                    >
+                      Start Assessment
+                      <ChevronRight className="w-4 h-4 ml-1" />
+                    </Button>
+                  </div>
+                </motion.div>
+              </div>
+            </div>
+
+            {/* Copilot panel */}
+            <motion.aside
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className="w-[380px] border-l border-gray-200 bg-white flex flex-col"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
+                <div className="flex items-center gap-2">
+                  <Menu className="w-4 h-4 text-gray-400" />
+                  <span className="text-sm font-semibold text-gray-900">Copilot</span>
+                </div>
+                <Button variant="ghost" size="icon" className="h-7 w-7">
+                  <X className="w-3.5 h-3.5" />
                 </Button>
               </div>
-            </motion.div>
+
+              {/* Previous Work Bookmark */}
+              <div className="border-b border-gray-100">
+                <button
+                  onClick={() => setPreviousWorkExpanded(!previousWorkExpanded)}
+                  className="w-full flex items-center justify-between px-5 py-3 hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <Bookmark className="w-4 h-4 text-gray-400" />
+                    <span className="text-xs font-medium text-gray-600">Previous work</span>
+                    <span className="text-xs text-gray-400">({previousWorkItems.length})</span>
+                  </div>
+                  <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${previousWorkExpanded ? 'rotate-180' : ''}`} />
+                </button>
+                <AnimatePresence>
+                  {previousWorkExpanded && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="px-5 pb-3 space-y-2">
+                        {previousWorkItems.map(item => (
+                          <button
+                            key={item.id}
+                            className="w-full flex items-center justify-between p-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors text-left"
+                          >
+                            <div>
+                              <p className="text-xs font-medium text-gray-700">{item.title}</p>
+                              <p className="text-[10px] text-gray-400">{item.date}</p>
+                            </div>
+                            <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
+                          </button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+                {copilotMessages.map(msg => (
+                  <motion.div
+                    key={msg.id}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    {msg.role === 'user' ? (
+                      <div className="max-w-[80%]">
+                        <div className="bg-gray-100 rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm text-gray-800 leading-relaxed">
+                          {msg.content}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="max-w-[85%] flex items-start gap-2.5">
+                        <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <span className="text-white text-[9px] font-bold">AI</span>
+                        </div>
+                        <div className="text-sm text-gray-700 leading-relaxed">
+                          {msg.content}
+                        </div>
+                      </div>
+                    )}
+                  </motion.div>
+                ))}
+                <div ref={chatBottomRef} />
+              </div>
+
+              {/* Input area */}
+              <div className="px-5 py-4 border-t border-gray-100">
+                <div className="relative bg-gray-50 border border-gray-200 rounded-xl focus-within:border-primary focus-within:bg-white transition-all duration-150">
+                  <textarea
+                    value={inputValue}
+                    onChange={e => setInputValue(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Ask Copilot about sources..."
+                    aria-label="Chat input"
+                    rows={2}
+                    className="w-full resize-none bg-transparent px-4 pt-3 pb-1 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none leading-relaxed"
+                  />
+                  <div className="flex items-center justify-between px-3 pb-2">
+                    <Button variant="ghost" size="icon" className="h-7 w-7 text-gray-400" aria-label="Attach">
+                      <Paperclip className="w-3.5 h-3.5" />
+                    </Button>
+                    <Button
+                      onClick={handleSendMessage}
+                      disabled={!inputValue.trim()}
+                      size="icon"
+                      className="h-7 w-7 rounded-lg bg-primary hover:bg-primary/90 disabled:opacity-30"
+                      aria-label="Send"
+                    >
+                      <ArrowUp className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </motion.aside>
           </div>
         </main>
       </div>
