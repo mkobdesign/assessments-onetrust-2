@@ -15,32 +15,25 @@ const quickActions = [
 const alerts = [
   {
     id: 1,
-    severity: 'amber',
     title: 'CCPA update for automated decision-making technology, notice drafted',
     description:
       'Flagged 2 use cases and drafted the notice plus a risk assessment with mitigations.',
   },
   {
     id: 2,
-    severity: 'red',
     title: 'High-risk processing update, 2 recommended controls',
     description:
       'A processing activity change now appears higher risk. I drafted a new risk register entry and suggested 2 controls plus evidence tasks based on your policies and regulations.',
   },
   {
     id: 3,
-    severity: 'amber',
     title: 'Vendor SOC 2 update, 1 recommended control',
     description:
       'A vendor posted an updated SOC 2 report. I flagged 2 new risks and proposed 1 mitigating control, including an updated vendor risk score.',
   },
 ]
 
-const severityColors: Record<string, string> = {
-  red: 'bg-red-500',
-  amber: 'bg-amber-400',
-  green: 'bg-green-500',
-}
+
 
 export default function HomePage() {
   const [prompt, setPrompt] = useState('')
@@ -91,11 +84,10 @@ export default function HomePage() {
 
               {/* Prompt input */}
               <div
-                className={`relative bg-white rounded-xl border transition-all duration-200 ${
-                  isFocused
+                className={`relative bg-white rounded-xl border transition-all duration-200 ${isFocused
                     ? 'border-primary shadow-md shadow-primary/5'
                     : 'border-gray-200 shadow-sm'
-                }`}
+                  }`}
               >
                 <textarea
                   ref={textareaRef}
@@ -163,7 +155,7 @@ export default function HomePage() {
             >
               <div className="flex items-center gap-2 mb-4">
                 <h3 className="text-sm font-semibold text-gray-900">
-                  Alerts ({alerts.length})
+                  Tasks ({alerts.length})
                 </h3>
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-purple-50 text-purple-700 rounded-full border border-purple-100">
                   <Sparkles className="w-3 h-3" />
@@ -180,11 +172,7 @@ export default function HomePage() {
                     transition={{ delay: 0.15 + i * 0.05, duration: 0.3 }}
                     className="relative bg-white border border-gray-200 rounded-xl p-4 hover:border-gray-300 hover:shadow-sm transition-all duration-150 cursor-pointer group"
                   >
-                    <div
-                      className={`absolute left-0 top-4 w-2 h-2 rounded-full -translate-x-1 ${severityColors[alert.severity]}`}
-                    />
-
-                    <div className="flex items-start gap-3 pl-2">
+                    <div className="flex items-start gap-3">
                       <CheckCircle2 className="w-4 h-4 text-gray-300 mt-0.5 flex-shrink-0 group-hover:text-gray-400 transition-colors" />
                       <div>
                         <p className="text-sm font-semibold text-gray-900 leading-snug">
