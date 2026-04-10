@@ -311,8 +311,8 @@ export const dataSources = [
   {
     id: 'sop',
     name: 'Support_SOP.pdf',
-    type: 'Process Document',
-    icon: 'book-open',
+    type: '/processes',
+    icon: 'sharepoint',
     note: 'Human review workflow confirmed from this document',
     confidence: 96,
   },

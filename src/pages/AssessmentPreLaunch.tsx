@@ -48,12 +48,22 @@ import {
 } from 'lucide-react'
 import { dataSources } from '@/data/mockFlow'
 
+// SharePoint icon component
+function SharePointIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M17.5 6.5c0 2.5-2 4.5-4.5 4.5s-4.5-2-4.5-4.5S10.5 2 13 2s4.5 2 4.5 4.5zM6 11c-2.2 0-4 1.8-4 4s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4zm5.5 2.5c0 2.5 2 4.5 4.5 4.5s4.5-2 4.5-4.5-2-4.5-4.5-4.5-4.5 2-4.5 4.5z" />
+    </svg>
+  )
+}
+
 const fileIconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   'file-text': FileText,
   shield: Shield,
   layout: Layout,
   'message-square': MessageSquare,
   'book-open': BookOpen,
+  'sharepoint': SharePointIcon,
 }
 
 const confidenceColor = (confidence: number) => {
