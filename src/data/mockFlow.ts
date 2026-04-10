@@ -154,14 +154,14 @@ export const governanceRecords: GovernanceRecord[] = [
     id: 'ai-initiative',
     label: 'AI Initiative',
     type: 'Initiative',
-    values: ['Support Copilot Rollout'],
+    values: ['Customer Support Copilot for Zendesk'],
     icon: 'zap',
   },
   {
     id: 'ai-agent',
     label: 'AI Agent',
     type: 'Agent',
-    values: ['Support Response Assistant'],
+    values: ['Customer Support Response Assistant'],
     icon: 'bot',
   },
   {

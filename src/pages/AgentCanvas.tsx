@@ -203,7 +203,7 @@ export default function AgentCanvas() {
           setMessages(prev => [...prev, msg])
           // Side effects per step
           if (nextStep === 1 && msg.role === 'assistant' && i === 0) {
-            setProjectTitle('Support Copilot Rollout')
+            setProjectTitle('Customer Support Copilot for Zendesk')
             setProjectSummary(
               'This initiative deploys an AI-powered assistant to help support agents summarize tickets, draft customer replies, and search internal knowledge bases. Personal data including ticket content, customer identifiers, and account metadata will be processed by the system.'
             )
@@ -245,7 +245,7 @@ export default function AgentCanvas() {
       <Sidebar />
 
       <div className="flex flex-col flex-1 overflow-hidden">
-        <TopBar title="Support Copilot Rollout" />
+        <TopBar title="Customer Support Copilot for Zendesk" />
 
         <div className="flex flex-1 overflow-hidden">
           {/* Left: Canvas */}
@@ -567,7 +567,7 @@ export default function AgentCanvas() {
             <div className="px-5 py-4 border-t border-gray-100">
               {step < conversationSteps.length - 1 && (
                 <p className="text-xs text-gray-400 text-center mb-2">
-                  Context: <span className="font-medium text-gray-600">Support Copilot Rollout</span>
+                  Context: <span className="font-medium text-gray-600">Customer Support Copilot for Zendesk</span>
                 </p>
               )}
               <div className="relative bg-gray-50 border border-gray-200 rounded-xl focus-within:border-primary focus-within:bg-white transition-all duration-150">
