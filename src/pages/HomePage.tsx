@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { TopBar } from '@/components/layout/TopBar'
 import { Button } from '@/components/ui/button'
-import { ArrowUp, Plus, CheckCircle2, ExternalLink, Sparkles } from 'lucide-react'
+import { ArrowUp, Plus, CheckCircle2, ExternalLink, Sparkles, FileText, Shield, FolderOpen, Users } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 const quickActions = [
@@ -184,6 +184,34 @@ export default function HomePage() {
                       </div>
                     </div>
                   </motion.div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Quick Links */}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, ease: 'easeOut', delay: 0.2 }}
+              className="mt-8"
+            >
+              <div className="grid grid-cols-4 gap-3">
+                {[
+                  { icon: FileText, label: 'Assessments', path: '/assessments' },
+                  { icon: Shield, label: 'Vendors', path: '/vendors' },
+                  { icon: FolderOpen, label: 'Documents', path: '/documents' },
+                  { icon: Users, label: 'Engagements', path: '/engagements' },
+                ].map((link) => (
+                  <button
+                    key={link.label}
+                    onClick={() => navigate(link.path)}
+                    className="flex flex-col items-center gap-2 p-4 bg-white border border-gray-200 rounded-xl hover:border-gray-300 hover:shadow-sm transition-all duration-150 group"
+                  >
+                    <link.icon className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                    <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">
+                      {link.label}
+                    </span>
+                  </button>
                 ))}
               </div>
             </motion.div>
