@@ -111,7 +111,7 @@ function SortableSourceCard({ source, rank, onDelete }: SortableSourceCardProps)
       <button
         {...attributes}
         {...listeners}
-        className="flex-shrink-0 mt-0.5 text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing transition-colors"
+        className="flex-shrink-0 mt-2 text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing transition-colors"
         aria-label="Drag to reorder"
       >
         <GripVertical className="w-4 h-4" />
