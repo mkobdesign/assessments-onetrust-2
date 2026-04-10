@@ -115,7 +115,7 @@ function AssessmentCardItem({
 
       <div className="flex items-center justify-between mt-2">
         <div className="flex items-center gap-1.5">
-          <Badge variant="inprogress" className="text-xs">In Progress</Badge>
+          <Badge variant="inprogress" className="text-xs">Not Started</Badge>
           <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${risk.bg} ${risk.text}`}>
             {card.riskLevel === 'very-high' ? 'Very High' : card.riskLevel.charAt(0).toUpperCase() + card.riskLevel.slice(1)} Risk
           </span>
@@ -403,9 +403,8 @@ export default function AgentCanvas() {
                     {[...Array(currentProgress.total)].map((_, i) => (
                       <div
                         key={i}
-                        className={`w-4 h-1 rounded-full transition-colors duration-300 ${
-                          i < currentProgress.current ? 'bg-primary' : 'bg-gray-200'
-                        }`}
+                        className={`w-4 h-1 rounded-full transition-colors duration-300 ${i < currentProgress.current ? 'bg-primary' : 'bg-gray-200'
+                          }`}
                       />
                     ))}
                   </div>
