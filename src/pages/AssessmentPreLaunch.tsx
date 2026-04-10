@@ -80,29 +80,24 @@ function SortableSourceCard({ source, rank, onDelete }: SortableSourceCardProps)
 
   const Icon = fileIconMap[source.icon] || FileText
 
-  // Rank badge color based on priority
-  const getRankColor = (r: number) => {
-    if (r === 1) return 'bg-primary text-white'
-    if (r === 2) return 'bg-primary/20 text-primary'
-    if (r === 3) return 'bg-primary/10 text-primary/80'
-    return 'bg-gray-100 text-gray-500'
-  }
-
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-start gap-3 bg-white border rounded-xl p-4 transition-all duration-150 group ${isDragging
+      className="flex items-start gap-3"
+    >
+      {/* Rank indicator - outside card */}
+      <span className="text-sm font-medium text-gray-400 w-4 flex-shrink-0 pt-4 text-right">
+        {rank}
+      </span>
+
+      {/* Card */}
+      <div className={`flex-1 flex items-start gap-3 bg-white border rounded-xl p-4 transition-all duration-150 group ${isDragging
           ? 'border-primary shadow-lg shadow-primary/10 scale-[1.01]'
           : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
         }`}
-    >
-      {/* Rank indicator */}
-      <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold ${getRankColor(rank)}`}>
-        {rank}
-      </div>
-
-      {/* Drag handle */}
+      >
+        {/* Drag handle */}
       <button
         {...attributes}
         {...listeners}
@@ -138,6 +133,7 @@ function SortableSourceCard({ source, rank, onDelete }: SortableSourceCardProps)
           </div>
         </div>
         <p className="text-xs text-gray-600 mt-2 leading-relaxed">{source.note}</p>
+      </div>
       </div>
     </div>
   )
