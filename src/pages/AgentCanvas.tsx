@@ -53,13 +53,6 @@ const fileIconMap: Record<string, React.ComponentType<{ className?: string }>> =
   doc: MessageSquare,
 }
 
-const assessmentColors = {
-  privacy: { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-100' },
-  security: { bg: 'bg-green-50', text: 'text-green-700', border: 'border-green-100' },
-  'third-party': { bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-100' },
-  'ai-risk': { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-100' },
-}
-
 const riskColors = {
   low: { bg: 'bg-green-50', text: 'text-green-700' },
   medium: { bg: 'bg-amber-50', text: 'text-amber-700' },
@@ -90,8 +83,8 @@ function AssessmentCardItem({
   onClick: () => void
   delay: number
 }) {
-  const colors = assessmentColors[card.type]
   const risk = riskColors[card.riskLevel]
+  const typeLabel = card.type === 'privacy' ? 'Privacy' : card.type === 'security' ? 'Security' : card.type === 'third-party' ? 'Third-Party Risk' : 'AI Risk'
 
   return (
     <motion.div
@@ -101,17 +94,17 @@ function AssessmentCardItem({
       onClick={onClick}
       className="bg-white border border-gray-200 rounded-xl p-4 cursor-pointer hover:border-primary/40 hover:shadow-md transition-all duration-200 group"
     >
-      <div className="flex items-start justify-between mb-3">
+      <div className="flex items-start justify-between">
         <div>
-          <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${colors.bg} ${colors.text} border ${colors.border} mb-2`}>
-            {card.type === 'privacy' ? 'Privacy' : card.type === 'security' ? 'Security' : card.type === 'third-party' ? 'Third-Party Risk' : 'AI Risk'}
+          <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
+            {typeLabel}
           </span>
-          <p className="text-sm font-semibold text-gray-900 leading-snug">{card.title}</p>
+          <p className="text-sm font-semibold text-gray-900 leading-snug mt-0.5">{card.title}</p>
         </div>
         <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-primary transition-colors mt-1 flex-shrink-0" />
       </div>
 
-      <Progress value={card.progress} className="mb-2" />
+      <Progress value={card.progress} className="mt-3 mb-2" />
 
       <div className="flex items-center justify-between mt-2">
         <div className="flex items-center gap-1.5">
