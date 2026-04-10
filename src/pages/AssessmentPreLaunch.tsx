@@ -38,6 +38,7 @@ import {
   ChevronRight,
   Folder,
   File,
+  Trash2,
 } from 'lucide-react'
 import { dataSources } from '@/data/mockFlow'
 
@@ -57,9 +58,11 @@ const confidenceColor = (confidence: number) => {
 
 interface SortableSourceCardProps {
   source: (typeof dataSources)[0]
+  rank: number
+  onDelete: (id: string) => void
 }
 
-function SortableSourceCard({ source }: SortableSourceCardProps) {
+function SortableSourceCard({ source, rank, onDelete }: SortableSourceCardProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: source.id })
 
@@ -71,15 +74,28 @@ function SortableSourceCard({ source }: SortableSourceCardProps) {
 
   const Icon = fileIconMap[source.icon] || FileText
 
+  // Rank badge color based on priority
+  const getRankColor = (r: number) => {
+    if (r === 1) return 'bg-primary text-white'
+    if (r === 2) return 'bg-primary/20 text-primary'
+    if (r === 3) return 'bg-primary/10 text-primary/80'
+    return 'bg-gray-100 text-gray-500'
+  }
+
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-start gap-3 bg-white border rounded-xl p-4 transition-all duration-150 ${isDragging
+      className={`flex items-start gap-3 bg-white border rounded-xl p-4 transition-all duration-150 group ${isDragging
           ? 'border-primary shadow-lg shadow-primary/10 scale-[1.01]'
           : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
         }`}
     >
+      {/* Rank indicator */}
+      <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold ${getRankColor(rank)}`}>
+        {rank}
+      </div>
+
       {/* Drag handle */}
       <button
         {...attributes}
@@ -102,9 +118,18 @@ function SortableSourceCard({ source }: SortableSourceCardProps) {
             <p className="text-sm font-semibold text-gray-900">{source.name}</p>
             <p className="text-xs text-gray-500 mt-0.5">{source.type}</p>
           </div>
-          <span className={`text-xs font-semibold flex-shrink-0 ${confidenceColor(source.confidence)}`}>
-            {source.confidence}% match
-          </span>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <span className={`text-xs font-semibold ${confidenceColor(source.confidence)}`}>
+              {source.confidence}% match
+            </span>
+            <button
+              onClick={() => onDelete(source.id)}
+              className="p-1 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
+              aria-label="Remove source"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
         <p className="text-xs text-gray-600 mt-2 leading-relaxed">{source.note}</p>
       </div>
@@ -220,6 +245,10 @@ export default function AssessmentPreLaunch() {
     }
   }
 
+  const handleDeleteSource = (id: string) => {
+    setSources(items => items.filter(item => item.id !== id))
+  }
+
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
       <Sidebar />
@@ -256,8 +285,13 @@ export default function AssessmentPreLaunch() {
               >
                 <SortableContext items={sources.map(s => s.id)} strategy={verticalListSortingStrategy}>
                   <div className="space-y-3 mb-6">
-                    {sources.map(source => (
-                      <SortableSourceCard key={source.id} source={source} />
+                    {sources.map((source, index) => (
+                      <SortableSourceCard 
+                        key={source.id} 
+                        source={source} 
+                        rank={index + 1}
+                        onDelete={handleDeleteSource}
+                      />
                     ))}
                   </div>
                 </SortableContext>
