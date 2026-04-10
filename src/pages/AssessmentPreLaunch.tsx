@@ -337,14 +337,14 @@ export default function AssessmentPreLaunch() {
                     </h3>
                   </div>
 
-                  {/* Source list with scroll */}
+                  {/* Source list */}
                   <DndContext
                     sensors={sensors}
                     collisionDetection={closestCenter}
                     onDragEnd={handleDragEnd}
                   >
                     <SortableContext items={sources.map(s => s.id)} strategy={verticalListSortingStrategy}>
-                      <div className="max-h-[400px] overflow-y-auto pr-1 space-y-3 mb-6">
+                      <div className="space-y-3 mb-6">
                         {sources.map((source, index) => (
                           <SortableSourceCard 
                             key={source.id} 
