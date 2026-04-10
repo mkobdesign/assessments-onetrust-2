@@ -146,6 +146,8 @@ export default function AgentCanvas() {
   const [projectTitle, setProjectTitle] = useState('')
   const [projectSummary, setProjectSummary] = useState('')
   const chatBottomRef = useRef<HTMLDivElement>(null)
+  const recordsRef = useRef<HTMLDivElement>(null)
+  const assessmentsRef = useRef<HTMLDivElement>(null)
 
   // Bootstrap with initial prompt
   useEffect(() => {
@@ -157,6 +159,24 @@ export default function AgentCanvas() {
   useEffect(() => {
     chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, isTyping])
+
+  // Scroll to governance records when they appear
+  useEffect(() => {
+    if (showRecords && recordsRef.current) {
+      setTimeout(() => {
+        recordsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      }, 300)
+    }
+  }, [showRecords])
+
+  // Scroll to assessments when they appear
+  useEffect(() => {
+    if (showAssessments && assessmentsRef.current) {
+      setTimeout(() => {
+        assessmentsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      }, 300)
+    }
+  }, [showAssessments])
 
   const advanceStep = (userInput?: string) => {
     const nextStep = step + 1
@@ -287,6 +307,7 @@ export default function AgentCanvas() {
             <AnimatePresence>
               {showRecords && (
                 <motion.div
+                  ref={recordsRef}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="mb-8"
@@ -328,6 +349,7 @@ export default function AgentCanvas() {
             <AnimatePresence>
               {showAssessments && (
                 <motion.div
+                  ref={assessmentsRef}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                 >
