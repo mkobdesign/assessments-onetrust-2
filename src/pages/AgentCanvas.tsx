@@ -138,6 +138,9 @@ export default function AgentCanvas() {
   const [showAssessments, setShowAssessments] = useState(false)
   const [projectTitle, setProjectTitle] = useState('')
   const [projectSummary, setProjectSummary] = useState('')
+  const [chatTitle, setChatTitle] = useState('New chat')
+  const [isEditingChatTitle, setIsEditingChatTitle] = useState(false)
+  const chatTitleInputRef = useRef<HTMLInputElement>(null)
   const chatBottomRef = useRef<HTMLDivElement>(null)
   const recordsRef = useRef<HTMLDivElement>(null)
   const assessmentsRef = useRef<HTMLDivElement>(null)
@@ -385,18 +388,65 @@ export default function AgentCanvas() {
             className="w-[380px] flex flex-col bg-white border-l border-gray-100 flex-shrink-0"
           >
             {/* Drawer header */}
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
-              <div className="flex items-center gap-2">
-                <Menu className="w-4 h-4 text-gray-400" />
-                <span className="text-sm font-semibold text-gray-900">Copilot</span>
+            <div className="flex flex-col px-5 py-3.5 border-b border-gray-100">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Menu className="w-4 h-4 text-gray-400" />
+                  <span className="text-sm font-semibold text-gray-900">Copilot</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" className="text-xs h-7 px-3" onClick={() => {
+                    setChatTitle('New chat')
+                    setMessages([])
+                    setStep(0)
+                    setShowRecords(false)
+                    setShowAssessments(false)
+                    setProjectTitle('')
+                    setProjectSummary('')
+                  }}>
+                    New chat
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => navigate('/')}>
+                    <X className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" className="text-xs h-7 px-3">
-                  New chat
-                </Button>
-                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => navigate('/')}>
-                  <X className="w-3.5 h-3.5" />
-                </Button>
+              {/* Editable chat title */}
+              <div className="mt-2">
+                {isEditingChatTitle ? (
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      ref={chatTitleInputRef}
+                      type="text"
+                      value={chatTitle}
+                      onChange={(e) => setChatTitle(e.target.value)}
+                      onBlur={() => setIsEditingChatTitle(false)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          setIsEditingChatTitle(false)
+                        }
+                        if (e.key === 'Escape') {
+                          setIsEditingChatTitle(false)
+                        }
+                      }}
+                      className="flex-1 text-xs text-gray-600 bg-gray-50 border border-gray-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                      autoFocus
+                    />
+                    <button
+                      onClick={() => setIsEditingChatTitle(false)}
+                      className="p-1 text-gray-400 hover:text-gray-600"
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setIsEditingChatTitle(true)}
+                    className="text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-50 px-1.5 py-0.5 -ml-1.5 rounded transition-colors"
+                  >
+                    {chatTitle}
+                  </button>
+                )}
               </div>
             </div>
 
