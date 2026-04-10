@@ -195,6 +195,9 @@ export default function HomePage() {
               transition={{ duration: 0.4, ease: 'easeOut', delay: 0.2 }}
               className="mt-8"
             >
+              <h3 className="text-sm font-semibold text-gray-900 mb-4">
+                Your stuff
+              </h3>
               <div className="grid grid-cols-4 gap-3">
                 {[
                   { icon: FileText, label: 'Assessments', path: '/assessments' },
