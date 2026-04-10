@@ -68,7 +68,7 @@ export default function HomePage() {
       <Sidebar />
 
       <div className="flex flex-col flex-1 overflow-hidden">
-        <TopBar title="Home" />
+        <TopBar title="Self Service Portal" />
 
         <main className="flex-1 overflow-y-auto">
           <div className="max-w-2xl mx-auto px-6 pt-20 pb-16">
@@ -85,8 +85,8 @@ export default function HomePage() {
               {/* Prompt input */}
               <div
                 className={`relative bg-white rounded-xl border transition-all duration-200 ${isFocused
-                    ? 'border-primary shadow-md shadow-primary/5'
-                    : 'border-gray-200 shadow-sm'
+                  ? 'border-primary shadow-md shadow-primary/5'
+                  : 'border-gray-200 shadow-sm'
                   }`}
               >
                 <textarea
@@ -125,12 +125,12 @@ export default function HomePage() {
               </div>
 
               {/* Disclaimer */}
-              <p className="text-xs text-gray-400 mt-2 text-center">
+              {/* <p className="text-xs text-gray-400 mt-2 text-center">
                 AI can make mistakes. Verify info.{' '}
                 <button className="text-primary hover:underline inline-flex items-center gap-0.5">
                   Learn more <ExternalLink className="w-3 h-3" />
                 </button>
-              </p>
+              </p> */}
 
               {/* Quick actions */}
               <div className="flex flex-wrap gap-2 mt-6 justify-center">
@@ -141,6 +141,38 @@ export default function HomePage() {
                     className="px-3 py-1.5 text-sm text-gray-600 bg-white border border-gray-200 rounded-full hover:border-gray-300 hover:text-gray-900 transition-all duration-150 hover:shadow-sm"
                   >
                     {action}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+
+
+            {/* Quick Links */}
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, ease: 'easeOut', delay: 0.2 }}
+              className="mt-8"
+            >
+              <h3 className="text-sm font-semibold text-gray-900 mb-4">
+                Your stuff
+              </h3>
+              <div className="grid grid-cols-4 gap-3">
+                {[
+                  { icon: FileText, label: 'Assessments', path: '/assessments' },
+                  { icon: Shield, label: 'Vendors', path: '/vendors' },
+                  { icon: FolderOpen, label: 'Documents', path: '/documents' },
+                  { icon: Users, label: 'Engagements', path: '/engagements' },
+                ].map((link) => (
+                  <button
+                    key={link.label}
+                    onClick={() => navigate(link.path)}
+                    className="flex flex-col items-center gap-2 p-4 bg-white border border-gray-200 rounded-xl hover:border-gray-300 hover:shadow-sm transition-all duration-150 group"
+                  >
+                    <link.icon className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                    <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">
+                      {link.label}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -188,36 +220,6 @@ export default function HomePage() {
               </div>
             </motion.div>
 
-            {/* Quick Links */}
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, ease: 'easeOut', delay: 0.2 }}
-              className="mt-8"
-            >
-              <h3 className="text-sm font-semibold text-gray-900 mb-4">
-                Your stuff
-              </h3>
-              <div className="grid grid-cols-4 gap-3">
-                {[
-                  { icon: FileText, label: 'Assessments', path: '/assessments' },
-                  { icon: Shield, label: 'Vendors', path: '/vendors' },
-                  { icon: FolderOpen, label: 'Documents', path: '/documents' },
-                  { icon: Users, label: 'Engagements', path: '/engagements' },
-                ].map((link) => (
-                  <button
-                    key={link.label}
-                    onClick={() => navigate(link.path)}
-                    className="flex flex-col items-center gap-2 p-4 bg-white border border-gray-200 rounded-xl hover:border-gray-300 hover:shadow-sm transition-all duration-150 group"
-                  >
-                    <link.icon className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
-                    <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">
-                      {link.label}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </motion.div>
           </div>
         </main>
       </div>
