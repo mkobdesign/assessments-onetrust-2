@@ -238,6 +238,8 @@ export default function AssessmentQuestionnaire() {
   const [activeGuide, setActiveGuide] = useState<Question | null>(null)
   const [chatInput, setChatInput] = useState('')
   const [chatMessages, setChatMessages] = useState(aiPrefilledMessages)
+  const [guideConversation, setGuideConversation] = useState<Array<{ role: 'user' | 'assistant'; content: string; options?: Array<{ id: string; label: string }> }>>([])
+  const [isGuideTyping, setIsGuideTyping] = useState(false)
   const [showReadiness, setShowReadiness] = useState(false)
   const chatBottomRef = useRef<HTMLDivElement>(null)
 
@@ -263,6 +265,38 @@ export default function AssessmentQuestionnaire() {
   const handleClarify = (question: Question) => {
     setActiveGuide(question)
     setCurrentQuestionId(question.id)
+    // Initialize guide conversation with AI intro message
+    setGuideConversation([
+      {
+        role: 'assistant',
+        content: `Let me help you understand "${question.title}". ${question.clarifyExplanation || 'This question helps us assess compliance requirements for your project.'}`,
+      },
+      {
+        role: 'assistant',
+        content: 'Here are the available options for this question:',
+        options: question.options.map(opt => ({ id: opt.id, label: opt.label })),
+      },
+    ])
+  }
+
+  const handleGuideChatSend = () => {
+    if (!chatInput.trim() || !activeGuide) return
+    const userMessage = chatInput.trim()
+    setGuideConversation(prev => [...prev, { role: 'user', content: userMessage }])
+    setChatInput('')
+    setIsGuideTyping(true)
+
+    // Simulate AI response
+    setTimeout(() => {
+      setIsGuideTyping(false)
+      const responses = [
+        `Based on your question about "${userMessage.slice(0, 30)}...", I'd recommend considering the compliance implications. The best approach depends on how personal data is being processed.`,
+        `Great question! For this assessment, you'll want to document the specific data flows involved. Would you like me to suggest an answer based on the context you've provided?`,
+        `I understand your concern. Looking at similar assessments, the most common approach is to select the option that best reflects your current data handling practices. Would you like me to pre-fill a suggested answer?`,
+      ]
+      const randomResponse = responses[Math.floor(Math.random() * responses.length)]
+      setGuideConversation(prev => [...prev, { role: 'assistant', content: randomResponse }])
+    }, 1200)
   }
 
   const handleChatSend = () => {
@@ -440,7 +474,7 @@ export default function AssessmentQuestionnaire() {
                     </motion.div>
                   ))}
 
-                  {/* Guide tool — appears when Clarify is clicked */}
+                  {/* Guide tool — appears when Ask Copilot is clicked */}
                   <AnimatePresence>
                     {activeGuide && (
                       <motion.div
@@ -450,24 +484,86 @@ export default function AssessmentQuestionnaire() {
                         transition={{ duration: 0.25 }}
                         className="bg-primary/5 border border-primary/20 rounded-xl p-3"
                       >
-                        <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-1.5">
                             <Bot className="w-3.5 h-3.5 text-primary" />
-                            <span className="text-xs font-semibold text-primary">Guide Tool</span>
+                            <span className="text-xs font-semibold text-primary">Ask Copilot</span>
                           </div>
                           <button
-                            onClick={() => setActiveGuide(null)}
+                            onClick={() => {
+                              setActiveGuide(null)
+                              setGuideConversation([])
+                            }}
                             className="text-gray-400 hover:text-gray-600"
                           >
                             <X className="w-3 h-3" />
                           </button>
                         </div>
-                        <p className="text-xs font-semibold text-gray-700 mb-1.5">
-                          {activeGuide.title}
-                        </p>
-                        <p className="text-xs text-gray-600 leading-relaxed">
-                          {activeGuide.clarifyExplanation}
-                        </p>
+
+                        {/* Question context */}
+                        <div className="bg-white/60 rounded-lg px-2.5 py-2 mb-3">
+                          <p className="text-[10px] text-gray-400 uppercase tracking-wide font-semibold mb-0.5">Question {activeGuide.number}</p>
+                          <p className="text-xs font-semibold text-gray-800">{activeGuide.title}</p>
+                        </div>
+
+                        {/* Conversation */}
+                        <div className="space-y-3 max-h-[200px] overflow-y-auto">
+                          {guideConversation.map((msg, idx) => (
+                            <motion.div
+                              key={idx}
+                              initial={{ opacity: 0, y: 4 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ duration: 0.2 }}
+                              className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                            >
+                              {msg.role === 'user' ? (
+                                <div className="bg-gray-100 rounded-xl rounded-tr-sm px-3 py-2 max-w-[85%]">
+                                  <p className="text-xs text-gray-800">{msg.content}</p>
+                                </div>
+                              ) : (
+                                <div className="flex items-start gap-2 max-w-[90%]">
+                                  <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <span className="text-white text-[6px] font-bold">AI</span>
+                                  </div>
+                                  <div>
+                                    <p className="text-xs text-gray-700 leading-relaxed">{msg.content}</p>
+                                    {msg.options && (
+                                      <div className="mt-2 space-y-1.5">
+                                        {msg.options.map((opt, i) => (
+                                          <button
+                                            key={opt.id}
+                                            className="w-full text-left text-xs px-2.5 py-1.5 bg-white border border-gray-200 rounded-md hover:border-primary/40 hover:bg-primary/5 transition-colors"
+                                          >
+                                            <span className="text-gray-400 mr-1.5">{i + 1}.</span>
+                                            <span className="text-gray-700">{opt.label}</span>
+                                          </button>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                            </motion.div>
+                          ))}
+
+                          {/* Typing indicator */}
+                          {isGuideTyping && (
+                            <motion.div
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              className="flex items-start gap-2"
+                            >
+                              <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <span className="text-white text-[6px] font-bold">AI</span>
+                              </div>
+                              <div className="flex items-center gap-1 px-2 py-1.5">
+                                <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                                <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                                <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                              </div>
+                            </motion.div>
+                          )}
+                        </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -531,9 +627,12 @@ export default function AssessmentQuestionnaire() {
                       >
                         <Bot className="w-3.5 h-3.5 text-primary flex-shrink-0" />
                         <p className="text-xs text-primary font-medium truncate">
-                          Explaining: {activeGuide.title}
+                          Chatting about: {activeGuide.title}
                         </p>
-                        <button onClick={() => setActiveGuide(null)} className="ml-auto">
+                        <button onClick={() => {
+                          setActiveGuide(null)
+                          setGuideConversation([])
+                        }} className="ml-auto">
                           <X className="w-3 h-3 text-primary/60" />
                         </button>
                       </motion.div>
@@ -547,7 +646,7 @@ export default function AssessmentQuestionnaire() {
                       onKeyDown={e => {
                         if (e.key === 'Enter' && !e.shiftKey) {
                           e.preventDefault()
-                          handleChatSend()
+                          activeGuide ? handleGuideChatSend() : handleChatSend()
                         }
                       }}
                       placeholder="Ask Copilot"
@@ -559,7 +658,7 @@ export default function AssessmentQuestionnaire() {
                         <Paperclip className="w-3 h-3" />
                       </Button>
                       <Button
-                        onClick={handleChatSend}
+                        onClick={activeGuide ? handleGuideChatSend : handleChatSend}
                         size="icon"
                         className="h-6 w-6 rounded-md bg-primary hover:bg-primary/90 disabled:opacity-30"
                         disabled={!chatInput.trim()}
