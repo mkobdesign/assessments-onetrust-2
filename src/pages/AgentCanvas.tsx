@@ -412,41 +412,48 @@ export default function AgentCanvas() {
                 </div>
               </div>
               {/* Editable chat title */}
-              <div className="mt-2">
-                {isEditingChatTitle ? (
-                  <div className="flex items-center gap-1.5">
-                    <input
-                      ref={chatTitleInputRef}
-                      type="text"
-                      value={chatTitle}
-                      onChange={(e) => setChatTitle(e.target.value)}
-                      onBlur={() => setIsEditingChatTitle(false)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          setIsEditingChatTitle(false)
-                        }
-                        if (e.key === 'Escape') {
-                          setIsEditingChatTitle(false)
-                        }
-                      }}
-                      className="flex-1 text-xs text-gray-600 bg-gray-50 border border-gray-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
-                      autoFocus
-                    />
+              <div className="mt-2 flex items-center justify-between">
+                <div>
+                  {isEditingChatTitle ? (
+                    <div className="flex items-center gap-1.5">
+                      <input
+                        ref={chatTitleInputRef}
+                        type="text"
+                        value={chatTitle}
+                        onChange={(e) => setChatTitle(e.target.value)}
+                        onBlur={() => setIsEditingChatTitle(false)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            setIsEditingChatTitle(false)
+                          }
+                          if (e.key === 'Escape') {
+                            setIsEditingChatTitle(false)
+                          }
+                        }}
+                        className="flex-1 text-xs text-gray-600 bg-gray-50 border border-gray-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                        autoFocus
+                      />
+                      <button
+                        onClick={() => setIsEditingChatTitle(false)}
+                        className="p-1 text-gray-400 hover:text-gray-600"
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ) : (
                     <button
-                      onClick={() => setIsEditingChatTitle(false)}
-                      className="p-1 text-gray-400 hover:text-gray-600"
+                      onClick={() => setIsEditingChatTitle(true)}
+                      className="text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-50 px-1.5 py-0.5 -ml-1.5 rounded transition-colors"
                     >
-                      <Check className="w-3.5 h-3.5" />
+                      {chatTitle}
                     </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => setIsEditingChatTitle(true)}
-                    className="text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-50 px-1.5 py-0.5 -ml-1.5 rounded transition-colors"
-                  >
-                    {chatTitle}
-                  </button>
-                )}
+                  )}
+                </div>
+                {/* Save indicator */}
+                <div className="flex items-center gap-1.5 text-[10px] text-gray-400">
+                  <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
+                  <span>Saved to Mike&apos;s history</span>
+                </div>
               </div>
             </div>
 
