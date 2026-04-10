@@ -75,11 +75,10 @@ function SortableSourceCard({ source }: SortableSourceCardProps) {
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-start gap-3 bg-white border rounded-xl p-4 transition-all duration-150 ${
-        isDragging
+      className={`flex items-start gap-3 bg-white border rounded-xl p-4 transition-all duration-150 ${isDragging
           ? 'border-primary shadow-lg shadow-primary/10 scale-[1.01]'
           : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
-      }`}
+        }`}
     >
       {/* Drag handle */}
       <button
@@ -148,11 +147,10 @@ function FileBrowser({ onClose }: { onClose: () => void }) {
                     )
                   }
                 }}
-                className={`w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 transition-colors ${
-                  item.type === 'file' && selected.includes(item.name)
+                className={`w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 transition-colors ${item.type === 'file' && selected.includes(item.name)
                     ? 'bg-primary/5 text-primary'
                     : 'text-gray-700'
-                }`}
+                  }`}
               >
                 {item.type === 'folder' ? (
                   <>
@@ -173,9 +171,8 @@ function FileBrowser({ onClose }: { onClose: () => void }) {
                 <button
                   key={child}
                   onClick={() => setSelected(prev => prev.includes(child) ? prev.filter(n => n !== child) : [...prev, child])}
-                  className={`w-full flex items-center gap-2 pl-8 pr-3 py-2 text-sm hover:bg-gray-50 transition-colors ${
-                    selected.includes(child) ? 'bg-primary/5 text-primary' : 'text-gray-700'
-                  }`}
+                  className={`w-full flex items-center gap-2 pl-8 pr-3 py-2 text-sm hover:bg-gray-50 transition-colors ${selected.includes(child) ? 'bg-primary/5 text-primary' : 'text-gray-700'
+                    }`}
                 >
                   <File className="w-4 h-4 text-gray-400" />
                   {child}
@@ -245,10 +242,10 @@ export default function AssessmentPreLaunch() {
               transition={{ duration: 0.3 }}
             >
               <h2 className="text-xl font-bold text-gray-900 mb-2">
-                Review your information sources
+                Review sources used to generate answers
               </h2>
               <p className="text-sm text-gray-500 mb-8 leading-relaxed">
-                These are the documents and data sources Copilot used to pre-fill this assessment. You can reorder them by priority or add more files before starting.
+                Drag to reorder. Items at the top are given maximum priority.
               </p>
 
               {/* Source list */}
