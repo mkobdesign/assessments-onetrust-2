@@ -334,14 +334,21 @@ export default function AssessmentPreLaunch() {
                     Drag to reorder. Items at the top are given maximum priority.
                   </p>
 
-                  {/* Source list */}
+                  {/* Source count header */}
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-semibold text-gray-900">
+                      Sources <span className="text-gray-400 font-normal">({sources.length})</span>
+                    </h3>
+                  </div>
+
+                  {/* Source list with scroll */}
                   <DndContext
                     sensors={sensors}
                     collisionDetection={closestCenter}
                     onDragEnd={handleDragEnd}
                   >
                     <SortableContext items={sources.map(s => s.id)} strategy={verticalListSortingStrategy}>
-                      <div className="space-y-3 mb-6">
+                      <div className="max-h-[400px] overflow-y-auto pr-1 space-y-3 mb-6">
                         {sources.map((source, index) => (
                           <SortableSourceCard 
                             key={source.id} 
