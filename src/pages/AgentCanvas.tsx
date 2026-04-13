@@ -95,13 +95,12 @@ function AssessmentCardItem({
       initial={{ opacity: 0, y: 10 }}
       animate={{ 
         opacity: isCompleted ? 0.7 : 1, 
-        y: 0,
-        boxShadow: isHighlighted ? '0 0 0 2px #22c55e' : '0 0 0 0px transparent'
+        y: 0
       }}
       transition={{ delay, duration: 0.3, ease: 'easeOut' }}
       onClick={onClick}
-      className={`bg-white border rounded-xl p-4 cursor-pointer hover:border-primary/40 hover:shadow-md transition-all duration-300 group ${
-        isHighlighted ? 'border-green-500' : 'border-gray-200'
+      className={`bg-white border border-gray-200 rounded-xl p-4 cursor-pointer hover:border-primary/40 hover:shadow-md transition-all duration-300 group ${
+        isHighlighted ? 'highlight-stroke' : ''
       } ${isCompleted ? 'pointer-events-none' : ''}`}
     >
       <div className="flex items-start justify-between">
