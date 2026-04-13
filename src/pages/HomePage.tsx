@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { TopBar } from '@/components/layout/TopBar'
 import { Button } from '@/components/ui/button'
-import { ArrowUp, Plus, CheckCircle2, ExternalLink, Sparkles, FileText, Shield, FolderOpen, Users } from 'lucide-react'
+import { ArrowUp, Plus, FileText, Shield, FolderOpen, Users } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 const quickActions = [
@@ -12,26 +12,7 @@ const quickActions = [
   'Assess a processing activity',
 ]
 
-const alerts = [
-  {
-    id: 1,
-    title: 'CCPA update for automated decision-making technology, notice drafted',
-    description:
-      'Flagged 2 use cases and drafted the notice plus a risk assessment with mitigations.',
-  },
-  {
-    id: 2,
-    title: 'High-risk processing update, 2 recommended controls',
-    description:
-      'A processing activity change now appears higher risk. I drafted a new risk register entry and suggested 2 controls plus evidence tasks based on your policies and regulations.',
-  },
-  {
-    id: 3,
-    title: 'Vendor SOC 2 update, 1 recommended control',
-    description:
-      'A vendor posted an updated SOC 2 report. I flagged 2 new risks and proposed 1 mitigating control, including an updated vendor risk score.',
-  },
-]
+
 
 
 
@@ -174,48 +155,6 @@ export default function HomePage() {
                       {link.label}
                     </span>
                   </button>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Alerts section */}
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, ease: 'easeOut', delay: 0.1 }}
-              className="mt-12"
-            >
-              <div className="flex items-center gap-2 mb-4">
-                <h3 className="text-sm font-semibold text-gray-900">
-                  Tasks ({alerts.length})
-                </h3>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-purple-50 text-purple-700 rounded-full border border-purple-100">
-                  <Sparkles className="w-3 h-3" />
-                  AI
-                </span>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                {alerts.map((alert, i) => (
-                  <motion.div
-                    key={alert.id}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.15 + i * 0.05, duration: 0.3 }}
-                    className="relative bg-white border border-gray-200 rounded-xl p-4 hover:border-gray-300 hover:shadow-sm transition-all duration-150 cursor-pointer group"
-                  >
-                    <div className="flex items-start gap-3">
-                      <CheckCircle2 className="w-4 h-4 text-gray-300 mt-0.5 flex-shrink-0 group-hover:text-gray-400 transition-colors" />
-                      <div>
-                        <p className="text-sm font-semibold text-gray-900 leading-snug">
-                          {alert.title}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-                          {alert.description}
-                        </p>
-                      </div>
-                    </div>
-                  </motion.div>
                 ))}
               </div>
             </motion.div>
