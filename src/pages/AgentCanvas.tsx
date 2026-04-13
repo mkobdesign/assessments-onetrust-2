@@ -547,12 +547,25 @@ export default function AgentCanvas() {
                           <div className="mt-3 bg-gray-50 border border-gray-200 rounded-lg p-3">
                             <div className="space-y-2">
                               {msg.todoList.map((todo: { id: string; label: string; status: string }, idx: number) => (
-                                <div key={todo.id} className="flex items-center gap-2.5">
-                                  <div className="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center text-[10px] font-bold text-gray-400">
-                                    {idx + 1}
+                                idx === 0 ? (
+                                  <button
+                                    key={todo.id}
+                                    onClick={() => navigate('/prelaunch')}
+                                    className="w-full flex items-center gap-2.5 bg-primary text-white rounded-lg px-3 py-2 hover:bg-primary/90 transition-colors"
+                                  >
+                                    <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px] font-bold">
+                                      {idx + 1}
+                                    </div>
+                                    <span className="text-xs font-medium">{todo.label}</span>
+                                  </button>
+                                ) : (
+                                  <div key={todo.id} className="flex items-center gap-2.5">
+                                    <div className="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center text-[10px] font-bold text-gray-400">
+                                      {idx + 1}
+                                    </div>
+                                    <span className="text-xs text-gray-700">{todo.label}</span>
                                   </div>
-                                  <span className="text-xs text-gray-700">{todo.label}</span>
-                                </div>
+                                )
                               ))}
                             </div>
                           </div>
