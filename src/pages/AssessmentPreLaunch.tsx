@@ -379,54 +379,21 @@ export default function AssessmentPreLaunch() {
                     Add Files
                   </Button>
 
-                  {/* Assessment Progress Audit */}
-                  <div className="mb-8">
-                    <h3 className="text-sm font-semibold text-gray-900 mb-4">Assessment progress audit</h3>
-                    <div className="relative">
-                      {/* Timeline line */}
-                      <div className="absolute left-3 top-3 bottom-3 w-0.5 bg-gray-200" />
-                      
-                      {/* Timeline items */}
-                      <div className="space-y-4">
-                        {/* Agent 1 - Documents */}
-                        <div className="flex items-start gap-3 relative">
-                          <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0 z-10">
-                            <FileText className="w-3 h-3 text-white" />
-                          </div>
-                          <div className="flex-1 bg-white border border-gray-200 rounded-lg p-3">
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-xs font-semibold text-gray-900">Document Analysis Agent</span>
-                              <span className="text-[10px] text-gray-400">2 min ago</span>
-                            </div>
-                            <p className="text-xs text-gray-600 leading-relaxed">
-                              Pre-filled <span className="font-semibold text-primary">12 questions</span> using 5 uploaded documents including Support_SOP.pdf and OpenAI_DPA_2024.pdf
-                            </p>
-                            <div className="flex items-center gap-1.5 mt-2">
-                              <span className="text-[10px] px-1.5 py-0.5 bg-green-50 text-green-700 rounded font-medium">+12 answers</span>
-                              <span className="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded font-medium">High confidence</span>
-                            </div>
-                          </div>
+                  {/* Assessment Progress Audit - subtle */}
+                  <div className="mb-6 opacity-60">
+                    <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-2">Progress audit</p>
+                    <div className="flex items-center gap-4 text-[11px] text-gray-500">
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center">
+                          <FileText className="w-2 h-2 text-gray-500" />
                         </div>
-
-                        {/* Agent 2 - Previous Assessment */}
-                        <div className="flex items-start gap-3 relative">
-                          <div className="w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center flex-shrink-0 z-10">
-                            <Shield className="w-3 h-3 text-white" />
-                          </div>
-                          <div className="flex-1 bg-white border border-gray-200 rounded-lg p-3">
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-xs font-semibold text-gray-900">Assessment Reuse Agent</span>
-                              <span className="text-[10px] text-gray-400">1 min ago</span>
-                            </div>
-                            <p className="text-xs text-gray-600 leading-relaxed">
-                              Pre-filled <span className="font-semibold text-purple-600">6 questions</span> from your previously completed Zendesk Risk Assessment
-                            </p>
-                            <div className="flex items-center gap-1.5 mt-2">
-                              <span className="text-[10px] px-1.5 py-0.5 bg-purple-50 text-purple-700 rounded font-medium">+6 answers</span>
-                              <span className="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded font-medium">From past work</span>
-                            </div>
-                          </div>
+                        <span>12 from docs</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center">
+                          <Shield className="w-2 h-2 text-gray-500" />
                         </div>
+                        <span>6 from past assessments</span>
                       </div>
                     </div>
                   </div>

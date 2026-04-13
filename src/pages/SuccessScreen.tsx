@@ -41,19 +41,19 @@ export default function SuccessScreen() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.45, duration: 0.4 }}
-          className="text-base text-gray-600 leading-relaxed mb-3"
+          className="text-base text-gray-600 leading-relaxed mb-10"
         >
           You just helped your organization move an important project forward the right way. By reviewing these assessments and confirming the governance steps, you've played a key role in keeping your company safe — and your customers' information protected.
         </motion.p>
 
-        <motion.p
+        {/* <motion.p
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.4 }}
           className="text-sm text-gray-500 leading-relaxed mb-10"
         >
           This kind of thoughtful oversight is exactly what builds trust — with customers, partners, and regulators. Your contribution has been submitted for governance approval.
-        </motion.p>
+        </motion.p> */}
 
         {/* Gamification - Better than others */}
         <motion.div
