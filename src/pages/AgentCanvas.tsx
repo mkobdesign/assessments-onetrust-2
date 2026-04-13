@@ -228,12 +228,6 @@ export default function AgentCanvas() {
           }
           if (nextStep === 5 && msg.role === 'assistant') {
             setShowAssessments(true)
-            // Trigger step 6 (next steps / todo list) after a delay - only on first assistant message
-            if (i === 0) {
-              setTimeout(() => {
-                advanceStep()
-              }, 2000)
-            }
           }
         }, delay)
         delay += 800
