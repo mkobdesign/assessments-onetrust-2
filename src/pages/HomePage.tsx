@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { TopBar } from '@/components/layout/TopBar'
 import { Button } from '@/components/ui/button'
-import { ArrowUp, Plus, FileText, Shield, FolderOpen, Users, ChevronRight } from 'lucide-react'
+import { ArrowUp, Plus, FileText, Shield, FolderOpen, Users } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 const quickActions = [
@@ -18,6 +18,7 @@ const cardData = [
     icon: FileText,
     label: 'Assessments',
     path: '/assessments',
+    actionLabel: 'Launch with template',
     items: [
       { name: 'OWASP Top Ten Assessment V1.0', type: 'INCIDENT', version: 'V 2' },
       { name: 'tareq 2.1', type: 'PIA', version: 'V 2' },
@@ -29,6 +30,7 @@ const cardData = [
     icon: Shield,
     label: 'Vendors',
     path: '/vendors',
+    actionLabel: 'View',
     items: [
       { name: 'Salesforce Enterprise', type: 'CRM', version: 'V 3' },
       { name: 'AWS Cloud Services', type: 'INFRA', version: 'V 2' },
@@ -40,6 +42,7 @@ const cardData = [
     icon: FolderOpen,
     label: 'Documents',
     path: '/documents',
+    actionLabel: 'View',
     items: [
       { name: 'Privacy Policy 2024', type: 'POLICY', version: 'V 4' },
       { name: 'Data Retention Guidelines', type: 'GUIDE', version: 'V 2' },
@@ -51,6 +54,7 @@ const cardData = [
     icon: Users,
     label: 'Engagements',
     path: '/engagements',
+    actionLabel: 'Start',
     items: [
       { name: 'Q1 Security Review', type: 'REVIEW', version: 'V 1' },
       { name: 'Vendor Onboarding - Stripe', type: 'ONBOARD', version: 'V 2' },
@@ -224,13 +228,13 @@ export default function HomePage() {
 
                         {/* Hover action button */}
                         <button
-                          className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 bg-primary text-white rounded-md hover:bg-primary/90"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity px-2.5 py-1 bg-primary text-white text-[10px] font-medium rounded-md hover:bg-primary/90 whitespace-nowrap"
                           onClick={(e) => {
                             e.stopPropagation()
                             navigate(card.path)
                           }}
                         >
-                          <ChevronRight className="w-3 h-3" />
+                          {card.actionLabel}
                         </button>
                       </div>
                     ))}
