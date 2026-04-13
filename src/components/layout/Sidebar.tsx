@@ -79,10 +79,10 @@ export function Sidebar() {
       {/* Logo */}
       <button
         onClick={() => navigate('/')}
-        className="flex items-center justify-center w-9 h-9 mb-4 text-primary font-bold text-base hover:opacity-80 transition-opacity"
+        className="flex items-center justify-center w-9 h-9 mb-4 hover:opacity-80 transition-opacity"
         aria-label="Go to home"
       >
-        <span className="font-bold text-[15px] tracking-tight">ot</span>
+        <img src="/ot-logo.svg" alt="OneTrust" className="w-6 h-7" />
       </button>
 
       {/* Top nav */}

@@ -147,6 +147,28 @@ export const conversationSteps: ChatMessage[][] = [
       progress: { current: 4, total: 4, label: 'Generating assessments' },
     },
   ],
+
+  // Step 6: After assessments are created - show next steps
+  [
+    {
+      id: 'a9',
+      role: 'assistant',
+      content:
+        "I've created 4 linked assessments for the Customer Support AI Copilot. Here's what to do next:",
+      todoList: [
+        { id: 'todo1', label: 'Complete the Privacy Impact Assessment', status: 'pending' },
+        { id: 'todo2', label: 'Review AI Risk Assessment findings', status: 'pending' },
+        { id: 'todo3', label: 'Verify vendor security documentation', status: 'pending' },
+        { id: 'todo4', label: 'Submit for stakeholder approval', status: 'pending' },
+      ],
+    },
+    {
+      id: 'a10',
+      role: 'assistant',
+      content:
+        "Click on any assessment card above to start. I'll guide you through each question and pre-fill answers based on what we discussed.",
+    },
+  ],
 ]
 
 export const governanceRecords: GovernanceRecord[] = [
@@ -154,14 +176,14 @@ export const governanceRecords: GovernanceRecord[] = [
     id: 'ai-initiative',
     label: 'AI Initiative',
     type: 'Initiative',
-    values: ['Support Copilot Rollout'],
+    values: ['Customer Support Copilot for Zendesk'],
     icon: 'zap',
   },
   {
     id: 'ai-agent',
     label: 'AI Agent',
     type: 'Agent',
-    values: ['Support Response Assistant'],
+    values: ['Customer Support Response Assistant'],
     icon: 'bot',
   },
   {
@@ -294,10 +316,10 @@ export const dataSources = [
   },
   {
     id: 'architecture',
-    name: 'Architecture_Diagram.png',
-    type: 'Technical Diagram',
+    name: 'Zendesk Risk Assessment',
+    type: 'Privacy Assessment',
     icon: 'layout',
-    note: 'Identified system integrations and data flows',
+    note: 'Completed March 15, 2024',
     confidence: 87,
   },
   {
@@ -311,8 +333,8 @@ export const dataSources = [
   {
     id: 'sop',
     name: 'Support_SOP.pdf',
-    type: 'Process Document',
-    icon: 'book-open',
+    type: '/processes',
+    icon: 'sharepoint',
     note: 'Human review workflow confirmed from this document',
     confidence: 96,
   },

@@ -53,13 +53,6 @@ const fileIconMap: Record<string, React.ComponentType<{ className?: string }>> =
   doc: MessageSquare,
 }
 
-const assessmentColors = {
-  privacy: { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-100' },
-  security: { bg: 'bg-green-50', text: 'text-green-700', border: 'border-green-100' },
-  'third-party': { bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-100' },
-  'ai-risk': { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-100' },
-}
-
 const riskColors = {
   low: { bg: 'bg-green-50', text: 'text-green-700' },
   medium: { bg: 'bg-amber-50', text: 'text-amber-700' },
@@ -90,8 +83,8 @@ function AssessmentCardItem({
   onClick: () => void
   delay: number
 }) {
-  const colors = assessmentColors[card.type]
   const risk = riskColors[card.riskLevel]
+  const typeLabel = card.type === 'privacy' ? 'Privacy' : card.type === 'security' ? 'Security' : card.type === 'third-party' ? 'Third-Party Risk' : 'AI Risk'
 
   return (
     <motion.div
@@ -101,21 +94,21 @@ function AssessmentCardItem({
       onClick={onClick}
       className="bg-white border border-gray-200 rounded-xl p-4 cursor-pointer hover:border-primary/40 hover:shadow-md transition-all duration-200 group"
     >
-      <div className="flex items-start justify-between mb-3">
+      <div className="flex items-start justify-between">
         <div>
-          <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${colors.bg} ${colors.text} border ${colors.border} mb-2`}>
-            {card.type === 'privacy' ? 'Privacy' : card.type === 'security' ? 'Security' : card.type === 'third-party' ? 'Third-Party Risk' : 'AI Risk'}
+          <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
+            {typeLabel}
           </span>
-          <p className="text-sm font-semibold text-gray-900 leading-snug">{card.title}</p>
+          <p className="text-sm font-semibold text-gray-900 leading-snug mt-0.5">{card.title}</p>
         </div>
         <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-primary transition-colors mt-1 flex-shrink-0" />
       </div>
 
-      <Progress value={card.progress} className="mb-2" />
+      <Progress value={card.progress} className="mt-3 mb-2" />
 
       <div className="flex items-center justify-between mt-2">
         <div className="flex items-center gap-1.5">
-          <Badge variant="inprogress" className="text-xs">In Progress</Badge>
+          <Badge variant="inprogress" className="text-xs">Not Started</Badge>
           <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${risk.bg} ${risk.text}`}>
             {card.riskLevel === 'very-high' ? 'Very High' : card.riskLevel.charAt(0).toUpperCase() + card.riskLevel.slice(1)} Risk
           </span>
@@ -145,7 +138,12 @@ export default function AgentCanvas() {
   const [showAssessments, setShowAssessments] = useState(false)
   const [projectTitle, setProjectTitle] = useState('')
   const [projectSummary, setProjectSummary] = useState('')
+  const [chatTitle, setChatTitle] = useState('Customer Support AI Copilot')
+  const [isEditingChatTitle, setIsEditingChatTitle] = useState(false)
+  const chatTitleInputRef = useRef<HTMLInputElement>(null)
   const chatBottomRef = useRef<HTMLDivElement>(null)
+  const recordsRef = useRef<HTMLDivElement>(null)
+  const assessmentsRef = useRef<HTMLDivElement>(null)
 
   // Bootstrap with initial prompt
   useEffect(() => {
@@ -158,50 +156,87 @@ export default function AgentCanvas() {
     chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, isTyping])
 
+  // Scroll to governance records when they appear
+  useEffect(() => {
+    if (showRecords && recordsRef.current) {
+      setTimeout(() => {
+        recordsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      }, 300)
+    }
+  }, [showRecords])
+
+  // Scroll to assessments when they appear
+  useEffect(() => {
+    if (showAssessments && assessmentsRef.current) {
+      setTimeout(() => {
+        assessmentsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      }, 300)
+    }
+  }, [showAssessments])
+
   const advanceStep = (userInput?: string) => {
     const nextStep = step + 1
     if (nextStep >= conversationSteps.length) return
 
-    const newMessages = conversationSteps[nextStep]
+    const newMessages = [...conversationSteps[nextStep]]
 
     if (userInput && newMessages[0]?.role === 'user') {
       newMessages[0] = { ...newMessages[0], content: userInput }
     }
 
-    // Show user message immediately
-    const userMsg = newMessages.find(m => m.role === 'user')
-    if (userMsg) {
-      setMessages(prev => [...prev, userMsg])
+    // Show first user message immediately
+    const firstUserMsg = newMessages.find(m => m.role === 'user')
+    if (firstUserMsg) {
+      setMessages(prev => {
+        if (prev.some(m => m.id === firstUserMsg.id)) return prev
+        return [...prev, firstUserMsg]
+      })
     }
 
-    // Show typing then assistant messages
+    // Get remaining messages (excluding the first user message we already added)
+    const remainingMessages = newMessages.filter(m => m !== firstUserMsg)
+
+    // Show typing then remaining messages (only if there are messages to show)
+    if (remainingMessages.length === 0) {
+      setStep(nextStep)
+      return
+    }
+    
     setIsTyping(true)
     setTimeout(() => {
       setIsTyping(false)
-      const assistantMsgs = newMessages.filter(m => m.role === 'assistant')
-      assistantMsgs.forEach((msg, i) => {
+      let delay = 0
+      remainingMessages.forEach((msg, i) => {
         setTimeout(() => {
-          setMessages(prev => [...prev, msg])
+          setMessages(prev => {
+            if (prev.some(m => m.id === msg.id)) return prev
+            return [...prev, msg]
+          })
           // Side effects per step
-          if (nextStep === 1) {
-            setProjectTitle('Support Copilot Rollout')
+          if (nextStep === 1 && msg.role === 'assistant' && i === 0) {
+            setProjectTitle('Customer Support Copilot for Zendesk')
             setProjectSummary(
               'This initiative deploys an AI-powered assistant to help support agents summarize tickets, draft customer replies, and search internal knowledge bases. Personal data including ticket content, customer identifiers, and account metadata will be processed by the system.'
             )
           }
-          if (nextStep === 4 && i === 0) {
+          if (nextStep === 4 && msg.role === 'assistant' && i === 0) {
             setShowRecords(true)
-          }
-          if (nextStep === 4) {
-            // Animate records one by one
-            for (let r = 0; r < governanceRecords.length; r++) {
+            // Animate records one by one (limit to 4)
+            for (let r = 0; r < 4; r++) {
               setTimeout(() => setVisibleRecords(r + 1), r * 200)
             }
           }
-          if (nextStep === 5) {
+          if (nextStep === 5 && msg.role === 'assistant') {
             setShowAssessments(true)
+            // Trigger step 6 (next steps / todo list) after a delay - only on first assistant message
+            if (i === 0) {
+              setTimeout(() => {
+                advanceStep()
+              }, 2000)
+            }
           }
-        }, i * 800)
+        }, delay)
+        delay += 800
       })
       setStep(nextStep)
     }, 1200)
@@ -227,7 +262,7 @@ export default function AgentCanvas() {
       <Sidebar />
 
       <div className="flex flex-col flex-1 overflow-hidden">
-        <TopBar title="Support Copilot Rollout" />
+        <TopBar title="Agent Canvas" />
 
         <div className="flex flex-1 overflow-hidden">
           {/* Left: Canvas */}
@@ -257,10 +292,6 @@ export default function AgentCanvas() {
                 >
                   <p className="text-xs font-semibold text-gray-500 mb-2">Documents</p>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-gray-200 rounded-lg text-xs text-gray-700 font-medium">
-                      <FileText className="w-3.5 h-3.5 text-red-500" />
-                      Braves Hat Product Line
-                    </div>
                     {step >= 4 && (
                       <>
                         <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-gray-200 rounded-lg text-xs text-gray-700 font-medium">
@@ -285,48 +316,39 @@ export default function AgentCanvas() {
             <AnimatePresence>
               {showRecords && (
                 <motion.div
+                  ref={recordsRef}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="mb-8"
                 >
                   <div className="flex items-center gap-2 mb-4">
-                    <h2 className="text-sm font-semibold text-gray-900">Copilot suggestions</h2>
+                    <h2 className="text-sm font-semibold text-gray-900">Governance Records</h2>
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-purple-50 text-purple-700 rounded-full border border-purple-100">
                       AI
                     </span>
                   </div>
 
-                  <div className="bg-white border border-gray-200 rounded-xl p-5">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <p className="text-sm font-semibold text-gray-900">Governance Records</p>
-                        <p className="text-xs text-gray-500 mt-0.5">Created from your conversation</p>
-                      </div>
-                      <ExternalLink className="w-4 h-4 text-gray-400" />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      {governanceRecords.slice(0, visibleRecords).map((record, i) => {
-                        const Icon = iconMap[record.icon] || Database
-                        return (
-                          <motion.div
-                            key={record.id}
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.25, ease: 'easeOut' }}
-                            className="flex items-start gap-2.5 p-3 bg-gray-50 rounded-lg"
-                          >
-                            <div className="w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                              <Icon className="w-3.5 h-3.5 text-primary" />
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{record.label}</p>
-                              <p className="text-xs text-gray-800 font-medium mt-0.5 truncate">{record.values.join(', ')}</p>
-                            </div>
-                          </motion.div>
-                        )
-                      })}
-                    </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {governanceRecords.slice(0, Math.min(visibleRecords, 4)).map((record, i) => {
+                      const Icon = iconMap[record.icon] || Database
+                      return (
+                        <motion.div
+                          key={record.id}
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ duration: 0.25, ease: 'easeOut' }}
+                          className="flex items-start gap-2.5 p-3 bg-white border border-gray-200 rounded-lg"
+                        >
+                          <div className="w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <Icon className="w-3.5 h-3.5 text-primary" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{record.label}</p>
+                            <p className="text-xs text-gray-800 font-medium mt-0.5 truncate">{record.values.join(', ')}</p>
+                          </div>
+                        </motion.div>
+                      )
+                    })}
                   </div>
                 </motion.div>
               )}
@@ -336,6 +358,7 @@ export default function AgentCanvas() {
             <AnimatePresence>
               {showAssessments && (
                 <motion.div
+                  ref={assessmentsRef}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                 >
@@ -365,7 +388,7 @@ export default function AgentCanvas() {
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   <Zap className="w-5 h-5 text-primary" />
                 </div>
-                <p className="text-gray-400 text-sm">Your project will appear here as you describe it</p>
+                <p className="text-gray-400 text-sm">Your work will appear here as you describe it</p>
               </div>
             )}
           </main>
@@ -378,18 +401,72 @@ export default function AgentCanvas() {
             className="w-[380px] flex flex-col bg-white border-l border-gray-100 flex-shrink-0"
           >
             {/* Drawer header */}
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
-              <div className="flex items-center gap-2">
-                <Menu className="w-4 h-4 text-gray-400" />
-                <span className="text-sm font-semibold text-gray-900">Copilot</span>
+            <div className="flex flex-col px-5 py-3.5 border-b border-gray-100">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Menu className="w-4 h-4 text-gray-400" />
+                  <span className="text-sm font-semibold text-gray-900">Copilot</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" className="text-xs h-7 px-3" onClick={() => {
+                    setChatTitle('Customer Support AI Copilot')
+                    setMessages([])
+                    setStep(0)
+                    setShowRecords(false)
+                    setShowAssessments(false)
+                    setProjectTitle('')
+                    setProjectSummary('')
+                  }}>
+                    New chat
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => navigate('/')}>
+                    <X className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" className="text-xs h-7 px-3">
-                  New chat
-                </Button>
-                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => navigate('/')}>
-                  <X className="w-3.5 h-3.5" />
-                </Button>
+              {/* Editable chat title */}
+              <div className="mt-2 flex items-center justify-between">
+                <div>
+                  {isEditingChatTitle ? (
+                    <div className="flex items-center gap-1.5">
+                      <input
+                        ref={chatTitleInputRef}
+                        type="text"
+                        value={chatTitle}
+                        onChange={(e) => setChatTitle(e.target.value)}
+                        onBlur={() => setIsEditingChatTitle(false)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            setIsEditingChatTitle(false)
+                          }
+                          if (e.key === 'Escape') {
+                            setIsEditingChatTitle(false)
+                          }
+                        }}
+                        className="flex-1 text-xs text-gray-600 bg-gray-50 border border-gray-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                        autoFocus
+                      />
+                      <button
+                        onClick={() => setIsEditingChatTitle(false)}
+                        className="p-1 text-gray-400 hover:text-gray-600"
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setIsEditingChatTitle(true)}
+                      className="text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-50 px-1.5 py-0.5 -ml-1.5 rounded transition-colors"
+                    >
+                      {chatTitle}
+                    </button>
+                  )}
+                </div>
+                {/* Save indicator */}
+                <div className="flex items-center gap-1.5 text-[10px] text-gray-400">
+                  <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
+                  <span>Saved to Mike&apos;s history</span>
+                </div>
               </div>
             </div>
 
@@ -401,9 +478,8 @@ export default function AgentCanvas() {
                     {[...Array(currentProgress.total)].map((_, i) => (
                       <div
                         key={i}
-                        className={`w-4 h-1 rounded-full transition-colors duration-300 ${
-                          i < currentProgress.current ? 'bg-primary' : 'bg-gray-200'
-                        }`}
+                        className={`w-4 h-1 rounded-full transition-colors duration-300 ${i < currentProgress.current ? 'bg-primary' : 'bg-gray-200'
+                          }`}
                       />
                     ))}
                   </div>
@@ -467,6 +543,33 @@ export default function AgentCanvas() {
                             i % 2 === 1 ? <strong key={i}>{part}</strong> : part
                           )}
                         </div>
+                        {msg.todoList && (
+                          <div className="mt-3 bg-gray-50 border border-gray-200 rounded-lg p-3">
+                            <div className="space-y-2">
+                              {msg.todoList.map((todo: { id: string; label: string; status: string }, idx: number) => (
+                                idx === 0 ? (
+                                  <button
+                                    key={todo.id}
+                                    onClick={() => navigate('/prelaunch')}
+                                    className="w-full flex items-center gap-2.5 bg-primary text-white rounded-lg px-3 py-2 hover:bg-primary/90 transition-colors"
+                                  >
+                                    <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px] font-bold">
+                                      {idx + 1}
+                                    </div>
+                                    <span className="text-xs font-medium">{todo.label}</span>
+                                  </button>
+                                ) : (
+                                  <div key={todo.id} className="flex items-center gap-2.5">
+                                    <div className="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center text-[10px] font-bold text-gray-400">
+                                      {idx + 1}
+                                    </div>
+                                    <span className="text-xs text-gray-700">{todo.label}</span>
+                                  </div>
+                                )
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
@@ -504,7 +607,7 @@ export default function AgentCanvas() {
             <div className="px-5 py-4 border-t border-gray-100">
               {step < conversationSteps.length - 1 && (
                 <p className="text-xs text-gray-400 text-center mb-2">
-                  Context: <span className="font-medium text-gray-600">Support Copilot Rollout</span>
+                  Context: <span className="font-medium text-gray-600">Customer Support Copilot for Zendesk</span>
                 </p>
               )}
               <div className="relative bg-gray-50 border border-gray-200 rounded-xl focus-within:border-primary focus-within:bg-white transition-all duration-150">

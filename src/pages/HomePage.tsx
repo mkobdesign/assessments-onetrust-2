@@ -3,44 +3,70 @@ import { useNavigate } from 'react-router-dom'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { TopBar } from '@/components/layout/TopBar'
 import { Button } from '@/components/ui/button'
-import { ArrowUp, Plus, CheckCircle2, ExternalLink, Sparkles } from 'lucide-react'
+import { ArrowUp, Plus, FileText, Shield, FolderOpen, Users } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 const quickActions = [
-  'Learn about CCPA changes',
-  'Analyze an incident',
-  'Assess a processing activity',
+  'Add a vendor',
+  'Scope a project',
+  'Start a risk assessment',
 ]
 
-const alerts = [
+// Card data with tables
+const cardData = [
   {
-    id: 1,
-    severity: 'amber',
-    title: 'CCPA update for automated decision-making technology, notice drafted',
-    description:
-      'Flagged 2 use cases and drafted the notice plus a risk assessment with mitigations.',
+    icon: FileText,
+    label: 'Assessments',
+    path: '/assessments',
+    actionLabel: 'Launch with template',
+    items: [
+      { name: 'OWASP Top Ten Assessment V1.0', type: 'INCIDENT', version: 'V 2' },
+      { name: 'tareq 2.1', type: 'PIA', version: 'V 2' },
+      { name: 'Assess Issue', type: 'ITRM', version: 'V 1' },
+      { name: 'LD Create Issue Template', type: 'ITRM', version: 'V 1' },
+    ],
   },
   {
-    id: 2,
-    severity: 'red',
-    title: 'High-risk processing update, 2 recommended controls',
-    description:
-      'A processing activity change now appears higher risk. I drafted a new risk register entry and suggested 2 controls plus evidence tasks based on your policies and regulations.',
+    icon: Shield,
+    label: 'Vendors',
+    path: '/vendors',
+    actionLabel: 'View',
+    items: [
+      { name: 'Salesforce Enterprise', type: 'CRM', version: 'V 3' },
+      { name: 'AWS Cloud Services', type: 'INFRA', version: 'V 2' },
+      { name: 'Zendesk Support', type: 'SUPPORT', version: 'V 1' },
+      { name: 'Slack Communications', type: 'COMMS', version: 'V 2' },
+    ],
   },
   {
-    id: 3,
-    severity: 'amber',
-    title: 'Vendor SOC 2 update, 1 recommended control',
-    description:
-      'A vendor posted an updated SOC 2 report. I flagged 2 new risks and proposed 1 mitigating control, including an updated vendor risk score.',
+    icon: FolderOpen,
+    label: 'Documents',
+    path: '/documents',
+    actionLabel: 'View',
+    items: [
+      { name: 'Privacy Policy 2024', type: 'POLICY', version: 'V 4' },
+      { name: 'Data Retention Guidelines', type: 'GUIDE', version: 'V 2' },
+      { name: 'Incident Response Plan', type: 'PROC', version: 'V 3' },
+      { name: 'GDPR Compliance Checklist', type: 'CHECK', version: 'V 1' },
+    ],
+  },
+  {
+    icon: Users,
+    label: 'Engagements',
+    path: '/engagements',
+    actionLabel: 'Start',
+    items: [
+      { name: 'Q1 Security Review', type: 'REVIEW', version: 'V 1' },
+      { name: 'Vendor Onboarding - Stripe', type: 'ONBOARD', version: 'V 2' },
+      { name: 'Annual Audit 2024', type: 'AUDIT', version: 'V 1' },
+      { name: 'DPIA - Marketing Analytics', type: 'DPIA', version: 'V 1' },
+    ],
   },
 ]
 
-const severityColors: Record<string, string> = {
-  red: 'bg-red-500',
-  amber: 'bg-amber-400',
-  green: 'bg-green-500',
-}
+
+
+
 
 export default function HomePage() {
   const [prompt, setPrompt] = useState('')
@@ -75,7 +101,7 @@ export default function HomePage() {
       <Sidebar />
 
       <div className="flex flex-col flex-1 overflow-hidden">
-        <TopBar title="Home" />
+        <TopBar title="Self Service Portal" />
 
         <main className="flex-1 overflow-y-auto">
           <div className="max-w-2xl mx-auto px-6 pt-20 pb-16">
@@ -91,11 +117,10 @@ export default function HomePage() {
 
               {/* Prompt input */}
               <div
-                className={`relative bg-white rounded-xl border transition-all duration-200 ${
-                  isFocused
-                    ? 'border-primary shadow-md shadow-primary/5'
-                    : 'border-gray-200 shadow-sm'
-                }`}
+                className={`relative bg-white rounded-xl border transition-all duration-200 ${isFocused
+                  ? 'border-primary shadow-md shadow-primary/5'
+                  : 'border-gray-200 shadow-sm'
+                  }`}
               >
                 <textarea
                   ref={textareaRef}
@@ -133,12 +158,12 @@ export default function HomePage() {
               </div>
 
               {/* Disclaimer */}
-              <p className="text-xs text-gray-400 mt-2 text-center">
+              {/* <p className="text-xs text-gray-400 mt-2 text-center">
                 AI can make mistakes. Verify info.{' '}
                 <button className="text-primary hover:underline inline-flex items-center gap-0.5">
                   Learn more <ExternalLink className="w-3 h-3" />
                 </button>
-              </p>
+              </p> */}
 
               {/* Quick actions */}
               <div className="flex flex-wrap gap-2 mt-6 justify-center">
@@ -154,52 +179,70 @@ export default function HomePage() {
               </div>
             </motion.div>
 
-            {/* Alerts section */}
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, ease: 'easeOut', delay: 0.1 }}
-              className="mt-12"
-            >
-              <div className="flex items-center gap-2 mb-4">
-                <h3 className="text-sm font-semibold text-gray-900">
-                  Alerts ({alerts.length})
-                </h3>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-purple-50 text-purple-700 rounded-full border border-purple-100">
-                  <Sparkles className="w-3 h-3" />
-                  AI
-                </span>
-              </div>
 
-              <div className="flex flex-col gap-2">
-                {alerts.map((alert, i) => (
-                  <motion.div
-                    key={alert.id}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.15 + i * 0.05, duration: 0.3 }}
-                    className="relative bg-white border border-gray-200 rounded-xl p-4 hover:border-gray-300 hover:shadow-sm transition-all duration-150 cursor-pointer group"
-                  >
-                    <div
-                      className={`absolute left-0 top-4 w-2 h-2 rounded-full -translate-x-1 ${severityColors[alert.severity]}`}
-                    />
-
-                    <div className="flex items-start gap-3 pl-2">
-                      <CheckCircle2 className="w-4 h-4 text-gray-300 mt-0.5 flex-shrink-0 group-hover:text-gray-400 transition-colors" />
-                      <div>
-                        <p className="text-sm font-semibold text-gray-900 leading-snug">
-                          {alert.title}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-                          {alert.description}
-                        </p>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
           </div>
+
+          {/* Quick Links - wider section */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: 'easeOut', delay: 0.2 }}
+            className="max-w-6xl mx-auto px-6 pb-16"
+          >
+            <h3 className="text-sm font-semibold text-gray-900 mb-4">
+              Your stuff
+            </h3>
+            <div className="grid grid-cols-4 gap-4">
+              {cardData.map((card) => (
+                <div
+                  key={card.label}
+                  className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:border-gray-300 hover:shadow-sm transition-all duration-150"
+                >
+                  {/* Card header */}
+                  <button
+                    onClick={() => navigate(card.path)}
+                    className="w-full flex items-center gap-2 px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                  >
+                    <card.icon className="w-4 h-4 text-gray-500" />
+                    <span className="text-sm font-semibold text-gray-900">{card.label}</span>
+                  </button>
+
+                  {/* Table */}
+                  <div className="divide-y divide-gray-100">
+                    {card.items.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="relative group px-4 py-2.5 hover:bg-gray-50 transition-colors cursor-pointer"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-medium text-gray-900 truncate pr-6">{item.name}</p>
+                          <div className="flex items-center gap-1.5 mt-1">
+                            <span className="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded font-medium">
+                              {item.type}
+                            </span>
+                            <span className="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded font-medium">
+                              {item.version}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Hover action button */}
+                        <button
+                          className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity px-2.5 py-1 bg-primary text-white text-[10px] font-medium rounded-md hover:bg-primary/90 whitespace-nowrap"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            navigate(card.path)
+                          }}
+                        >
+                          {card.actionLabel}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
         </main>
       </div>
     </div>
