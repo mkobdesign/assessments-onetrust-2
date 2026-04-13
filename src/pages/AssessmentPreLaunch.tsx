@@ -379,21 +379,31 @@ export default function AssessmentPreLaunch() {
                     Add Files
                   </Button>
 
-                  {/* Assessment Progress Audit - subtle */}
-                  <div className="mb-6 opacity-60">
+                  {/* Assessment Progress Audit - compact timeline */}
+                  <div className="mb-6">
                     <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-2">Progress audit</p>
-                    <div className="flex items-center gap-4 text-[11px] text-gray-500">
-                      <div className="flex items-center gap-1.5">
-                        <div className="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center">
-                          <FileText className="w-2 h-2 text-gray-500" />
+                    <div className="relative pl-4">
+                      {/* Timeline line */}
+                      <div className="absolute left-[7px] top-1 bottom-1 w-px bg-gray-200" />
+                      
+                      <div className="space-y-2">
+                        {/* Agent 1 */}
+                        <div className="flex items-center gap-2 relative">
+                          <div className="absolute left-[-12px] w-3 h-3 rounded-full bg-gray-300 flex items-center justify-center">
+                            <FileText className="w-1.5 h-1.5 text-white" />
+                          </div>
+                          <span className="text-[11px] text-gray-500">Document Agent pre-filled <span className="text-gray-700 font-medium">12 questions</span></span>
+                          <span className="text-[10px] text-gray-400">2m ago</span>
                         </div>
-                        <span>12 from docs</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <div className="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center">
-                          <Shield className="w-2 h-2 text-gray-500" />
+                        
+                        {/* Agent 2 */}
+                        <div className="flex items-center gap-2 relative">
+                          <div className="absolute left-[-12px] w-3 h-3 rounded-full bg-gray-300 flex items-center justify-center">
+                            <Shield className="w-1.5 h-1.5 text-white" />
+                          </div>
+                          <span className="text-[11px] text-gray-500">Reuse Agent added <span className="text-gray-700 font-medium">6 questions</span> from past work</span>
+                          <span className="text-[10px] text-gray-400">1m ago</span>
                         </div>
-                        <span>6 from past assessments</span>
                       </div>
                     </div>
                   </div>
