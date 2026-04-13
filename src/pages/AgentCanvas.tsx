@@ -113,11 +113,15 @@ function AssessmentCardItem({
             {card.riskLevel === 'very-high' ? 'Very High' : card.riskLevel.charAt(0).toUpperCase() + card.riskLevel.slice(1)} Risk
           </span>
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center">
             {card.ownerInitials}
           </div>
-          <span className="text-xs text-gray-500">{card.progress}% complete</span>
+          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+            <span>{card.progress}%</span>
+            <span className="text-gray-300">|</span>
+            <span className="text-primary font-medium">{card.questionsAnswered}/{card.totalQuestions} from docs</span>
+          </div>
         </div>
       </div>
     </motion.div>
@@ -363,7 +367,7 @@ export default function AgentCanvas() {
                   animate={{ opacity: 1, y: 0 }}
                 >
                   <div className="flex items-center gap-2 mb-4">
-                    <h2 className="text-sm font-semibold text-gray-900">Linked Assessments</h2>
+                    <h2 className="text-sm font-semibold text-gray-900">Recommended Assessments</h2>
                     <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-primary/10 text-primary rounded-full">
                       4 created
                     </span>

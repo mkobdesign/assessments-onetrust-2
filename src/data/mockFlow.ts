@@ -33,6 +33,8 @@ export interface AssessmentCard {
   ownerInitials: string
   riskLevel: 'low' | 'medium' | 'high' | 'very-high'
   progress: number
+  questionsAnswered: number
+  totalQuestions: number
   prefilled: string[]
 }
 
@@ -224,6 +226,8 @@ export const assessmentCards: AssessmentCard[] = [
     ownerInitials: 'SC',
     riskLevel: 'medium',
     progress: 72,
+    questionsAnswered: 18,
+    totalQuestions: 25,
     prefilled: [
       'Personal data types detected',
       'Purpose compatibility mapped',
@@ -240,6 +244,8 @@ export const assessmentCards: AssessmentCard[] = [
     ownerInitials: 'MR',
     riskLevel: 'low',
     progress: 60,
+    questionsAnswered: 12,
+    totalQuestions: 20,
     prefilled: [
       'SSO requirement flagged',
       'RBAC controls identified',
@@ -256,6 +262,8 @@ export const assessmentCards: AssessmentCard[] = [
     ownerInitials: 'KP',
     riskLevel: 'low',
     progress: 80,
+    questionsAnswered: 16,
+    totalQuestions: 20,
     prefilled: [
       'Training opt-out confirmed (DPA)',
       'Retention policy reviewed',
@@ -272,6 +280,8 @@ export const assessmentCards: AssessmentCard[] = [
     ownerInitials: 'JL',
     riskLevel: 'medium',
     progress: 55,
+    questionsAnswered: 11,
+    totalQuestions: 20,
     prefilled: [
       'Hallucination risk: Medium',
       'Customer impact: Indirect only',
