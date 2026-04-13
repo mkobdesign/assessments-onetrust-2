@@ -294,10 +294,10 @@ export const dataSources = [
   },
   {
     id: 'architecture',
-    name: 'Architecture_Diagram.png',
-    type: 'Technical Diagram',
+    name: 'Zendesk Risk Assessment',
+    type: 'Privacy Assessment',
     icon: 'layout',
-    note: 'Identified system integrations and data flows',
+    note: 'Completed March 15, 2024',
     confidence: 87,
   },
   {
