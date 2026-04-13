@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { TopBar } from '@/components/layout/TopBar'
 import { Button } from '@/components/ui/button'
-import { ArrowUp, Plus, FileText, Shield, FolderOpen, Users, Briefcase, ChevronRight } from 'lucide-react'
+import { ArrowUp, Plus, FileText, Shield, FolderOpen, Users, ChevronRight } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 const quickActions = [
@@ -210,18 +210,15 @@ export default function HomePage() {
                         key={idx}
                         className="relative group px-4 py-2.5 hover:bg-gray-50 transition-colors cursor-pointer"
                       >
-                        <div className="flex items-start gap-2">
-                          <Briefcase className="w-4 h-4 text-gray-800 mt-0.5 flex-shrink-0" />
-                          <div className="min-w-0 flex-1">
-                            <p className="text-xs font-medium text-gray-900 truncate pr-6">{item.name}</p>
-                            <div className="flex items-center gap-1.5 mt-1">
-                              <span className="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded font-medium">
-                                {item.type}
-                              </span>
-                              <span className="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded font-medium">
-                                {item.version}
-                              </span>
-                            </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-medium text-gray-900 truncate pr-6">{item.name}</p>
+                          <div className="flex items-center gap-1.5 mt-1">
+                            <span className="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded font-medium">
+                              {item.type}
+                            </span>
+                            <span className="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded font-medium">
+                              {item.version}
+                            </span>
                           </div>
                         </div>
 
