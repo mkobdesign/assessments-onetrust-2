@@ -78,10 +78,14 @@ function AssessmentCardItem({
   card,
   onClick,
   delay,
+  isHighlighted,
+  isCompleted,
 }: {
   card: AssessmentCard
   onClick: () => void
   delay: number
+  isHighlighted?: boolean
+  isCompleted?: boolean
 }) {
   const risk = riskColors[card.riskLevel]
   const typeLabel = card.type === 'privacy' ? 'Privacy' : card.type === 'security' ? 'Security' : card.type === 'third-party' ? 'Third-Party Risk' : 'AI Risk'
@@ -89,10 +93,16 @@ function AssessmentCardItem({
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
+      animate={{ 
+        opacity: isCompleted ? 0.7 : 1, 
+        y: 0,
+        boxShadow: isHighlighted ? '0 0 0 2px #22c55e' : '0 0 0 0px transparent'
+      }}
       transition={{ delay, duration: 0.3, ease: 'easeOut' }}
       onClick={onClick}
-      className="bg-white border border-gray-200 rounded-xl p-4 cursor-pointer hover:border-primary/40 hover:shadow-md transition-all duration-200 group"
+      className={`bg-white border rounded-xl p-4 cursor-pointer hover:border-primary/40 hover:shadow-md transition-all duration-300 group ${
+        isHighlighted ? 'border-green-500' : 'border-gray-200'
+      } ${isCompleted ? 'pointer-events-none' : ''}`}
     >
       <div className="flex items-start justify-between">
         <div>
@@ -108,7 +118,11 @@ function AssessmentCardItem({
 
       <div className="flex items-center justify-between mt-2">
         <div className="flex items-center gap-1.5">
-          <Badge variant="inprogress" className="text-xs">Not Started</Badge>
+          {isCompleted ? (
+            <Badge variant="default" className="text-xs bg-green-500 hover:bg-green-500">Complete</Badge>
+          ) : (
+            <Badge variant="inprogress" className="text-xs">Not Started</Badge>
+          )}
           <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${risk.bg} ${risk.text}`}>
             {card.riskLevel === 'very-high' ? 'Very High' : card.riskLevel.charAt(0).toUpperCase() + card.riskLevel.slice(1)} Risk
           </span>
@@ -146,6 +160,8 @@ export default function AgentCanvas() {
   const [isEditingChatTitle, setIsEditingChatTitle] = useState(false)
   const chatTitleInputRef = useRef<HTMLInputElement>(null)
   const [progressLabel, setProgressLabel] = useState<string | null>(null)
+  const [highlightedAssessments, setHighlightedAssessments] = useState<string[]>([])
+  const [completedAssessments, setCompletedAssessments] = useState<string[]>([])
   const chatBottomRef = useRef<HTMLDivElement>(null)
   const recordsRef = useRef<HTMLDivElement>(null)
   const assessmentsRef = useRef<HTMLDivElement>(null)
@@ -240,6 +256,16 @@ export default function AgentCanvas() {
           }
           if (nextStep === 5 && msg.role === 'assistant') {
             setShowAssessments(true)
+          }
+          // Step 6: Highlight and complete assessments after data retention answer
+          if (nextStep === 6 && msg.role === 'assistant') {
+            // Trigger green highlight animation
+            setHighlightedAssessments(['privacy', 'security', 'third-party'])
+            // After animation, mark third-party as complete and fade it
+            setTimeout(() => {
+              setHighlightedAssessments([])
+              setCompletedAssessments(['third-party'])
+            }, 1500)
           }
         }, delay)
         delay += 800
@@ -375,12 +401,14 @@ export default function AgentCanvas() {
 
                   <div className="grid grid-cols-1 gap-3">
                     {assessmentCards.map((card, i) => (
-                      <AssessmentCardItem
-                        key={card.id}
-                        card={card}
-                        delay={i * 0.1}
-                        onClick={() => navigate('/prelaunch', { state: { assessment: card } })}
-                      />
+<AssessmentCardItem
+  key={card.id}
+  card={card}
+  delay={i * 0.1}
+  onClick={() => navigate('/prelaunch', { state: { assessment: card } })}
+  isHighlighted={highlightedAssessments.includes(card.id)}
+  isCompleted={completedAssessments.includes(card.id)}
+  />
                     ))}
                   </div>
                 </motion.div>

@@ -145,8 +145,26 @@ export const conversationSteps: ChatMessage[][] = [
       id: 'a8',
       role: 'assistant',
       content:
-        "Perfect. I've got everything I need. I'm now generating four linked risk assessments for this initiative. You'll be able to review and complete them with my help.",
+        "Great, I've noted GDPR and CCPA compliance requirements.\n\nI have **2 quick questions about data retention** that will help me progress 3 assessments at once:\n\n**1. How long will conversation data be retained?**\n**2. Where will the data be stored geographically?**",
+      affectedAssessments: ['privacy', 'security', 'third-party'],
+    },
+  ],
+
+  // Step 6: Data retention answer + assessments generated
+  [
+    {
+      id: 'u7',
+      role: 'user',
+      content: 'We retain data for 90 days, stored in US-West and EU-Frankfurt regions.',
+    },
+    {
+      id: 'a9',
+      role: 'assistant',
+      content:
+        "Perfect — those answers just completed 3 questions across your Privacy, Security, and Third-Party assessments. I'm now generating your linked risk assessments.",
       progress: { current: 4, total: 4, label: 'Generating assessments' },
+      completedAssessments: ['third-party'],
+      highlightAssessments: ['privacy', 'security', 'third-party'],
       todoList: [
         { id: 'todo1', label: 'Complete the Privacy Impact Assessment', status: 'pending' },
         { id: 'todo2', label: 'Review AI Risk Assessment findings', status: 'pending' },
