@@ -7,9 +7,9 @@ import { ArrowUp, Plus, FileText, Shield, FolderOpen, Users } from 'lucide-react
 import { motion } from 'framer-motion'
 
 const quickActions = [
-  'Learn about CCPA changes',
-  'Analyze an incident',
-  'Assess a processing activity',
+  'Add a vendor',
+  'Scope a project',
+  'Start a risk assessment',
 ]
 
 // Card data with tables
