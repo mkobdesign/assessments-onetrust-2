@@ -386,7 +386,7 @@ export default function AssessmentQuestionnaire() {
           </main>
 
           {/* Right: Copilot drawer */}
-          <aside className="w-[300px] flex flex-col bg-white border-l border-gray-100 flex-shrink-0">
+          <aside className="w-[440px] flex flex-col bg-white border-l border-gray-100 flex-shrink-0">
             <Tabs defaultValue="chat" className="flex flex-col h-full">
               {/* Tabs header */}
               <div className="border-b border-gray-100 px-2 pt-2 flex-shrink-0">

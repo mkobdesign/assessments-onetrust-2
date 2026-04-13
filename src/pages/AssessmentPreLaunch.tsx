@@ -403,7 +403,7 @@ export default function AssessmentPreLaunch() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3, ease: 'easeOut' }}
-              className="w-[380px] border-l border-gray-200 bg-white flex flex-col"
+              className="w-[440px] border-l border-gray-200 bg-white flex flex-col"
             >
               {/* Header */}
               <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
