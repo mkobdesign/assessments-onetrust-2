@@ -21,7 +21,6 @@ import {
   Bot,
   CheckCheck,
   Minus,
-  Pencil,
 } from 'lucide-react'
 import { privacyAssessmentSections, type Question } from '@/data/assessmentQuestions'
 
@@ -220,8 +219,12 @@ function QuestionCard({
             <button
               className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-primary px-2.5 py-1.5 rounded-md hover:bg-primary/5 transition-colors"
             >
-              <Pencil className="w-3 h-3" />
-              <Sparkles className="w-3 h-3" />
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                {/* Pencil */}
+                <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                {/* Sparkle */}
+                <path d="M19 9l.5-1.5L21 7l-1.5-.5L19 5l-.5 1.5L17 7l1.5.5Z" fill="currentColor" strokeWidth="1" />
+              </svg>
               Rewrite with Copilot
             </button>
           </div>
