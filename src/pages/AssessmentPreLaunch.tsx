@@ -409,7 +409,7 @@ export default function AssessmentPreLaunch() {
               <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
                 <div className="flex items-center gap-2">
                   <Menu className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm font-semibold text-gray-900">Customer Support AI Copilot</span>
+                  <span className="text-sm font-semibold text-gray-900">Copilot</span>
                 </div>
                 <Button variant="ghost" size="icon" className="h-7 w-7">
                   <X className="w-3.5 h-3.5" />

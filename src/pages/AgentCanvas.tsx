@@ -138,7 +138,7 @@ export default function AgentCanvas() {
   const [showAssessments, setShowAssessments] = useState(false)
   const [projectTitle, setProjectTitle] = useState('')
   const [projectSummary, setProjectSummary] = useState('')
-  const [chatTitle, setChatTitle] = useState('New chat')
+  const [chatTitle, setChatTitle] = useState('Customer Support AI Copilot')
   const [isEditingChatTitle, setIsEditingChatTitle] = useState(false)
   const chatTitleInputRef = useRef<HTMLInputElement>(null)
   const chatBottomRef = useRef<HTMLDivElement>(null)
@@ -394,11 +394,11 @@ export default function AgentCanvas() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Menu className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm font-semibold text-gray-900">Customer Support AI Copilot</span>
+                  <span className="text-sm font-semibold text-gray-900">Copilot</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Button variant="outline" size="sm" className="text-xs h-7 px-3" onClick={() => {
-                    setChatTitle('New chat')
+                    setChatTitle('Customer Support AI Copilot')
                     setMessages([])
                     setStep(0)
                     setShowRecords(false)
