@@ -196,7 +196,12 @@ export default function AgentCanvas() {
     // Get remaining messages (excluding the first user message we already added)
     const remainingMessages = newMessages.filter(m => m !== firstUserMsg)
 
-    // Show typing then remaining messages
+    // Show typing then remaining messages (only if there are messages to show)
+    if (remainingMessages.length === 0) {
+      setStep(nextStep)
+      return
+    }
+    
     setIsTyping(true)
     setTimeout(() => {
       setIsTyping(false)
@@ -223,10 +228,12 @@ export default function AgentCanvas() {
           }
           if (nextStep === 5 && msg.role === 'assistant') {
             setShowAssessments(true)
-            // Trigger step 6 (next steps / todo list) after a delay
-            setTimeout(() => {
-              advanceStep()
-            }, 2000)
+            // Trigger step 6 (next steps / todo list) after a delay - only on first assistant message
+            if (i === 0) {
+              setTimeout(() => {
+                advanceStep()
+              }, 2000)
+            }
           }
         }, delay)
         delay += 800
