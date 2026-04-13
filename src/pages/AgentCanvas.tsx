@@ -187,7 +187,10 @@ export default function AgentCanvas() {
     // Show first user message immediately
     const firstUserMsg = newMessages.find(m => m.role === 'user')
     if (firstUserMsg) {
-      setMessages(prev => [...prev, firstUserMsg])
+      setMessages(prev => {
+        if (prev.some(m => m.id === firstUserMsg.id)) return prev
+        return [...prev, firstUserMsg]
+      })
     }
 
     // Get remaining messages (excluding the first user message we already added)
@@ -200,7 +203,10 @@ export default function AgentCanvas() {
       let delay = 0
       remainingMessages.forEach((msg, i) => {
         setTimeout(() => {
-          setMessages(prev => [...prev, msg])
+          setMessages(prev => {
+            if (prev.some(m => m.id === msg.id)) return prev
+            return [...prev, msg]
+          })
           // Side effects per step
           if (nextStep === 1 && msg.role === 'assistant' && i === 0) {
             setProjectTitle('Customer Support Copilot for Zendesk')
@@ -245,7 +251,7 @@ export default function AgentCanvas() {
       <Sidebar />
 
       <div className="flex flex-col flex-1 overflow-hidden">
-        <TopBar title="Customer Support Copilot for Zendesk" />
+        <TopBar title="Agent Canvas" />
 
         <div className="flex flex-1 overflow-hidden">
           {/* Left: Canvas */}
@@ -371,7 +377,7 @@ export default function AgentCanvas() {
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   <Zap className="w-5 h-5 text-primary" />
                 </div>
-                <p className="text-gray-400 text-sm">Your project will appear here as you describe it</p>
+                <p className="text-gray-400 text-sm">Your work will appear here as you describe it</p>
               </div>
             )}
           </main>
