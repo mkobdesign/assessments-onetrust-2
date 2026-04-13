@@ -113,7 +113,7 @@ function AssessmentCardItem({
         <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-primary transition-colors mt-1 flex-shrink-0" />
       </div>
 
-      <Progress value={card.progress} className="mt-3 mb-2" />
+      <Progress value={isCompleted ? 100 : card.progress} className={`mt-3 mb-2 transition-all duration-500 ${isCompleted ? '[&>div]:bg-green-500' : ''}`} />
 
       <div className="flex items-center justify-between mt-2">
         <div className="flex items-center gap-1.5">
@@ -131,7 +131,7 @@ function AssessmentCardItem({
             {card.ownerInitials}
           </div>
           <div className="flex items-center gap-1.5 text-xs text-gray-500">
-            <span>{card.progress}%</span>
+            <span>{isCompleted ? 100 : card.progress}%</span>
             <span className="text-gray-300">|</span>
             <span className="text-primary font-medium">{card.questionsAnswered}/{card.totalQuestions} from docs</span>
           </div>
