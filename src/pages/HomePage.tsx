@@ -3,13 +3,61 @@ import { useNavigate } from 'react-router-dom'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { TopBar } from '@/components/layout/TopBar'
 import { Button } from '@/components/ui/button'
-import { ArrowUp, Plus, FileText, Shield, FolderOpen, Users } from 'lucide-react'
+import { ArrowUp, Plus, FileText, Shield, FolderOpen, Users, Briefcase, ChevronRight } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 const quickActions = [
   'Learn about CCPA changes',
   'Analyze an incident',
   'Assess a processing activity',
+]
+
+// Card data with tables
+const cardData = [
+  {
+    icon: FileText,
+    label: 'Assessments',
+    path: '/assessments',
+    items: [
+      { name: 'OWASP Top Ten Assessment V1.0', type: 'INCIDENT', version: 'V 2' },
+      { name: 'tareq 2.1', type: 'PIA', version: 'V 2' },
+      { name: 'Assess Issue', type: 'ITRM', version: 'V 1' },
+      { name: 'LD Create Issue Template', type: 'ITRM', version: 'V 1' },
+    ],
+  },
+  {
+    icon: Shield,
+    label: 'Vendors',
+    path: '/vendors',
+    items: [
+      { name: 'Salesforce Enterprise', type: 'CRM', version: 'V 3' },
+      { name: 'AWS Cloud Services', type: 'INFRA', version: 'V 2' },
+      { name: 'Zendesk Support', type: 'SUPPORT', version: 'V 1' },
+      { name: 'Slack Communications', type: 'COMMS', version: 'V 2' },
+    ],
+  },
+  {
+    icon: FolderOpen,
+    label: 'Documents',
+    path: '/documents',
+    items: [
+      { name: 'Privacy Policy 2024', type: 'POLICY', version: 'V 4' },
+      { name: 'Data Retention Guidelines', type: 'GUIDE', version: 'V 2' },
+      { name: 'Incident Response Plan', type: 'PROC', version: 'V 3' },
+      { name: 'GDPR Compliance Checklist', type: 'CHECK', version: 'V 1' },
+    ],
+  },
+  {
+    icon: Users,
+    label: 'Engagements',
+    path: '/engagements',
+    items: [
+      { name: 'Q1 Security Review', type: 'REVIEW', version: 'V 1' },
+      { name: 'Vendor Onboarding - Stripe', type: 'ONBOARD', version: 'V 2' },
+      { name: 'Annual Audit 2024', type: 'AUDIT', version: 'V 1' },
+      { name: 'DPIA - Marketing Analytics', type: 'DPIA', version: 'V 1' },
+    ],
+  },
 ]
 
 
@@ -128,38 +176,72 @@ export default function HomePage() {
             </motion.div>
 
 
-            {/* Quick Links */}
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, ease: 'easeOut', delay: 0.2 }}
-              className="mt-8"
-            >
-              <h3 className="text-sm font-semibold text-gray-900 mb-4">
-                Your stuff
-              </h3>
-              <div className="grid grid-cols-4 gap-3">
-                {[
-                  { icon: FileText, label: 'Assessments', path: '/assessments' },
-                  { icon: Shield, label: 'Vendors', path: '/vendors' },
-                  { icon: FolderOpen, label: 'Documents', path: '/documents' },
-                  { icon: Users, label: 'Engagements', path: '/engagements' },
-                ].map((link) => (
-                  <button
-                    key={link.label}
-                    onClick={() => navigate(link.path)}
-                    className="flex flex-col items-center gap-2 p-4 bg-white border border-gray-200 rounded-xl hover:border-gray-300 hover:shadow-sm transition-all duration-150 group"
-                  >
-                    <link.icon className="w-5 h-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
-                    <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">
-                      {link.label}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </motion.div>
-
           </div>
+
+          {/* Quick Links - wider section */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: 'easeOut', delay: 0.2 }}
+            className="max-w-5xl mx-auto px-6 pb-16"
+          >
+            <h3 className="text-sm font-semibold text-gray-900 mb-4">
+              Your stuff
+            </h3>
+            <div className="grid grid-cols-4 gap-4">
+              {cardData.map((card) => (
+                <div
+                  key={card.label}
+                  className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:border-gray-300 hover:shadow-sm transition-all duration-150"
+                >
+                  {/* Card header */}
+                  <button
+                    onClick={() => navigate(card.path)}
+                    className="w-full flex items-center gap-2 px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                  >
+                    <card.icon className="w-4 h-4 text-gray-500" />
+                    <span className="text-sm font-semibold text-gray-900">{card.label}</span>
+                  </button>
+
+                  {/* Table */}
+                  <div className="divide-y divide-gray-100">
+                    {card.items.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="relative group px-4 py-2.5 hover:bg-gray-50 transition-colors cursor-pointer"
+                      >
+                        <div className="flex items-start gap-2">
+                          <Briefcase className="w-4 h-4 text-gray-800 mt-0.5 flex-shrink-0" />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-medium text-gray-900 truncate pr-6">{item.name}</p>
+                            <div className="flex items-center gap-1.5 mt-1">
+                              <span className="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded font-medium">
+                                {item.type}
+                              </span>
+                              <span className="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded font-medium">
+                                {item.version}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Hover action button */}
+                        <button
+                          className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 bg-primary text-white rounded-md hover:bg-primary/90"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            navigate(card.path)
+                          }}
+                        >
+                          <ChevronRight className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
         </main>
       </div>
     </div>
