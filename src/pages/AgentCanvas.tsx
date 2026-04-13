@@ -141,6 +141,7 @@ export default function AgentCanvas() {
   const [chatTitle, setChatTitle] = useState('Customer Support AI Copilot')
   const [isEditingChatTitle, setIsEditingChatTitle] = useState(false)
   const chatTitleInputRef = useRef<HTMLInputElement>(null)
+  const [progressLabel, setProgressLabel] = useState<string | null>(null)
   const chatBottomRef = useRef<HTMLDivElement>(null)
   const recordsRef = useRef<HTMLDivElement>(null)
   const assessmentsRef = useRef<HTMLDivElement>(null)
@@ -202,9 +203,16 @@ export default function AgentCanvas() {
       return
     }
     
+    // Check if any message has a progress label
+    const progressMsg = remainingMessages.find(m => m.progress)
+    if (progressMsg?.progress) {
+      setProgressLabel(progressMsg.progress.label)
+    }
+    
     setIsTyping(true)
     setTimeout(() => {
       setIsTyping(false)
+      setProgressLabel(null)
       let delay = 0
       remainingMessages.forEach((msg, i) => {
         setTimeout(() => {
@@ -248,8 +256,6 @@ export default function AgentCanvas() {
       handleSend()
     }
   }
-
-  const currentProgress = messages.find(m => m.progress)?.progress
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
@@ -464,27 +470,6 @@ export default function AgentCanvas() {
               </div>
             </div>
 
-            {/* Progress */}
-            {currentProgress && (
-              <div className="px-5 py-2 border-b border-gray-100 bg-gray-50">
-                <div className="flex items-center gap-2">
-                  <div className="flex gap-1">
-                    {[...Array(currentProgress.total)].map((_, i) => (
-                      <div
-                        key={i}
-                        className={`w-4 h-1 rounded-full transition-colors duration-300 ${i < currentProgress.current ? 'bg-primary' : 'bg-gray-200'
-                          }`}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-xs text-gray-500">
-                    {currentProgress.current} of {currentProgress.total} tasks complete
-                  </span>
-                  <button className="ml-auto text-xs text-primary hover:underline">View timeline</button>
-                </div>
-              </div>
-            )}
-
             {/* Messages */}
             <div className="flex-1 overflow-y-auto scrollbar-thin px-5 py-4 space-y-4">
               {messages.map(msg => (
@@ -523,15 +508,6 @@ export default function AgentCanvas() {
                         <span className="text-white text-[9px] font-bold">AI</span>
                       </div>
                       <div>
-                        {msg.progress && (
-                          <div className="mb-2 bg-primary/5 rounded-lg px-3 py-2">
-                            <div className="flex items-center gap-1.5 mb-1">
-                              <div className="w-3 h-3 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-                              <span className="text-xs font-medium text-primary">{msg.progress.label}</span>
-                            </div>
-                            <Progress value={(msg.progress.current / msg.progress.total) * 100} className="h-1" />
-                          </div>
-                        )}
                         <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
                           {msg.content.split('**').map((part, i) =>
                             i % 2 === 1 ? <strong key={i}>{part}</strong> : part
@@ -575,7 +551,14 @@ export default function AgentCanvas() {
                   <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
                     <span className="text-white text-[9px] font-bold">AI</span>
                   </div>
-                  <TypingIndicator />
+                  {progressLabel ? (
+                    <div className="flex items-center gap-1.5 pt-1">
+                      <div className="w-3.5 h-3.5 rounded-full border-2 border-gray-400 border-t-transparent animate-spin" />
+                      <span className="text-sm text-gray-500">{progressLabel}</span>
+                    </div>
+                  ) : (
+                    <TypingIndicator />
+                  )}
                 </div>
               )}
 
