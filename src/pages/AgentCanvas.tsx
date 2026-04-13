@@ -223,6 +223,10 @@ export default function AgentCanvas() {
           }
           if (nextStep === 5 && msg.role === 'assistant') {
             setShowAssessments(true)
+            // Trigger step 6 (next steps / todo list) after a delay
+            setTimeout(() => {
+              advanceStep()
+            }, 2000)
           }
         }, delay)
         delay += 800
@@ -532,6 +536,20 @@ export default function AgentCanvas() {
                             i % 2 === 1 ? <strong key={i}>{part}</strong> : part
                           )}
                         </div>
+                        {msg.todoList && (
+                          <div className="mt-3 bg-gray-50 border border-gray-200 rounded-lg p-3">
+                            <div className="space-y-2">
+                              {msg.todoList.map((todo: { id: string; label: string; status: string }, idx: number) => (
+                                <div key={todo.id} className="flex items-center gap-2.5">
+                                  <div className="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center text-[10px] font-bold text-gray-400">
+                                    {idx + 1}
+                                  </div>
+                                  <span className="text-xs text-gray-700">{todo.label}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}

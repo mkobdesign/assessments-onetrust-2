@@ -147,6 +147,28 @@ export const conversationSteps: ChatMessage[][] = [
       progress: { current: 4, total: 4, label: 'Generating assessments' },
     },
   ],
+
+  // Step 6: After assessments are created - show next steps
+  [
+    {
+      id: 'a9',
+      role: 'assistant',
+      content:
+        "I've created 4 linked assessments for the Customer Support AI Copilot. Here's what to do next:",
+      todoList: [
+        { id: 'todo1', label: 'Complete the Privacy Impact Assessment', status: 'pending' },
+        { id: 'todo2', label: 'Review AI Risk Assessment findings', status: 'pending' },
+        { id: 'todo3', label: 'Verify vendor security documentation', status: 'pending' },
+        { id: 'todo4', label: 'Submit for stakeholder approval', status: 'pending' },
+      ],
+    },
+    {
+      id: 'a10',
+      role: 'assistant',
+      content:
+        "Click on any assessment card above to start. I'll guide you through each question and pre-fill answers based on what we discussed.",
+    },
+  ],
 ]
 
 export const governanceRecords: GovernanceRecord[] = [
