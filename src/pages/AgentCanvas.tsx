@@ -275,10 +275,6 @@ export default function AgentCanvas() {
                 >
                   <p className="text-xs font-semibold text-gray-500 mb-2">Documents</p>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-gray-200 rounded-lg text-xs text-gray-700 font-medium">
-                      <FileText className="w-3.5 h-3.5 text-red-500" />
-                      Braves Hat Product Line
-                    </div>
                     {step >= 4 && (
                       <>
                         <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-gray-200 rounded-lg text-xs text-gray-700 font-medium">
