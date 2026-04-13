@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
-import { CheckCircle2, Home } from 'lucide-react'
+import { CheckCircle2 } from 'lucide-react'
 
 export default function SuccessScreen() {
   const navigate = useNavigate()
@@ -55,11 +55,27 @@ export default function SuccessScreen() {
           This kind of thoughtful oversight is exactly what builds trust — with customers, partners, and regulators. Your contribution has been submitted for governance approval.
         </motion.p>
 
-        {/* Stats */}
+        {/* Gamification - Better than others */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.55, duration: 0.4 }}
+          className="bg-gradient-to-r from-primary/5 to-green-50 border border-primary/20 rounded-2xl p-6 mb-8"
+        >
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <span className="text-4xl font-bold text-primary">23%</span>
+            <span className="text-sm text-gray-600 text-left leading-tight">faster than<br />average</span>
+          </div>
+          <p className="text-xs text-gray-500">
+            You completed this assessment faster than 77% of users in your organization
+          </p>
+        </motion.div>
+
+        {/* Stats */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.4 }}
           className="grid grid-cols-3 gap-4 mb-10"
         >
           {[
@@ -74,19 +90,27 @@ export default function SuccessScreen() {
           ))}
         </motion.div>
 
-        {/* CTA */}
+        {/* CTAs */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.4 }}
+          transition={{ delay: 0.65, duration: 0.4 }}
+          className="flex flex-col gap-3"
         >
           <Button
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/prelaunch')}
             size="lg"
-            className="px-8"
+            className="w-full"
           >
-            <Home className="w-4 h-4 mr-2" />
-            Return to home
+            Complete your next assessment
+          </Button>
+          <Button
+            onClick={() => navigate('/')}
+            variant="outline"
+            size="lg"
+            className="w-full"
+          >
+            Return to the self service portal
           </Button>
         </motion.div>
       </motion.div>
