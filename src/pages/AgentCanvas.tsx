@@ -202,13 +202,13 @@ export default function AgentCanvas() {
       setStep(nextStep)
       return
     }
-    
+
     // Check if any message has a progress label
     const progressMsg = remainingMessages.find(m => m.progress)
     if (progressMsg?.progress) {
       setProgressLabel(progressMsg.progress.label)
     }
-    
+
     setIsTyping(true)
     setTimeout(() => {
       setIsTyping(false)
@@ -388,7 +388,7 @@ export default function AgentCanvas() {
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   <Zap className="w-5 h-5 text-primary" />
                 </div>
-                <p className="text-gray-400 text-sm">Your work will appear here as you describe it</p>
+                <p className="text-gray-400 text-sm">Agent output will be seen here.</p>
               </div>
             )}
           </main>
@@ -398,7 +398,7 @@ export default function AgentCanvas() {
             initial={{ x: 24, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.35, ease: 'easeOut' }}
-            className="w-[440px] flex flex-col bg-white border-l border-gray-100 flex-shrink-0"
+            className="w-[380px] flex flex-col bg-white border-l border-gray-100 flex-shrink-0"
           >
             {/* Drawer header */}
             <div className="flex flex-col px-5 py-3.5 border-b border-gray-100">
@@ -518,16 +518,17 @@ export default function AgentCanvas() {
                             <div className="space-y-2">
                               {msg.todoList.map((todo: { id: string; label: string; status: string }, idx: number) => (
                                 idx === 0 ? (
-                                  <button
-                                    key={todo.id}
-                                    onClick={() => navigate('/prelaunch')}
-                                    className="w-full flex items-center gap-2.5 bg-primary text-white rounded-lg px-3 py-2 hover:bg-primary/90 transition-colors"
-                                  >
-                                    <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px] font-bold">
+                                  <div key={todo.id} className="flex items-center gap-2.5">
+                                    <div className="w-5 h-5 rounded-full border-2 border-primary flex items-center justify-center text-[10px] font-bold text-primary flex-shrink-0">
                                       {idx + 1}
                                     </div>
-                                    <span className="text-xs font-medium">{todo.label}</span>
-                                  </button>
+                                    <button
+                                      onClick={() => navigate('/prelaunch')}
+                                      className="flex-1 text-left bg-primary text-white rounded-lg px-3 py-2 hover:bg-primary/90 transition-colors"
+                                    >
+                                      <span className="text-xs font-medium">{todo.label}</span>
+                                    </button>
+                                  </div>
                                 ) : (
                                   <div key={todo.id} className="flex items-center gap-2.5">
                                     <div className="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center text-[10px] font-bold text-gray-400">
