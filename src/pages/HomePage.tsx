@@ -187,7 +187,7 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: 'easeOut', delay: 0.2 }}
-            className="max-w-5xl mx-auto px-6 pb-16"
+            className="max-w-6xl mx-auto px-6 pb-16"
           >
             <h3 className="text-sm font-semibold text-gray-900 mb-4">
               Your stuff
