@@ -406,6 +406,14 @@ export default function AssessmentQuestionnaire() {
     setAcceptedSuggestions(prev => prev + 1)
   }
 
+  const handleQuestionSelect = (questionId: string) => {
+    setCurrentQuestionId(questionId)
+    const element = document.getElementById(`question-${questionId}`)
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
       <Sidebar />
@@ -451,11 +459,11 @@ export default function AssessmentQuestionnaire() {
               </div>
             </div>
 
-            <QuestionNav
-              sections={privacyAssessmentSections}
-              currentQuestionId={currentQuestionId}
-              onSelect={setCurrentQuestionId}
-            />
+                <QuestionNav
+                  sections={privacyAssessmentSections}
+                  currentQuestionId={currentQuestionId}
+                  onSelect={handleQuestionSelect}
+                />
           </aside>
 
           {/* Main: Questions */}
