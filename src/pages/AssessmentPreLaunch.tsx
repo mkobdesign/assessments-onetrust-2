@@ -51,11 +51,22 @@ import { dataSources } from '@/data/mockFlow'
 // SharePoint icon component
 function SharePointIcon({ className }: { className?: string }) {
   return (
-    <img 
-      src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-uXSQaUB6d8aavaRrBwD8LVJFkVUnVa.png" 
-      alt="SharePoint" 
+    <img
+      src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-uXSQaUB6d8aavaRrBwD8LVJFkVUnVa.png"
+      alt="SharePoint"
       className={className}
     />
+  )
+}
+
+// Audit icon component (outlined document with checkmark)
+function AuditIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <polyline points="14 2 14 8 20 8" />
+      <polyline points="9 15 11 17 15 13" />
+    </svg>
   )
 }
 
@@ -66,6 +77,7 @@ const fileIconMap: Record<string, React.ComponentType<{ className?: string }>> =
   'message-square': MessageSquare,
   'book-open': BookOpen,
   'sharepoint': SharePointIcon,
+  'audit': AuditIcon,
 }
 
 const confidenceColor = (confidence: number) => {
@@ -105,47 +117,47 @@ function SortableSourceCard({ source, rank, onDelete }: SortableSourceCardProps)
 
       {/* Card */}
       <div className={`flex-1 flex items-start gap-3 bg-white border rounded-xl p-4 transition-all duration-150 group ${isDragging
-          ? 'border-primary shadow-lg shadow-primary/10 scale-[1.01]'
-          : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
+        ? 'border-primary shadow-lg shadow-primary/10 scale-[1.01]'
+        : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
         }`}
       >
         {/* Drag handle */}
-      <button
-        {...attributes}
-        {...listeners}
-        className="flex-shrink-0 mt-2 text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing transition-colors"
-        aria-label="Drag to reorder"
-      >
-        <GripVertical className="w-4 h-4" />
-      </button>
+        <button
+          {...attributes}
+          {...listeners}
+          className="flex-shrink-0 mt-2 text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing transition-colors"
+          aria-label="Drag to reorder"
+        >
+          <GripVertical className="w-4 h-4" />
+        </button>
 
-      {/* Icon */}
-      <div className="w-8 h-8 rounded-lg bg-primary/8 flex items-center justify-center flex-shrink-0 border border-primary/10">
-        <Icon className="w-4 h-4 text-primary" />
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <p className="text-sm font-semibold text-gray-900">{source.name}</p>
-            <p className="text-xs text-gray-500 mt-0.5">{source.type}</p>
-          </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <span className={`text-xs font-semibold ${confidenceColor(source.confidence)}`}>
-              {source.confidence}% match
-            </span>
-            <button
-              onClick={() => onDelete(source.id)}
-              className="p-1 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
-              aria-label="Remove source"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-            </button>
-          </div>
+        {/* Icon */}
+        <div className="w-8 h-8 rounded-lg bg-primary/8 flex items-center justify-center flex-shrink-0 border border-primary/10">
+          <Icon className="w-4 h-4 text-primary" />
         </div>
-        <p className="text-xs text-gray-600 mt-2 leading-relaxed">{source.note}</p>
-      </div>
+
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <p className="text-sm font-semibold text-gray-900">{source.name}</p>
+              <p className="text-xs text-gray-500 mt-0.5">{source.type}</p>
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <span className={`text-xs font-semibold ${confidenceColor(source.confidence)}`}>
+                {source.confidence}% match
+              </span>
+              <button
+                onClick={() => onDelete(source.id)}
+                className="p-1 text-gray-600 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
+                aria-label="Remove source"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+          <p className="text-xs text-gray-600 mt-2 leading-relaxed">{source.note}</p>
+        </div>
       </div>
     </div>
   )
@@ -187,8 +199,8 @@ function FileBrowser({ onClose }: { onClose: () => void }) {
                   }
                 }}
                 className={`w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 transition-colors ${item.type === 'file' && selected.includes(item.name)
-                    ? 'bg-primary/5 text-primary'
-                    : 'text-gray-700'
+                  ? 'bg-primary/5 text-primary'
+                  : 'text-gray-700'
                   }`}
               >
                 {item.type === 'folder' ? (
@@ -288,7 +300,7 @@ export default function AssessmentPreLaunch() {
     const userMsg = { id: `u${Date.now()}`, role: 'user' as const, content: inputValue }
     setCopilotMessages(prev => [...prev, userMsg])
     setInputValue('')
-    
+
     // Simulate AI response
     setTimeout(() => {
       const aiMsg = {
@@ -358,9 +370,9 @@ export default function AssessmentPreLaunch() {
                     <SortableContext items={sources.map(s => s.id)} strategy={verticalListSortingStrategy}>
                       <div className="space-y-3 mb-6">
                         {sources.map((source, index) => (
-                          <SortableSourceCard 
-                            key={source.id} 
-                            source={source} 
+                          <SortableSourceCard
+                            key={source.id}
+                            source={source}
                             rank={index + 1}
                             onDelete={handleDeleteSource}
                           />
@@ -378,6 +390,35 @@ export default function AssessmentPreLaunch() {
                     <Plus className="w-4 h-4 mr-2" />
                     Add Files
                   </Button>
+
+                  {/* Assessment Progress Audit - compact timeline */}
+                  <div className="mb-8">
+                    <p className="text-[12px] text-gray-700 uppercase tracking-wide mb-2">Progress audit</p>
+                    <div className="relative pl-4">
+                      {/* Timeline line */}
+                      <div className="absolute left-[9px] top-1 bottom-1 w-px bg-gray-200" />
+
+                      <div className="space-y-2">
+                        {/* Agent 1 */}
+                        <div className="flex items-center gap-2 relative">
+                          <div className="absolute left-[-12px] w-3 h-3 rounded-full bg-gray-300 flex items-center justify-center">
+                            <FileText className="w-1.5 h-1.5 text-white" />
+                          </div>
+                          <span className="text-[11px] text-gray-500 ml-2">Document Agent pre-filled <span className="text-gray-700 font-medium">12 questions</span></span>
+                          <span className="text-[10px] text-gray-400">2m ago</span>
+                        </div>
+
+                        {/* Agent 2 */}
+                        <div className="flex items-center gap-2 relative">
+                          <div className="absolute left-[-12px] w-3 h-3 rounded-full bg-gray-300 flex items-center justify-center">
+                            <Shield className="w-1.5 h-1.5 text-white" />
+                          </div>
+                          <span className="text-[11px] text-gray-500 ml-2">Reuse Agent added <span className="text-gray-700 font-medium">6 questions</span> from past work</span>
+                          <span className="text-[10px] text-gray-400">1m ago</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
                   {/* CTA */}
                   <div className="bg-white border border-gray-200 rounded-xl p-6">
@@ -403,7 +444,7 @@ export default function AssessmentPreLaunch() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3, ease: 'easeOut' }}
-              className="w-[380px] border-l border-gray-200 bg-white flex flex-col"
+              className="w-[440px] border-l border-gray-200 bg-white flex flex-col"
             >
               {/* Header */}
               <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">

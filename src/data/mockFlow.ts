@@ -33,6 +33,8 @@ export interface AssessmentCard {
   ownerInitials: string
   riskLevel: 'low' | 'medium' | 'high' | 'very-high'
   progress: number
+  questionsAnswered: number
+  totalQuestions: number
   prefilled: string[]
 }
 
@@ -143,30 +145,32 @@ export const conversationSteps: ChatMessage[][] = [
       id: 'a8',
       role: 'assistant',
       content:
-        "Perfect. I've got everything I need. I'm now generating four linked risk assessments for this initiative. You'll be able to review and complete them with my help.",
-      progress: { current: 4, total: 4, label: 'Generating assessments' },
+        "Great, I've noted GDPR and CCPA compliance requirements.\n\nI have **2 quick questions about data retention** that will help me progress 3 assessments at once:\n\n**1. How long will conversation data be retained?**\n**2. Where will the data be stored geographically?**",
+      affectedAssessments: ['privacy', 'security', 'third-party'],
     },
   ],
 
-  // Step 6: After assessments are created - show next steps
+  // Step 6: Data retention answer + assessments generated
   [
+    {
+      id: 'u7',
+      role: 'user',
+      content: 'We retain data for 90 days, stored in US-West and EU-Frankfurt regions.',
+    },
     {
       id: 'a9',
       role: 'assistant',
       content:
-        "I've created 4 linked assessments for the Customer Support AI Copilot. Here's what to do next:",
+        "Perfect — those answers just completed 3 questions across your Privacy, Security, and Third-Party assessments. I'm now generating your linked risk assessments.",
+      progress: { current: 4, total: 4, label: 'Generating assessments' },
+      completedAssessments: ['third-party'],
+      highlightAssessments: ['privacy', 'security', 'third-party'],
       todoList: [
         { id: 'todo1', label: 'Complete the Privacy Impact Assessment', status: 'pending' },
         { id: 'todo2', label: 'Review AI Risk Assessment findings', status: 'pending' },
         { id: 'todo3', label: 'Verify vendor security documentation', status: 'pending' },
         { id: 'todo4', label: 'Submit for stakeholder approval', status: 'pending' },
       ],
-    },
-    {
-      id: 'a10',
-      role: 'assistant',
-      content:
-        "Click on any assessment card above to start. I'll guide you through each question and pre-fill answers based on what we discussed.",
     },
   ],
 ]
@@ -240,6 +244,8 @@ export const assessmentCards: AssessmentCard[] = [
     ownerInitials: 'SC',
     riskLevel: 'medium',
     progress: 72,
+    questionsAnswered: 18,
+    totalQuestions: 25,
     prefilled: [
       'Personal data types detected',
       'Purpose compatibility mapped',
@@ -256,6 +262,8 @@ export const assessmentCards: AssessmentCard[] = [
     ownerInitials: 'MR',
     riskLevel: 'low',
     progress: 60,
+    questionsAnswered: 12,
+    totalQuestions: 20,
     prefilled: [
       'SSO requirement flagged',
       'RBAC controls identified',
@@ -272,6 +280,8 @@ export const assessmentCards: AssessmentCard[] = [
     ownerInitials: 'KP',
     riskLevel: 'low',
     progress: 80,
+    questionsAnswered: 16,
+    totalQuestions: 20,
     prefilled: [
       'Training opt-out confirmed (DPA)',
       'Retention policy reviewed',
@@ -288,6 +298,8 @@ export const assessmentCards: AssessmentCard[] = [
     ownerInitials: 'JL',
     riskLevel: 'medium',
     progress: 55,
+    questionsAnswered: 11,
+    totalQuestions: 20,
     prefilled: [
       'Hallucination risk: Medium',
       'Customer impact: Indirect only',
@@ -310,7 +322,7 @@ export const dataSources = [
     id: 'security',
     name: 'Vendor_Security_Overview.pdf',
     type: 'Security Document',
-    icon: 'shield',
+    icon: 'file-text',
     note: 'Mapped to security controls and SSO requirements',
     confidence: 94,
   },
@@ -318,7 +330,7 @@ export const dataSources = [
     id: 'architecture',
     name: 'Zendesk Risk Assessment',
     type: 'Privacy Assessment',
-    icon: 'layout',
+    icon: 'audit',
     note: 'Completed March 15, 2024',
     confidence: 87,
   },
@@ -326,7 +338,7 @@ export const dataSources = [
     id: 'prompts',
     name: 'Sample_Prompts.docx',
     type: 'Usage Examples',
-    icon: 'message-square',
+    icon: 'file-text',
     note: 'Analyzed for personal data exposure and output risk',
     confidence: 91,
   },

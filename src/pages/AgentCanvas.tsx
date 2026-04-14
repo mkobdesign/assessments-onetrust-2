@@ -78,10 +78,14 @@ function AssessmentCardItem({
   card,
   onClick,
   delay,
+  isHighlighted,
+  isCompleted,
 }: {
   card: AssessmentCard
   onClick: () => void
   delay: number
+  isHighlighted?: boolean
+  isCompleted?: boolean
 }) {
   const risk = riskColors[card.riskLevel]
   const typeLabel = card.type === 'privacy' ? 'Privacy' : card.type === 'security' ? 'Security' : card.type === 'third-party' ? 'Third-Party Risk' : 'AI Risk'
@@ -89,10 +93,15 @@ function AssessmentCardItem({
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
+      animate={{ 
+        opacity: isCompleted ? 0.7 : 1, 
+        y: 0
+      }}
       transition={{ delay, duration: 0.3, ease: 'easeOut' }}
       onClick={onClick}
-      className="bg-white border border-gray-200 rounded-xl p-4 cursor-pointer hover:border-primary/40 hover:shadow-md transition-all duration-200 group"
+      className={`bg-white border border-gray-200 rounded-xl p-4 cursor-pointer hover:border-primary/40 hover:shadow-md transition-all duration-300 group ${
+        isHighlighted ? 'highlight-stroke' : ''
+      } ${isCompleted ? 'pointer-events-none' : ''}`}
     >
       <div className="flex items-start justify-between">
         <div>
@@ -104,20 +113,28 @@ function AssessmentCardItem({
         <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-primary transition-colors mt-1 flex-shrink-0" />
       </div>
 
-      <Progress value={card.progress} className="mt-3 mb-2" />
+      <Progress value={isCompleted ? 100 : card.progress} className={`mt-3 mb-2 transition-all duration-500 ${isCompleted ? '[&>div]:bg-green-500' : ''}`} />
 
       <div className="flex items-center justify-between mt-2">
         <div className="flex items-center gap-1.5">
-          <Badge variant="inprogress" className="text-xs">Not Started</Badge>
+          {isCompleted ? (
+            <Badge variant="default" className="text-xs bg-green-500 hover:bg-green-500">Complete</Badge>
+          ) : (
+            <Badge variant="inprogress" className="text-xs">Not Started</Badge>
+          )}
           <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${risk.bg} ${risk.text}`}>
             {card.riskLevel === 'very-high' ? 'Very High' : card.riskLevel.charAt(0).toUpperCase() + card.riskLevel.slice(1)} Risk
           </span>
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center">
             {card.ownerInitials}
           </div>
-          <span className="text-xs text-gray-500">{card.progress}% complete</span>
+          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+            <span>{isCompleted ? 100 : card.progress}%</span>
+            <span className="text-gray-300">|</span>
+            <span className="text-primary font-medium">{card.questionsAnswered}/{card.totalQuestions} from docs</span>
+          </div>
         </div>
       </div>
     </motion.div>
@@ -141,6 +158,9 @@ export default function AgentCanvas() {
   const [chatTitle, setChatTitle] = useState('Customer Support AI Copilot')
   const [isEditingChatTitle, setIsEditingChatTitle] = useState(false)
   const chatTitleInputRef = useRef<HTMLInputElement>(null)
+  const [progressLabel, setProgressLabel] = useState<string | null>(null)
+  const [highlightedAssessments, setHighlightedAssessments] = useState<string[]>([])
+  const [completedAssessments, setCompletedAssessments] = useState<string[]>([])
   const chatBottomRef = useRef<HTMLDivElement>(null)
   const recordsRef = useRef<HTMLDivElement>(null)
   const assessmentsRef = useRef<HTMLDivElement>(null)
@@ -201,10 +221,17 @@ export default function AgentCanvas() {
       setStep(nextStep)
       return
     }
-    
+
+    // Check if any message has a progress label
+    const progressMsg = remainingMessages.find(m => m.progress)
+    if (progressMsg?.progress) {
+      setProgressLabel(progressMsg.progress.label)
+    }
+
     setIsTyping(true)
     setTimeout(() => {
       setIsTyping(false)
+      setProgressLabel(null)
       let delay = 0
       remainingMessages.forEach((msg, i) => {
         setTimeout(() => {
@@ -228,12 +255,16 @@ export default function AgentCanvas() {
           }
           if (nextStep === 5 && msg.role === 'assistant') {
             setShowAssessments(true)
-            // Trigger step 6 (next steps / todo list) after a delay - only on first assistant message
-            if (i === 0) {
-              setTimeout(() => {
-                advanceStep()
-              }, 2000)
-            }
+          }
+          // Step 6: Highlight and complete assessments after data retention answer
+          if (nextStep === 6 && msg.role === 'assistant') {
+            // Trigger green highlight animation
+            setHighlightedAssessments(['privacy', 'security', 'third-party'])
+            // After animation, mark third-party as complete and fade it
+            setTimeout(() => {
+              setHighlightedAssessments([])
+              setCompletedAssessments(['third-party'])
+            }, 1500)
           }
         }, delay)
         delay += 800
@@ -254,8 +285,6 @@ export default function AgentCanvas() {
       handleSend()
     }
   }
-
-  const currentProgress = messages.find(m => m.progress)?.progress
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
@@ -363,7 +392,7 @@ export default function AgentCanvas() {
                   animate={{ opacity: 1, y: 0 }}
                 >
                   <div className="flex items-center gap-2 mb-4">
-                    <h2 className="text-sm font-semibold text-gray-900">Linked Assessments</h2>
+                    <h2 className="text-sm font-semibold text-gray-900">Recommended Assessments</h2>
                     <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-primary/10 text-primary rounded-full">
                       4 created
                     </span>
@@ -371,12 +400,14 @@ export default function AgentCanvas() {
 
                   <div className="grid grid-cols-1 gap-3">
                     {assessmentCards.map((card, i) => (
-                      <AssessmentCardItem
-                        key={card.id}
-                        card={card}
-                        delay={i * 0.1}
-                        onClick={() => navigate('/prelaunch', { state: { assessment: card } })}
-                      />
+<AssessmentCardItem
+  key={card.id}
+  card={card}
+  delay={i * 0.1}
+  onClick={() => navigate('/prelaunch', { state: { assessment: card } })}
+  isHighlighted={highlightedAssessments.includes(card.id)}
+  isCompleted={completedAssessments.includes(card.id)}
+  />
                     ))}
                   </div>
                 </motion.div>
@@ -388,7 +419,7 @@ export default function AgentCanvas() {
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   <Zap className="w-5 h-5 text-primary" />
                 </div>
-                <p className="text-gray-400 text-sm">Your work will appear here as you describe it</p>
+                <p className="text-gray-400 text-sm">Agent output will be seen here.</p>
               </div>
             )}
           </main>
@@ -470,27 +501,6 @@ export default function AgentCanvas() {
               </div>
             </div>
 
-            {/* Progress */}
-            {currentProgress && (
-              <div className="px-5 py-2 border-b border-gray-100 bg-gray-50">
-                <div className="flex items-center gap-2">
-                  <div className="flex gap-1">
-                    {[...Array(currentProgress.total)].map((_, i) => (
-                      <div
-                        key={i}
-                        className={`w-4 h-1 rounded-full transition-colors duration-300 ${i < currentProgress.current ? 'bg-primary' : 'bg-gray-200'
-                          }`}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-xs text-gray-500">
-                    {currentProgress.current} of {currentProgress.total} tasks complete
-                  </span>
-                  <button className="ml-auto text-xs text-primary hover:underline">View timeline</button>
-                </div>
-              </div>
-            )}
-
             {/* Messages */}
             <div className="flex-1 overflow-y-auto scrollbar-thin px-5 py-4 space-y-4">
               {messages.map(msg => (
@@ -529,15 +539,6 @@ export default function AgentCanvas() {
                         <span className="text-white text-[9px] font-bold">AI</span>
                       </div>
                       <div>
-                        {msg.progress && (
-                          <div className="mb-2 bg-primary/5 rounded-lg px-3 py-2">
-                            <div className="flex items-center gap-1.5 mb-1">
-                              <div className="w-3 h-3 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-                              <span className="text-xs font-medium text-primary">{msg.progress.label}</span>
-                            </div>
-                            <Progress value={(msg.progress.current / msg.progress.total) * 100} className="h-1" />
-                          </div>
-                        )}
                         <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
                           {msg.content.split('**').map((part, i) =>
                             i % 2 === 1 ? <strong key={i}>{part}</strong> : part
@@ -548,16 +549,17 @@ export default function AgentCanvas() {
                             <div className="space-y-2">
                               {msg.todoList.map((todo: { id: string; label: string; status: string }, idx: number) => (
                                 idx === 0 ? (
-                                  <button
-                                    key={todo.id}
-                                    onClick={() => navigate('/prelaunch')}
-                                    className="w-full flex items-center gap-2.5 bg-primary text-white rounded-lg px-3 py-2 hover:bg-primary/90 transition-colors"
-                                  >
-                                    <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px] font-bold">
+                                  <div key={todo.id} className="flex items-center gap-2.5">
+                                    <div className="w-5 h-5 rounded-full border-2 border-primary flex items-center justify-center text-[10px] font-bold text-primary flex-shrink-0">
                                       {idx + 1}
                                     </div>
-                                    <span className="text-xs font-medium">{todo.label}</span>
-                                  </button>
+                                    <button
+                                      onClick={() => navigate('/prelaunch')}
+                                      className="flex-1 text-left bg-primary text-white rounded-lg px-3 py-2 hover:bg-primary/90 transition-colors"
+                                    >
+                                      <span className="text-xs font-medium">{todo.label}</span>
+                                    </button>
+                                  </div>
                                 ) : (
                                   <div key={todo.id} className="flex items-center gap-2.5">
                                     <div className="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center text-[10px] font-bold text-gray-400">
@@ -581,7 +583,14 @@ export default function AgentCanvas() {
                   <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
                     <span className="text-white text-[9px] font-bold">AI</span>
                   </div>
-                  <TypingIndicator />
+                  {progressLabel ? (
+                    <div className="flex items-center gap-1.5 pt-1">
+                      <div className="w-3.5 h-3.5 rounded-full border-2 border-gray-400 border-t-transparent animate-spin" />
+                      <span className="text-sm text-gray-500">{progressLabel}</span>
+                    </div>
+                  ) : (
+                    <TypingIndicator />
+                  )}
                 </div>
               )}
 

@@ -13,16 +13,24 @@ import {
   Sparkles,
   Paperclip,
   ArrowUp,
-  Database,
   Search,
   MessageCircle,
   X,
   ChevronRight,
+  ChevronDown,
   Bot,
   CheckCheck,
   Minus,
+  FileText,
+  AlertTriangle,
+  Database,
+  GripVertical,
+  Trash2,
+  Bookmark,
+  Clock,
 } from 'lucide-react'
 import { privacyAssessmentSections, type Question } from '@/data/assessmentQuestions'
+import { dataSources } from '@/data/mockFlow'
 
 const aiMessages = [
   {
@@ -39,11 +47,7 @@ const aiMessages = [
   },
 ]
 
-const aiPrefilledMessages = [
-  'Based on your uploaded DPA, OpenAI disables training on customer prompts. I pre-completed the vendor data usage section.',
-  'I detected Zendesk RBAC groups in the architecture diagram. Should access be limited to support managers and agents only?',
-  'Because responses are customer-facing, I marked human review as required before sending.',
-]
+
 
 const readinessSummary = {
   records: 8,
@@ -74,6 +78,7 @@ function QuestionNav({
           {section.questions.map(q => {
             const isCurrent = q.id === currentQuestionId
             const isAnswered = q.answered
+            const isMarkedForReview = q.markedForReview
 
             return (
               <button
@@ -87,6 +92,8 @@ function QuestionNav({
                 <div className="flex-shrink-0">
                   {isAnswered ? (
                     <CheckCircle2 className="w-4 h-4 text-primary" />
+                  ) : isMarkedForReview ? (
+                    <MessageCircle className="w-4 h-4 fill-[#6673C7] text-[#6673C7]" />
                   ) : isCurrent ? (
                     <div className="w-4 h-4 rounded-full border-2 border-primary bg-primary/10 flex items-center justify-center">
                       <div className="w-1.5 h-1.5 rounded-full bg-primary" />
@@ -97,7 +104,7 @@ function QuestionNav({
                 </div>
                 <div className="min-w-0">
                   <span className="text-xs text-gray-400 font-mono">{q.number}</span>
-                  <p className={`text-xs leading-snug truncate mt-0.5 ${isCurrent ? 'font-semibold text-gray-900' : isAnswered ? 'text-gray-500' : 'text-gray-700'}`}>
+                  <p className={`text-xs leading-snug truncate mt-0.5 ${isCurrent ? 'font-semibold text-gray-900' : isAnswered || isMarkedForReview ? 'text-gray-500' : 'text-gray-700'}`}>
                     {q.title}
                   </p>
                 </div>
@@ -115,18 +122,35 @@ function QuestionCard({
   onAnswer,
   onClarify,
   isActive,
+  onAcceptSuggestion,
 }: {
   question: Question
   onAnswer: (questionId: string, answerId: string) => void
   onClarify: (question: Question) => void
   isActive: boolean
+  onAcceptSuggestion?: () => void
 }) {
   const [selected, setSelected] = useState(question.aiPrefilled ?? '')
+  const [suggestionAccepted, setSuggestionAccepted] = useState(false)
+  const [suggestionDismissed, setSuggestionDismissed] = useState(false)
 
   const handleSelect = (value: string) => {
     setSelected(value)
     onAnswer(question.id, value)
   }
+
+  const handleAcceptSuggestion = () => {
+    if (question.suggestedAnswer) {
+      setSelected(question.suggestedAnswer)
+      onAnswer(question.id, question.suggestedAnswer)
+      setSuggestionAccepted(true)
+      onAcceptSuggestion?.()
+    }
+  }
+
+  const suggestedOption = question.suggestedAnswer 
+    ? question.options.find(opt => opt.id === question.suggestedAnswer)
+    : null
 
   return (
     <motion.div
@@ -145,7 +169,13 @@ function QuestionCard({
             <span className="text-xs font-mono text-gray-400 bg-gray-100 px-2 py-0.5 rounded">
               {question.number}
             </span>
-            {question.answered && (
+            {question.markedForReview && !suggestionAccepted && (
+              <span className="inline-flex items-center gap-1 text-xs text-[#6673C7] bg-[#6673C7]/10 px-2 py-0.5 rounded-full font-medium">
+                <MessageCircle className="w-3 h-3 fill-[#6673C7]" />
+                Marked for review
+              </span>
+            )}
+            {(question.answered || suggestionAccepted) && (
               <span className="inline-flex items-center gap-1 text-xs text-primary bg-primary/8 px-2 py-0.5 rounded-full font-medium">
                 <Sparkles className="w-3 h-3" />
                 AI pre-filled
@@ -200,6 +230,45 @@ function QuestionCard({
         ))}
       </RadioGroup>
 
+      {/* Suggested response box */}
+      {question.markedForReview && suggestedOption && !suggestionAccepted && !suggestionDismissed && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-5 bg-[#6673C7]/5 border border-[#6673C7]/20 rounded-xl p-4"
+        >
+          <div className="flex items-start gap-3">
+            <div className="w-6 h-6 rounded-full bg-[#6673C7] flex items-center justify-center flex-shrink-0">
+              <Sparkles className="w-3 h-3 text-white" />
+            </div>
+            <div className="flex-1">
+              <p className="text-xs font-semibold text-[#6673C7] mb-1">Suggested response</p>
+              <p className="text-sm font-medium text-gray-900 mb-1">{suggestedOption.label}</p>
+              {suggestedOption.description && (
+                <p className="text-xs text-gray-600 leading-relaxed">{suggestedOption.description}</p>
+              )}
+              <div className="flex items-center gap-2 mt-3">
+                <Button
+                  size="sm"
+                  className="h-7 text-xs bg-[#6673C7] hover:bg-[#6673C7]/90"
+                  onClick={handleAcceptSuggestion}
+                >
+                  Accept
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 text-xs text-gray-500 hover:text-gray-700"
+                  onClick={() => setSuggestionDismissed(true)}
+                >
+                  Dismiss
+                </Button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
       {/* Additional notes / rewrite area */}
       <div className="mt-5 pt-4 border-t border-gray-100">
         <label className="text-xs font-medium text-gray-700 mb-2 block">
@@ -231,17 +300,264 @@ function QuestionCard({
   )
 }
 
+// Data Sources Card component with collapsible stats per item
+function DataSourcesCard() {
+  const [isEditMode, setIsEditMode] = useState(false)
+  const [expandedSources, setExpandedSources] = useState<Record<string, boolean>>({})
+  const [localSources, setLocalSources] = useState(dataSources)
+
+  const toggleSourceExpanded = (id: string) => {
+    setExpandedSources(prev => ({ ...prev, [id]: !prev[id] }))
+  }
+
+  const handleDeleteSource = (id: string) => {
+    setLocalSources(prev => prev.filter(s => s.id !== id))
+  }
+
+  const handleCancel = () => {
+    setLocalSources(dataSources)
+    setIsEditMode(false)
+  }
+
+  // Per-source stats (mock data varying by source)
+  const getSourceStats = (sourceId: string) => {
+    const statsMap: Record<string, { relevance: string; completeness: string; freshness: string; contradictions: string }> = {
+      dpa: { relevance: 'High', completeness: 'Complete', freshness: 'Current', contradictions: 'None' },
+      security: { relevance: 'High', completeness: 'Good', freshness: 'Current', contradictions: 'None' },
+      architecture: { relevance: 'Medium', completeness: 'Partial', freshness: '6 months old', contradictions: 'None' },
+      prompts: { relevance: 'High', completeness: 'Complete', freshness: 'Current', contradictions: 'None' },
+      sop: { relevance: 'High', completeness: 'Good', freshness: 'Current', contradictions: 'None' },
+    }
+    return statsMap[sourceId] || { relevance: 'Unknown', completeness: 'Unknown', freshness: 'Unknown', contradictions: 'Unknown' }
+  }
+
+  const getSourceQuestions = (sourceId: string) => {
+    const questionsMap: Record<string, string[]> = {
+      dpa: ['Where will data be stored geographically?', 'What transfer mechanisms are in place?', 'What is the data retention period?'],
+      security: ['Which systems process data?', 'What security controls are in place?'],
+      architecture: ['Where are data subjects located?', 'What is the data flow architecture?'],
+      prompts: ['What types of prompts are used?', 'Is personal data included in prompts?'],
+      sop: ['Is human review required?', 'What is the escalation workflow?'],
+    }
+    return questionsMap[sourceId] || []
+  }
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      {/* Header */}
+      <div className="px-3 py-2.5 border-b border-gray-100 flex items-center justify-between">
+        <div>
+          <p className="text-xs font-semibold text-gray-900">Data Sources</p>
+          <p className="text-[10px] text-gray-500 mt-0.5">Documents used to generate answers</p>
+        </div>
+        {!isEditMode ? (
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-6 text-[10px] px-2"
+            onClick={() => setIsEditMode(true)}
+          >
+            Edit
+          </Button>
+        ) : (
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-6 text-[10px] px-2"
+            onClick={handleCancel}
+          >
+            Cancel
+          </Button>
+        )}
+      </div>
+      
+      {/* Document list with per-item health */}
+      <div className="divide-y divide-gray-100">
+        {localSources.map((source, i) => {
+          const stats = getSourceStats(source.id)
+          const questions = getSourceQuestions(source.id)
+          const isExpanded = expandedSources[source.id]
+          const hasWarning = stats.completeness === 'Partial' || stats.freshness.includes('months')
+
+          return (
+            <div key={source.id}>
+              {/* Source row */}
+              <div className={`px-3 py-2.5 ${isEditMode ? 'bg-gray-50' : ''}`}>
+                <div className="flex items-center gap-2">
+                  {isEditMode && (
+                    <GripVertical className="w-3 h-3 text-gray-400 cursor-grab flex-shrink-0" />
+                  )}
+                  <span className="text-gray-400 text-xs w-4">{i + 1}.</span>
+                  <FileText className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-gray-800 truncate">{source.name}</p>
+                    <p className="text-[10px] text-gray-500">{source.type}</p>
+                  </div>
+                  {hasWarning && !isEditMode && (
+                    <AlertTriangle className="w-3 h-3 text-amber-500 flex-shrink-0" />
+                  )}
+                  {isEditMode ? (
+                    <button
+                      onClick={() => handleDeleteSource(source.id)}
+                      className="p-1 hover:bg-red-50 rounded transition-colors"
+                    >
+                      <Trash2 className="w-3 h-3 text-red-500" />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => toggleSourceExpanded(source.id)}
+                      className="p-1 hover:bg-gray-100 rounded transition-colors"
+                    >
+                      <ChevronDown className={`w-3 h-3 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Expanded health info */}
+              <AnimatePresence>
+                {isExpanded && !isEditMode && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.15 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="px-3 pb-3 pt-1 bg-gray-50/50 space-y-2">
+                      {/* Stats row */}
+                      <div className="grid grid-cols-2 gap-1.5">
+                        <div className="text-[10px]">
+                          <span className="text-gray-500">Relevance:</span>{' '}
+                          <span className={stats.relevance === 'High' ? 'text-green-600 font-medium' : 'text-amber-600 font-medium'}>{stats.relevance}</span>
+                        </div>
+                        <div className="text-[10px]">
+                          <span className="text-gray-500">Completeness:</span>{' '}
+                          <span className={stats.completeness === 'Complete' || stats.completeness === 'Good' ? 'text-green-600 font-medium' : 'text-amber-600 font-medium'}>{stats.completeness}</span>
+                        </div>
+                        <div className="text-[10px]">
+                          <span className="text-gray-500">Freshness:</span>{' '}
+                          <span className={stats.freshness === 'Current' ? 'text-green-600 font-medium' : 'text-amber-600 font-medium'}>{stats.freshness}</span>
+                        </div>
+                        <div className="text-[10px]">
+                          <span className="text-gray-500">Contradictions:</span>{' '}
+                          <span className="text-green-600 font-medium">{stats.contradictions}</span>
+                        </div>
+                      </div>
+
+                      {/* Questions answered */}
+                      {questions.length > 0 && (
+                        <div className="pt-1.5 border-t border-gray-200">
+                          <p className="text-[10px] text-gray-500 mb-1">Questions answered:</p>
+                          <div className="space-y-0.5">
+                            {questions.map((q, idx) => (
+                              <div key={idx} className="flex items-center gap-1.5 text-[10px]">
+                                <CheckCircle2 className="w-2.5 h-2.5 text-green-500 flex-shrink-0" />
+                                <span className="text-gray-700 truncate">{q}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* Edit mode footer */}
+      {isEditMode && (
+        <div className="px-3 py-3 border-t border-gray-200 bg-amber-50/50 space-y-2">
+          <div className="flex items-start gap-2">
+            <AlertTriangle className="w-3 h-3 text-amber-500 flex-shrink-0 mt-0.5" />
+            <p className="text-[10px] text-amber-700">Changes may take up to 10 minutes to process and regenerate answers.</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              className="h-7 text-xs flex-1"
+              onClick={() => setIsEditMode(false)}
+            >
+              Confirm
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 text-xs"
+              onClick={handleCancel}
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function AssessmentQuestionnaire() {
   const navigate = useNavigate()
-  const [currentQuestionId, setCurrentQuestionId] = useState('q2-1')
+  const [currentQuestionId, setCurrentQuestionId] = useState('q1-1')
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [activeGuide, setActiveGuide] = useState<Question | null>(null)
   const [chatInput, setChatInput] = useState('')
-  const [chatMessages, setChatMessages] = useState(aiPrefilledMessages)
   const [guideConversation, setGuideConversation] = useState<Array<{ role: 'user' | 'assistant'; content: string; options?: Array<{ id: string; label: string }> }>>([])
   const [isGuideTyping, setIsGuideTyping] = useState(false)
-  const [showReadiness, setShowReadiness] = useState(false)
+  const [acceptedSuggestions, setAcceptedSuggestions] = useState<number>(0)
+  
+  // Guide history - stores conversations per question with timestamps
+  type GuideSession = {
+    timestamp: Date
+    conversation: Array<{ role: 'user' | 'assistant'; content: string }>
+  }
+  const [guideHistory, setGuideHistory] = useState<Record<string, GuideSession[]>>({})
+  
+  // Track if all residency suggestions accepted (3) and all systems questions answered (3)
+  const systemsQuestionIds = ['q2-1', 'q2-3', 'q2-4']
+  const systemsAnsweredCount = systemsQuestionIds.filter(id => answers[id]).length
+  const showGovernanceReadiness = acceptedSuggestions >= 3 && systemsAnsweredCount >= 3
   const chatBottomRef = useRef<HTMLDivElement>(null)
+  const mainContentRef = useRef<HTMLElement>(null)
+
+  // Scroll-based active question tracking
+  useEffect(() => {
+    const mainContent = mainContentRef.current
+    if (!mainContent) return
+
+    const allQuestionIds = privacyAssessmentSections.flatMap(s => s.questions.map(q => q.id))
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleEntries = entries.filter(entry => entry.isIntersecting)
+        if (visibleEntries.length > 0) {
+          // Find the topmost visible question
+          const topEntry = visibleEntries.reduce((prev, curr) => 
+            prev.boundingClientRect.top < curr.boundingClientRect.top ? prev : curr
+          )
+          const questionId = topEntry.target.id.replace('question-', '')
+          if (allQuestionIds.includes(questionId)) {
+            setCurrentQuestionId(questionId)
+          }
+        }
+      },
+      {
+        root: mainContent,
+        rootMargin: '-20% 0px -60% 0px',
+        threshold: 0
+      }
+    )
+
+    // Observe all question elements
+    allQuestionIds.forEach(id => {
+      const element = document.getElementById(`question-${id}`)
+      if (element) observer.observe(element)
+    })
+
+    return () => observer.disconnect()
+  }, [])
 
   const allQuestions = privacyAssessmentSections.flatMap(s => s.questions)
   const unansweredQuestions = allQuestions.filter(q => !q.answered && !answers[q.id]).slice(0, 3)
@@ -253,10 +569,7 @@ export default function AssessmentQuestionnaire() {
   const totalCount = allQuestions.length + 4 // simulate more questions
   const progress = Math.round((answeredCount / totalCount) * 100) + 40
 
-  useEffect(() => {
-    const timer = setTimeout(() => setShowReadiness(true), 2000)
-    return () => clearTimeout(timer)
-  }, [])
+
 
   const handleAnswer = (questionId: string, answerId: string) => {
     setAnswers(prev => ({ ...prev, [questionId]: answerId }))
@@ -301,8 +614,19 @@ export default function AssessmentQuestionnaire() {
 
   const handleChatSend = () => {
     if (!chatInput.trim()) return
-    setChatMessages(prev => [...prev, chatInput])
     setChatInput('')
+  }
+
+  const handleAcceptSuggestion = () => {
+    setAcceptedSuggestions(prev => prev + 1)
+  }
+
+  const handleQuestionSelect = (questionId: string) => {
+    setCurrentQuestionId(questionId)
+    const element = document.getElementById(`question-${questionId}`)
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
   }
 
   return (
@@ -350,22 +674,45 @@ export default function AssessmentQuestionnaire() {
               </div>
             </div>
 
-            <QuestionNav
-              sections={privacyAssessmentSections}
-              currentQuestionId={currentQuestionId}
-              onSelect={setCurrentQuestionId}
-            />
+                <QuestionNav
+                  sections={privacyAssessmentSections}
+                  currentQuestionId={currentQuestionId}
+                  onSelect={handleQuestionSelect}
+                />
           </aside>
 
           {/* Main: Questions */}
-          <main className="flex-1 overflow-y-auto scrollbar-thin px-8 py-6">
-            <div className="max-w-2xl">
+          <main ref={mainContentRef} className="flex-1 overflow-y-auto scrollbar-thin px-8 py-6">
+            <div>
               <div className="flex items-center gap-2 mb-6">
-                <h2 className="text-base font-semibold text-gray-900">Systems</h2>
-                <span className="text-xs text-gray-400">— 7 questions</span>
+                <h2 className="text-base font-semibold text-gray-900">Residency information</h2>
+                <span className="text-xs text-gray-400">— 3 questions</span>
+                <span className="ml-2 inline-flex items-center gap-1 text-xs text-[#6673C7] bg-[#6673C7]/10 px-2 py-0.5 rounded-full font-medium">
+                  <MessageCircle className="w-3 h-3 fill-[#6673C7]" />
+                  3 marked for review
+                </span>
               </div>
 
-              {allQuestions.slice(0, 3).map((question, i) => (
+              {/* Show the 3 residency questions */}
+              {privacyAssessmentSections[0].questions.map((question) => (
+                <QuestionCard
+                  key={question.id}
+                  question={question}
+                  onAnswer={handleAnswer}
+                  onClarify={handleClarify}
+                  isActive={question.id === currentQuestionId}
+                  onAcceptSuggestion={handleAcceptSuggestion}
+                />
+              ))}
+
+              {/* Systems section header */}
+              <div className="flex items-center gap-2 mb-6 mt-8">
+                <h2 className="text-base font-semibold text-gray-900">Systems</h2>
+                <span className="text-xs text-gray-400">— 3 questions</span>
+              </div>
+
+              {/* Show the 3 systems questions */}
+              {privacyAssessmentSections[1].questions.map((question) => (
                 <QuestionCard
                   key={question.id}
                   question={question}
@@ -374,19 +721,11 @@ export default function AssessmentQuestionnaire() {
                   isActive={question.id === currentQuestionId}
                 />
               ))}
-
-              {/* Load more hint */}
-              <button
-                className="w-full text-center text-xs text-gray-400 py-4 hover:text-gray-600 transition-colors"
-                onClick={() => {}}
-              >
-                Scroll for more questions ↓
-              </button>
             </div>
           </main>
 
           {/* Right: Copilot drawer */}
-          <aside className="w-[300px] flex flex-col bg-white border-l border-gray-100 flex-shrink-0">
+          <aside className="w-[440px] flex flex-col bg-white border-l border-gray-100 flex-shrink-0">
             <Tabs defaultValue="chat" className="flex flex-col h-full">
               {/* Tabs header */}
               <div className="border-b border-gray-100 px-2 pt-2 flex-shrink-0">
@@ -407,7 +746,7 @@ export default function AssessmentQuestionnaire() {
                 </TabsList>
               </div>
 
-              <TabsContent value="chat" className="flex flex-col flex-1 overflow-hidden mt-0">
+              <TabsContent value="chat" className="flex flex-col flex-1 overflow-hidden mt-0 data-[state=inactive]:hidden">
                 {/* Context badge */}
                 <div className="px-4 py-2 border-b border-gray-100 bg-gray-50/50">
                   <div className="flex items-center gap-1.5">
@@ -450,7 +789,10 @@ export default function AssessmentQuestionnaire() {
                       <button
                         key={label}
                         className="w-full flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-700 hover:border-primary/40 hover:bg-primary/5 hover:text-primary transition-all duration-150 text-left"
-                        onClick={label === 'Guide me through answering questions' ? () => setActiveGuide(allQuestions[0]) : undefined}
+                        onClick={label === 'Guide me through answering questions' ? () => {
+                          setActiveGuide(allQuestions[0])
+                          handleQuestionSelect(allQuestions[0].id)
+                        } : undefined}
                       >
                         <Icon className="w-3.5 h-3.5 flex-shrink-0" />
                         {label}
@@ -458,21 +800,76 @@ export default function AssessmentQuestionnaire() {
                     ))}
                   </div>
 
-                  {/* AI prefilled messages */}
-                  {chatMessages.map((msg, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.2, duration: 0.3 }}
-                      className="flex items-start gap-2"
-                    >
-                      <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-white text-[8px] font-bold">AI</span>
-                      </div>
-                      <p className="text-xs text-gray-700 leading-relaxed">{msg}</p>
-                    </motion.div>
-                  ))}
+                  {/* Guide History Bookmarks */}
+                  {console.log('[v0] Rendering bookmarks, guideHistory:', guideHistory)}
+                  {Object.entries(guideHistory).length > 0 && (
+                    <div className="space-y-3 mt-4">
+                      {Object.entries(guideHistory).map(([questionId, sessions]) => {
+                        const question = allQuestions.find(q => q.id === questionId)
+                        if (!question || sessions.length === 0) return null
+                        
+                        return (
+                          <motion.div
+                            key={questionId}
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="bg-gradient-to-r from-[#6673C7]/5 to-[#6673C7]/10 border border-[#6673C7]/20 rounded-xl overflow-hidden"
+                          >
+                            {/* Bookmark header */}
+                            <div className="flex items-center gap-2 px-3 py-2 bg-[#6673C7]/10 border-b border-[#6673C7]/10">
+                              <Bookmark className="w-3 h-3 text-[#6673C7] fill-[#6673C7]" />
+                              <span className="text-[10px] font-semibold text-[#6673C7] uppercase tracking-wide">Guide Session</span>
+                            </div>
+                            
+                            {/* Question context */}
+                            <div className="px-3 py-2 border-b border-[#6673C7]/10">
+                              <p className="text-[10px] text-gray-400">Question {question.number}</p>
+                              <p className="text-xs font-medium text-gray-800 truncate">{question.title}</p>
+                            </div>
+
+                            {/* Sessions */}
+                            <div className="divide-y divide-[#6673C7]/10">
+                              {sessions.map((session, sessionIdx) => (
+                                <div key={sessionIdx} className="px-3 py-2">
+                                  {/* Timestamp */}
+                                  <div className="flex items-center gap-1.5 mb-2">
+                                    <Clock className="w-2.5 h-2.5 text-gray-400" />
+                                    <span className="text-[10px] text-gray-400">
+                                      {session.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </span>
+                                  </div>
+                                  
+                                  {/* Conversation preview */}
+                                  <div className="space-y-1.5">
+                                    {session.conversation.slice(0, 4).map((msg, msgIdx) => (
+                                      <div key={msgIdx} className={`text-[11px] ${msg.role === 'user' ? 'text-gray-600 italic' : 'text-gray-700'}`}>
+                                        <span className="text-[10px] text-gray-400 mr-1">{msg.role === 'user' ? 'You:' : 'AI:'}</span>
+                                        <span className="line-clamp-2">{msg.content}</span>
+                                      </div>
+                                    ))}
+                                    {session.conversation.length > 4 && (
+                                      <p className="text-[10px] text-gray-400">+{session.conversation.length - 4} more messages</p>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+
+                            {/* Revisit button */}
+                            <button
+                              onClick={() => {
+                                setActiveGuide(question)
+                                handleQuestionSelect(question.id)
+                              }}
+                              className="w-full px-3 py-2 text-[10px] font-medium text-[#6673C7] bg-white/50 hover:bg-white transition-colors border-t border-[#6673C7]/10"
+                            >
+                              Continue this conversation
+                            </button>
+                          </motion.div>
+                        )
+                      })}
+                    </div>
+                  )}
 
                   {/* Guide tool — appears when Ask Copilot is clicked */}
                   <AnimatePresence>
@@ -491,6 +888,27 @@ export default function AssessmentQuestionnaire() {
                           </div>
                           <button
                             onClick={() => {
+                              console.log('[v0] Closing guide, conversation length:', guideConversation.length, 'activeGuide:', activeGuide?.id)
+                              // Save conversation to history if there was any user interaction (more than just AI intro)
+                              const hasUserMessages = guideConversation.some(m => m.role === 'user')
+                              console.log('[v0] Has user messages:', hasUserMessages)
+                              if (hasUserMessages && activeGuide) {
+                                console.log('[v0] Saving to history for question:', activeGuide.id)
+                                setGuideHistory(prev => {
+                                  const updated = {
+                                    ...prev,
+                                    [activeGuide.id]: [
+                                      ...(prev[activeGuide.id] || []),
+                                      {
+                                        timestamp: new Date(),
+                                        conversation: guideConversation.map(m => ({ role: m.role, content: m.content }))
+                                      }
+                                    ]
+                                  }
+                                  console.log('[v0] Updated guide history:', updated)
+                                  return updated
+                                })
+                              }
                               setActiveGuide(null)
                               setGuideConversation([])
                             }}
@@ -504,6 +922,10 @@ export default function AssessmentQuestionnaire() {
                         <div className="bg-white/60 rounded-lg px-2.5 py-2 mb-3">
                           <p className="text-[10px] text-gray-400 uppercase tracking-wide font-semibold mb-0.5">Question {activeGuide.number}</p>
                           <p className="text-xs font-semibold text-gray-800">{activeGuide.title}</p>
+                          <div className="flex items-center gap-1 mt-1">
+                            <MessageCircle className="w-3 h-3 fill-[#6673C7] text-[#6673C7]" />
+                            <span className="text-[10px] text-[#6673C7] font-medium">Review suggested answer</span>
+                          </div>
                         </div>
 
                         {/* Conversation */}
@@ -521,26 +943,21 @@ export default function AssessmentQuestionnaire() {
                                   <p className="text-xs text-gray-800">{msg.content}</p>
                                 </div>
                               ) : (
-                                <div className="flex items-start gap-2 max-w-[90%]">
-                                  <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
-                                    <span className="text-white text-[6px] font-bold">AI</span>
-                                  </div>
-                                  <div>
-                                    <p className="text-xs text-gray-700 leading-relaxed">{msg.content}</p>
-                                    {msg.options && (
-                                      <div className="mt-2 space-y-1.5">
-                                        {msg.options.map((opt, i) => (
-                                          <button
-                                            key={opt.id}
-                                            className="w-full text-left text-xs px-2.5 py-1.5 bg-white border border-gray-200 rounded-md hover:border-primary/40 hover:bg-primary/5 transition-colors"
-                                          >
-                                            <span className="text-gray-400 mr-1.5">{i + 1}.</span>
-                                            <span className="text-gray-700">{opt.label}</span>
-                                          </button>
-                                        ))}
-                                      </div>
-                                    )}
-                                  </div>
+                                <div className="max-w-[90%]">
+                                  <p className="text-xs text-gray-700 leading-relaxed">{msg.content}</p>
+                                  {msg.options && (
+                                    <div className="mt-2 space-y-1.5">
+                                      {msg.options.map((opt, i) => (
+                                        <button
+                                          key={opt.id}
+                                          className="w-full text-left text-xs px-2.5 py-1.5 bg-white border border-gray-200 rounded-md hover:border-primary/40 hover:bg-primary/5 transition-colors"
+                                        >
+                                          <span className="text-gray-400 mr-1.5">{i + 1}.</span>
+                                          <span className="text-gray-700">{opt.label}</span>
+                                        </button>
+                                      ))}
+                                    </div>
+                                  )}
                                 </div>
                               )}
                             </motion.div>
@@ -551,16 +968,11 @@ export default function AssessmentQuestionnaire() {
                             <motion.div
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
-                              className="flex items-start gap-2"
+                              className="flex items-center gap-1 px-2 py-1.5"
                             >
-                              <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <span className="text-white text-[6px] font-bold">AI</span>
-                              </div>
-                              <div className="flex items-center gap-1 px-2 py-1.5">
-                                <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-                                <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-                                <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '300ms' }} />
-                              </div>
+                              <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                              <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                              <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '300ms' }} />
                             </motion.div>
                           )}
                         </div>
@@ -568,9 +980,9 @@ export default function AssessmentQuestionnaire() {
                     )}
                   </AnimatePresence>
 
-                  {/* Readiness summary */}
+                  {/* Readiness summary - shows after all 3 suggestions accepted AND all 3 systems questions answered */}
                   <AnimatePresence>
-                    {showReadiness && (
+                    {showGovernanceReadiness && (
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -674,29 +1086,34 @@ export default function AssessmentQuestionnaire() {
                 </div>
               </TabsContent>
 
-              <TabsContent value="tools" className="flex-1 overflow-y-auto mt-0 px-4 py-4">
-                <div className="space-y-3">
-                  <p className="text-xs text-gray-500 leading-relaxed">
-                    Use these tools to automatically generate or research answers for this assessment.
-                  </p>
-                  {[
-                    { icon: Database, label: 'Edit data sources', desc: 'Manage the files and data Copilot uses' },
-                    { icon: Search, label: 'Deep research', desc: 'Scan connected systems for relevant information' },
-                    { icon: MessageCircle, label: 'Guided walkthrough', desc: 'Let Copilot explain each question in plain language' },
-                  ].map(({ icon: Icon, label, desc }) => (
-                    <button
-                      key={label}
-                      className="w-full flex items-start gap-3 p-3 bg-white border border-gray-200 rounded-xl text-left hover:border-primary/40 hover:bg-primary/5 transition-all duration-150"
-                    >
-                      <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                        <Icon className="w-3.5 h-3.5 text-primary" />
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold text-gray-900">{label}</p>
-                        <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
-                      </div>
-                    </button>
-                  ))}
+              <TabsContent value="tools" className="flex-1 overflow-y-auto mt-0 px-4 py-4 data-[state=inactive]:hidden">
+                <div className="space-y-4">
+                  {/* Data Sources Card - at top */}
+                  <DataSourcesCard />
+
+                  {/* Tools section */}
+                  <div>
+                    <p className="text-[10px] text-gray-400 uppercase tracking-wide font-medium mb-2">Tools</p>
+                    <div className="space-y-2">
+                      {[
+                        { icon: Search, label: 'Deep research', desc: 'Scan connected systems for relevant information' },
+                        { icon: MessageCircle, label: 'Guided walkthrough', desc: 'Let Copilot explain each question in plain language' },
+                      ].map(({ icon: Icon, label, desc }) => (
+                        <button
+                          key={label}
+                          className="w-full flex items-start gap-3 p-3 bg-white border border-gray-200 rounded-xl text-left hover:border-primary/40 hover:bg-primary/5 transition-all duration-150"
+                        >
+                          <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                            <Icon className="w-3.5 h-3.5 text-primary" />
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-gray-900">{label}</p>
+                            <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </TabsContent>
             </Tabs>

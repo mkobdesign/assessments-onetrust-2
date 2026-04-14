@@ -12,8 +12,10 @@ export interface Question {
   description: string
   options: QuestionOption[]
   aiPrefilled?: string
+  suggestedAnswer?: string
   clarifyExplanation?: string
   answered?: boolean
+  markedForReview?: boolean
 }
 
 export interface QuestionSection {
@@ -42,8 +44,8 @@ export const privacyAssessmentSections: QuestionSection[] = [
           { id: 'eu-us', label: 'EU and US', description: 'Data is stored or processed across both regions' },
           { id: 'global', label: 'Global / multiple regions', description: 'Data may be handled across various international locations' },
         ],
-        aiPrefilled: 'eu-us',
-        answered: true,
+        suggestedAnswer: 'eu-us',
+        markedForReview: true,
         clarifyExplanation: "This question is asking where the actual servers storing your data are located. Since you use OpenAI (US-based) and your company operates in the EU, data crosses borders — which means EU privacy rules (GDPR) apply to how it's handled.",
       },
       {
@@ -58,8 +60,8 @@ export const privacyAssessmentSections: QuestionSection[] = [
           { id: 'both', label: 'Both EU and US users', description: 'Multiple regulatory frameworks apply' },
           { id: 'neither', label: 'Neither — other regions', description: 'Different regional laws may apply' },
         ],
-        aiPrefilled: 'both',
-        answered: true,
+        suggestedAnswer: 'both',
+        markedForReview: true,
         clarifyExplanation: "This is asking where the people whose data you're using actually live. Your customers and support agents are in the EU and US, so both GDPR and CCPA apply — meaning your company has privacy obligations in both regions.",
       },
       {
@@ -75,8 +77,8 @@ export const privacyAssessmentSections: QuestionSection[] = [
           { id: 'adequacy', label: 'Adequacy decision', description: 'The destination country has been approved by the EU' },
           { id: 'none', label: 'Not yet in place', description: 'A legal mechanism still needs to be established' },
         ],
-        aiPrefilled: 'scc',
-        answered: true,
+        suggestedAnswer: 'scc',
+        markedForReview: true,
         clarifyExplanation: "When your EU customer data goes to OpenAI's US servers, you need a legal 'permission slip' to make that transfer okay under EU law. Your DPA with OpenAI already includes Standard Contractual Clauses, which is the most common permission mechanism — so you're covered.",
       },
     ],
