@@ -207,7 +207,7 @@ function QuestionCard({
       </p>
 
       {/* Options */}
-      <RadioGroup value={selected} onValueChange={handleSelect} className="space-y-2.5">
+      <RadioGroup value={selected} onValueChange={handleSelect} className="space-y-1">
         {question.options.map(option => (
           <label
             key={option.id}
