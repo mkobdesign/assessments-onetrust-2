@@ -348,7 +348,7 @@ function DataSourcesCard() {
           <p className="text-xs font-semibold text-gray-900">Data Sources</p>
           <p className="text-[10px] text-gray-500 mt-0.5">Documents used to generate answers</p>
         </div>
-        {!isEditMode && (
+        {!isEditMode ? (
           <Button
             variant="outline"
             size="sm"
@@ -356,6 +356,15 @@ function DataSourcesCard() {
             onClick={() => setIsEditMode(true)}
           >
             Edit
+          </Button>
+        ) : (
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-6 text-[10px] px-2"
+            onClick={handleCancel}
+          >
+            Cancel
           </Button>
         )}
       </div>
