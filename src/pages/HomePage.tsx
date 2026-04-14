@@ -196,16 +196,24 @@ export default function HomePage() {
               {cardData.map((card) => (
                 <div
                   key={card.label}
-                  className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:border-gray-300 hover:shadow-sm transition-all duration-150"
+                  className="group/card bg-white border border-gray-200 rounded-xl overflow-hidden hover:border-gray-300 hover:shadow-sm transition-all duration-150"
                 >
                   {/* Card header */}
-                  <button
-                    onClick={() => navigate(card.path)}
-                    className="w-full flex items-center gap-2 px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors"
-                  >
-                    <card.icon className="w-4 h-4 text-gray-500" />
-                    <span className="text-sm font-semibold text-gray-900">{card.label}</span>
-                  </button>
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                    <button
+                      onClick={() => navigate(card.path)}
+                      className="flex items-center gap-2 hover:opacity-70 transition-opacity"
+                    >
+                      <card.icon className="w-4 h-4 text-gray-500" />
+                      <span className="text-sm font-semibold text-gray-900">{card.label}</span>
+                    </button>
+                    <button
+                      onClick={() => navigate(card.path)}
+                      className="text-xs text-primary font-medium opacity-0 group-hover/card:opacity-100 transition-opacity hover:underline"
+                    >
+                      See all
+                    </button>
+                  </div>
 
                   {/* Table */}
                   <div className="divide-y divide-gray-100">
