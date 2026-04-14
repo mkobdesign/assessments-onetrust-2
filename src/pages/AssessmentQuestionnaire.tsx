@@ -801,6 +801,7 @@ export default function AssessmentQuestionnaire() {
                   </div>
 
                   {/* Guide History Bookmarks */}
+                  {console.log('[v0] Rendering bookmarks, guideHistory:', guideHistory)}
                   {Object.entries(guideHistory).length > 0 && (
                     <div className="space-y-3 mt-4">
                       {Object.entries(guideHistory).map(([questionId, sessions]) => {
@@ -887,18 +888,26 @@ export default function AssessmentQuestionnaire() {
                           </div>
                           <button
                             onClick={() => {
-                              // Save conversation to history if there was any interaction
-                              if (guideConversation.length > 0 && activeGuide) {
-                                setGuideHistory(prev => ({
-                                  ...prev,
-                                  [activeGuide.id]: [
-                                    ...(prev[activeGuide.id] || []),
-                                    {
-                                      timestamp: new Date(),
-                                      conversation: guideConversation.map(m => ({ role: m.role, content: m.content }))
-                                    }
-                                  ]
-                                }))
+                              console.log('[v0] Closing guide, conversation length:', guideConversation.length, 'activeGuide:', activeGuide?.id)
+                              // Save conversation to history if there was any user interaction (more than just AI intro)
+                              const hasUserMessages = guideConversation.some(m => m.role === 'user')
+                              console.log('[v0] Has user messages:', hasUserMessages)
+                              if (hasUserMessages && activeGuide) {
+                                console.log('[v0] Saving to history for question:', activeGuide.id)
+                                setGuideHistory(prev => {
+                                  const updated = {
+                                    ...prev,
+                                    [activeGuide.id]: [
+                                      ...(prev[activeGuide.id] || []),
+                                      {
+                                        timestamp: new Date(),
+                                        conversation: guideConversation.map(m => ({ role: m.role, content: m.content }))
+                                      }
+                                    ]
+                                  }
+                                  console.log('[v0] Updated guide history:', updated)
+                                  return updated
+                                })
                               }
                               setActiveGuide(null)
                               setGuideConversation([])
