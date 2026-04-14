@@ -39,11 +39,7 @@ const aiMessages = [
   },
 ]
 
-const aiPrefilledMessages = [
-  'Based on your uploaded DPA, OpenAI disables training on customer prompts. I pre-completed the vendor data usage section.',
-  'I detected Zendesk RBAC groups in the architecture diagram. Should access be limited to support managers and agents only?',
-  'Because responses are customer-facing, I marked human review as required before sending.',
-]
+
 
 const readinessSummary = {
   records: 8,
@@ -74,6 +70,7 @@ function QuestionNav({
           {section.questions.map(q => {
             const isCurrent = q.id === currentQuestionId
             const isAnswered = q.answered
+            const isMarkedForReview = q.markedForReview
 
             return (
               <button
@@ -87,6 +84,8 @@ function QuestionNav({
                 <div className="flex-shrink-0">
                   {isAnswered ? (
                     <CheckCircle2 className="w-4 h-4 text-primary" />
+                  ) : isMarkedForReview ? (
+                    <MessageCircle className="w-4 h-4 fill-[#6673C7] text-[#6673C7]" />
                   ) : isCurrent ? (
                     <div className="w-4 h-4 rounded-full border-2 border-primary bg-primary/10 flex items-center justify-center">
                       <div className="w-1.5 h-1.5 rounded-full bg-primary" />
@@ -97,7 +96,7 @@ function QuestionNav({
                 </div>
                 <div className="min-w-0">
                   <span className="text-xs text-gray-400 font-mono">{q.number}</span>
-                  <p className={`text-xs leading-snug truncate mt-0.5 ${isCurrent ? 'font-semibold text-gray-900' : isAnswered ? 'text-gray-500' : 'text-gray-700'}`}>
+                  <p className={`text-xs leading-snug truncate mt-0.5 ${isCurrent ? 'font-semibold text-gray-900' : isAnswered || isMarkedForReview ? 'text-gray-500' : 'text-gray-700'}`}>
                     {q.title}
                   </p>
                 </div>
@@ -115,18 +114,34 @@ function QuestionCard({
   onAnswer,
   onClarify,
   isActive,
+  onAcceptSuggestion,
 }: {
   question: Question
   onAnswer: (questionId: string, answerId: string) => void
   onClarify: (question: Question) => void
   isActive: boolean
+  onAcceptSuggestion?: () => void
 }) {
   const [selected, setSelected] = useState(question.aiPrefilled ?? '')
+  const [suggestionAccepted, setSuggestionAccepted] = useState(false)
 
   const handleSelect = (value: string) => {
     setSelected(value)
     onAnswer(question.id, value)
   }
+
+  const handleAcceptSuggestion = () => {
+    if (question.suggestedAnswer) {
+      setSelected(question.suggestedAnswer)
+      onAnswer(question.id, question.suggestedAnswer)
+      setSuggestionAccepted(true)
+      onAcceptSuggestion?.()
+    }
+  }
+
+  const suggestedOption = question.suggestedAnswer 
+    ? question.options.find(opt => opt.id === question.suggestedAnswer)
+    : null
 
   return (
     <motion.div
@@ -145,7 +160,13 @@ function QuestionCard({
             <span className="text-xs font-mono text-gray-400 bg-gray-100 px-2 py-0.5 rounded">
               {question.number}
             </span>
-            {question.answered && (
+            {question.markedForReview && !suggestionAccepted && (
+              <span className="inline-flex items-center gap-1 text-xs text-[#6673C7] bg-[#6673C7]/10 px-2 py-0.5 rounded-full font-medium">
+                <MessageCircle className="w-3 h-3 fill-[#6673C7]" />
+                Marked for review
+              </span>
+            )}
+            {(question.answered || suggestionAccepted) && (
               <span className="inline-flex items-center gap-1 text-xs text-primary bg-primary/8 px-2 py-0.5 rounded-full font-medium">
                 <Sparkles className="w-3 h-3" />
                 AI pre-filled
@@ -200,6 +221,44 @@ function QuestionCard({
         ))}
       </RadioGroup>
 
+      {/* Suggested response box */}
+      {question.markedForReview && suggestedOption && !suggestionAccepted && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-5 bg-[#6673C7]/5 border border-[#6673C7]/20 rounded-xl p-4"
+        >
+          <div className="flex items-start gap-3">
+            <div className="w-6 h-6 rounded-full bg-[#6673C7] flex items-center justify-center flex-shrink-0">
+              <Sparkles className="w-3 h-3 text-white" />
+            </div>
+            <div className="flex-1">
+              <p className="text-xs font-semibold text-[#6673C7] mb-1">Suggested response</p>
+              <p className="text-sm font-medium text-gray-900 mb-1">{suggestedOption.label}</p>
+              {suggestedOption.description && (
+                <p className="text-xs text-gray-600 leading-relaxed">{suggestedOption.description}</p>
+              )}
+              <div className="flex items-center gap-2 mt-3">
+                <Button
+                  size="sm"
+                  className="h-7 text-xs bg-[#6673C7] hover:bg-[#6673C7]/90"
+                  onClick={handleAcceptSuggestion}
+                >
+                  Accept
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 text-xs text-gray-500 hover:text-gray-700"
+                >
+                  Dismiss
+                </Button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
       {/* Additional notes / rewrite area */}
       <div className="mt-5 pt-4 border-t border-gray-100">
         <label className="text-xs font-medium text-gray-700 mb-2 block">
@@ -237,10 +296,9 @@ export default function AssessmentQuestionnaire() {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [activeGuide, setActiveGuide] = useState<Question | null>(null)
   const [chatInput, setChatInput] = useState('')
-  const [chatMessages, setChatMessages] = useState(aiPrefilledMessages)
   const [guideConversation, setGuideConversation] = useState<Array<{ role: 'user' | 'assistant'; content: string; options?: Array<{ id: string; label: string }> }>>([])
   const [isGuideTyping, setIsGuideTyping] = useState(false)
-  const [showReadiness, setShowReadiness] = useState(false)
+  const [acceptedSuggestions, setAcceptedSuggestions] = useState<number>(0)
   const chatBottomRef = useRef<HTMLDivElement>(null)
 
   const allQuestions = privacyAssessmentSections.flatMap(s => s.questions)
@@ -253,10 +311,7 @@ export default function AssessmentQuestionnaire() {
   const totalCount = allQuestions.length + 4 // simulate more questions
   const progress = Math.round((answeredCount / totalCount) * 100) + 40
 
-  useEffect(() => {
-    const timer = setTimeout(() => setShowReadiness(true), 2000)
-    return () => clearTimeout(timer)
-  }, [])
+
 
   const handleAnswer = (questionId: string, answerId: string) => {
     setAnswers(prev => ({ ...prev, [questionId]: answerId }))
@@ -301,8 +356,11 @@ export default function AssessmentQuestionnaire() {
 
   const handleChatSend = () => {
     if (!chatInput.trim()) return
-    setChatMessages(prev => [...prev, chatInput])
     setChatInput('')
+  }
+
+  const handleAcceptSuggestion = () => {
+    setAcceptedSuggestions(prev => prev + 1)
   }
 
   return (
@@ -361,17 +419,23 @@ export default function AssessmentQuestionnaire() {
           <main className="flex-1 overflow-y-auto scrollbar-thin px-8 py-6">
             <div className="max-w-2xl">
               <div className="flex items-center gap-2 mb-6">
-                <h2 className="text-base font-semibold text-gray-900">Systems</h2>
-                <span className="text-xs text-gray-400">— 7 questions</span>
+                <h2 className="text-base font-semibold text-gray-900">Residency information</h2>
+                <span className="text-xs text-gray-400">— 3 questions</span>
+                <span className="ml-2 inline-flex items-center gap-1 text-xs text-[#6673C7] bg-[#6673C7]/10 px-2 py-0.5 rounded-full font-medium">
+                  <MessageCircle className="w-3 h-3 fill-[#6673C7]" />
+                  3 marked for review
+                </span>
               </div>
 
-              {allQuestions.slice(0, 3).map((question, i) => (
+              {/* Show the 3 residency questions */}
+              {privacyAssessmentSections[0].questions.map((question) => (
                 <QuestionCard
                   key={question.id}
                   question={question}
                   onAnswer={handleAnswer}
                   onClarify={handleClarify}
                   isActive={question.id === currentQuestionId}
+                  onAcceptSuggestion={handleAcceptSuggestion}
                 />
               ))}
 
@@ -457,22 +521,6 @@ export default function AssessmentQuestionnaire() {
                       </button>
                     ))}
                   </div>
-
-                  {/* AI prefilled messages */}
-                  {chatMessages.map((msg, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.2, duration: 0.3 }}
-                      className="flex items-start gap-2"
-                    >
-                      <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-white text-[8px] font-bold">AI</span>
-                      </div>
-                      <p className="text-xs text-gray-700 leading-relaxed">{msg}</p>
-                    </motion.div>
-                  ))}
 
                   {/* Guide tool — appears when Ask Copilot is clicked */}
                   <AnimatePresence>
@@ -568,9 +616,9 @@ export default function AssessmentQuestionnaire() {
                     )}
                   </AnimatePresence>
 
-                  {/* Readiness summary */}
+                  {/* Readiness summary - shows after 2 suggestions are accepted */}
                   <AnimatePresence>
-                    {showReadiness && (
+                    {acceptedSuggestions >= 2 && (
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
