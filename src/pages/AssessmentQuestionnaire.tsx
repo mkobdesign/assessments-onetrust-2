@@ -627,7 +627,8 @@ export default function AssessmentQuestionnaire() {
     const container = mainContentRef.current
     if (element && container) {
       const elementTop = element.offsetTop
-      container.scrollTo({ top: elementTop - 10, behavior: 'smooth' })
+      // Offset by 80px to account for section header height
+      container.scrollTo({ top: Math.max(0, elementTop - 80), behavior: 'smooth' })
     }
   }
 
