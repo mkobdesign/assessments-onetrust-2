@@ -299,6 +299,11 @@ export default function AssessmentQuestionnaire() {
   const [guideConversation, setGuideConversation] = useState<Array<{ role: 'user' | 'assistant'; content: string; options?: Array<{ id: string; label: string }> }>>([])
   const [isGuideTyping, setIsGuideTyping] = useState(false)
   const [acceptedSuggestions, setAcceptedSuggestions] = useState<number>(0)
+  
+  // Track if all residency suggestions accepted (3) and all systems questions answered (3)
+  const systemsQuestionIds = ['q2-1', 'q2-3', 'q2-4']
+  const systemsAnsweredCount = systemsQuestionIds.filter(id => answers[id]).length
+  const showGovernanceReadiness = acceptedSuggestions >= 3 && systemsAnsweredCount >= 3
   const chatBottomRef = useRef<HTMLDivElement>(null)
 
   const allQuestions = privacyAssessmentSections.flatMap(s => s.questions)
@@ -439,13 +444,22 @@ export default function AssessmentQuestionnaire() {
                 />
               ))}
 
-              {/* Load more hint */}
-              <button
-                className="w-full text-center text-xs text-gray-400 py-4 hover:text-gray-600 transition-colors"
-                onClick={() => {}}
-              >
-                Scroll for more questions ↓
-              </button>
+              {/* Systems section header */}
+              <div className="flex items-center gap-2 mb-6 mt-8">
+                <h2 className="text-base font-semibold text-gray-900">Systems</h2>
+                <span className="text-xs text-gray-400">— 3 questions</span>
+              </div>
+
+              {/* Show the 3 systems questions */}
+              {privacyAssessmentSections[1].questions.map((question) => (
+                <QuestionCard
+                  key={question.id}
+                  question={question}
+                  onAnswer={handleAnswer}
+                  onClarify={handleClarify}
+                  isActive={question.id === currentQuestionId}
+                />
+              ))}
             </div>
           </main>
 
@@ -616,9 +630,9 @@ export default function AssessmentQuestionnaire() {
                     )}
                   </AnimatePresence>
 
-                  {/* Readiness summary - shows after 2 suggestions are accepted */}
+                  {/* Readiness summary - shows after all 3 suggestions accepted AND all 3 systems questions answered */}
                   <AnimatePresence>
-                    {acceptedSuggestions >= 2 && (
+                    {showGovernanceReadiness && (
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
