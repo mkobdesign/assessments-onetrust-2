@@ -468,7 +468,7 @@ export default function AssessmentQuestionnaire() {
 
           {/* Main: Questions */}
           <main ref={mainContentRef} className="flex-1 overflow-y-auto scrollbar-thin px-8 py-6">
-            <div className="max-w-2xl">
+            <div>
               <div className="flex items-center gap-2 mb-6">
                 <h2 className="text-base font-semibold text-gray-900">Residency information</h2>
                 <span className="text-xs text-gray-400">— 3 questions</span>
