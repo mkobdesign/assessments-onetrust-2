@@ -158,7 +158,7 @@ function QuestionCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
       className={`bg-white border rounded-xl p-6 mb-4 transition-all duration-200 ${
-        isActive ? 'border-primary/30 shadow-sm shadow-primary/5' : 'border-gray-200'
+        isActive ? 'border-primary/30 shadow-sm shadow-primary/5 border-l-2 border-l-primary' : 'border-gray-200'
       }`}
       id={`question-${question.id}`}
     >
@@ -624,8 +624,10 @@ export default function AssessmentQuestionnaire() {
   const handleQuestionSelect = (questionId: string) => {
     setCurrentQuestionId(questionId)
     const element = document.getElementById(`question-${questionId}`)
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    const container = mainContentRef.current
+    if (element && container) {
+      const elementTop = element.offsetTop
+      container.scrollTo({ top: elementTop - 10, behavior: 'smooth' })
     }
   }
 
