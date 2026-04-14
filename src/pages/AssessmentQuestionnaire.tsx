@@ -292,7 +292,7 @@ function QuestionCard({
 
 export default function AssessmentQuestionnaire() {
   const navigate = useNavigate()
-  const [currentQuestionId, setCurrentQuestionId] = useState('q2-1')
+  const [currentQuestionId, setCurrentQuestionId] = useState('q1-1')
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [activeGuide, setActiveGuide] = useState<Question | null>(null)
   const [chatInput, setChatInput] = useState('')
@@ -305,6 +305,44 @@ export default function AssessmentQuestionnaire() {
   const systemsAnsweredCount = systemsQuestionIds.filter(id => answers[id]).length
   const showGovernanceReadiness = acceptedSuggestions >= 3 && systemsAnsweredCount >= 3
   const chatBottomRef = useRef<HTMLDivElement>(null)
+  const mainContentRef = useRef<HTMLElement>(null)
+
+  // Scroll-based active question tracking
+  useEffect(() => {
+    const mainContent = mainContentRef.current
+    if (!mainContent) return
+
+    const allQuestionIds = privacyAssessmentSections.flatMap(s => s.questions.map(q => q.id))
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleEntries = entries.filter(entry => entry.isIntersecting)
+        if (visibleEntries.length > 0) {
+          // Find the topmost visible question
+          const topEntry = visibleEntries.reduce((prev, curr) => 
+            prev.boundingClientRect.top < curr.boundingClientRect.top ? prev : curr
+          )
+          const questionId = topEntry.target.id.replace('question-', '')
+          if (allQuestionIds.includes(questionId)) {
+            setCurrentQuestionId(questionId)
+          }
+        }
+      },
+      {
+        root: mainContent,
+        rootMargin: '-20% 0px -60% 0px',
+        threshold: 0
+      }
+    )
+
+    // Observe all question elements
+    allQuestionIds.forEach(id => {
+      const element = document.getElementById(`question-${id}`)
+      if (element) observer.observe(element)
+    })
+
+    return () => observer.disconnect()
+  }, [])
 
   const allQuestions = privacyAssessmentSections.flatMap(s => s.questions)
   const unansweredQuestions = allQuestions.filter(q => !q.answered && !answers[q.id]).slice(0, 3)
@@ -421,7 +459,7 @@ export default function AssessmentQuestionnaire() {
           </aside>
 
           {/* Main: Questions */}
-          <main className="flex-1 overflow-y-auto scrollbar-thin px-8 py-6">
+          <main ref={mainContentRef} className="flex-1 overflow-y-auto scrollbar-thin px-8 py-6">
             <div className="max-w-2xl">
               <div className="flex items-center gap-2 mb-6">
                 <h2 className="text-base font-semibold text-gray-900">Residency information</h2>
