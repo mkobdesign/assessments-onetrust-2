@@ -23,6 +23,7 @@ import {
   Minus,
   FileText,
   AlertTriangle,
+  Database,
 } from 'lucide-react'
 import { privacyAssessmentSections, type Question } from '@/data/assessmentQuestions'
 import { dataSources } from '@/data/mockFlow'
