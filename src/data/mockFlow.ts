@@ -136,6 +136,10 @@ export const conversationSteps: ChatMessage[][] = [
       content:
         "That's important — I've marked human-in-the-loop as required. \n\n**Are there any regulatory requirements we should be aware of?** For example, GDPR, CCPA, or industry-specific rules?",
     },
+  ],
+
+  // Step 6: User answers regulatory requirements
+  [
     {
       id: 'u6',
       role: 'user',
@@ -150,7 +154,7 @@ export const conversationSteps: ChatMessage[][] = [
     },
   ],
 
-  // Step 6: Data retention answer + assessments generated
+  // Step 7: Data retention answer + assessments generated
   [
     {
       id: 'u7',
