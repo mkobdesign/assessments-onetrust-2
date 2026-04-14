@@ -158,7 +158,7 @@ function QuestionCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
       className={`bg-white border rounded-xl p-6 mb-4 transition-all duration-200 ${
-        isActive ? 'border-primary/30 shadow-sm shadow-primary/5' : 'border-gray-200'
+        isActive ? 'border-primary/30 shadow-sm shadow-primary/5 border-l-2 border-l-primary' : 'border-gray-200'
       }`}
       id={`question-${question.id}`}
     >
@@ -207,14 +207,14 @@ function QuestionCard({
       </p>
 
       {/* Options */}
-      <RadioGroup value={selected} onValueChange={handleSelect} className="space-y-2.5">
+      <RadioGroup value={selected} onValueChange={handleSelect} className="space-y-1">
         {question.options.map(option => (
           <label
             key={option.id}
-            className={`flex items-start gap-3 p-3.5 rounded-lg border cursor-pointer transition-all duration-150 ${
+            className={`flex items-start gap-3 p-3.5 rounded-lg cursor-pointer transition-all duration-150 ${
               selected === option.id
-                ? 'border-primary bg-primary/5'
-                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                ? 'bg-primary/5'
+                : 'hover:bg-gray-50'
             }`}
           >
             <RadioGroupItem value={option.id} id={`${question.id}-${option.id}`} className="mt-0.5 flex-shrink-0" />
@@ -624,8 +624,11 @@ export default function AssessmentQuestionnaire() {
   const handleQuestionSelect = (questionId: string) => {
     setCurrentQuestionId(questionId)
     const element = document.getElementById(`question-${questionId}`)
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    const container = mainContentRef.current
+    if (element && container) {
+      const elementTop = element.offsetTop
+      // Offset by 80px to account for section header height
+      container.scrollTo({ top: Math.max(0, elementTop - 80), behavior: 'smooth' })
     }
   }
 

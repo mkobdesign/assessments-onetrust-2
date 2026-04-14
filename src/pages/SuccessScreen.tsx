@@ -3,26 +3,103 @@ import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { CheckCircle2 } from 'lucide-react'
 
+// Subtle rising particles for professional celebration
+function CelebrationParticles() {
+  const particles = Array.from({ length: 12 }, (_, i) => ({
+    id: i,
+    x: Math.random() * 100 - 50, // -50 to 50
+    delay: Math.random() * 0.5,
+    duration: 2 + Math.random() * 1.5,
+    size: 4 + Math.random() * 4,
+  }))
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {particles.map((particle) => (
+        <motion.div
+          key={particle.id}
+          initial={{ opacity: 0, y: 60, x: particle.x }}
+          animate={{ 
+            opacity: [0, 0.6, 0.6, 0],
+            y: -120,
+            x: particle.x + (Math.random() * 30 - 15)
+          }}
+          transition={{
+            delay: 0.3 + particle.delay,
+            duration: particle.duration,
+            ease: 'easeOut',
+          }}
+          className="absolute left-1/2 top-1/2"
+          style={{ 
+            width: particle.size, 
+            height: particle.size,
+            borderRadius: '50%',
+            backgroundColor: particle.id % 3 === 0 ? '#22c55e' : particle.id % 3 === 1 ? '#86efac' : '#dcfce7',
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
+// Subtle ring pulse animation
+function RingPulse() {
+  return (
+    <>
+      <motion.div
+        initial={{ scale: 1, opacity: 0.4 }}
+        animate={{ scale: 2.5, opacity: 0 }}
+        transition={{ delay: 0.4, duration: 1.2, ease: 'easeOut' }}
+        className="absolute inset-0 rounded-full border-2 border-primary/30"
+      />
+      <motion.div
+        initial={{ scale: 1, opacity: 0.3 }}
+        animate={{ scale: 2, opacity: 0 }}
+        transition={{ delay: 0.6, duration: 1, ease: 'easeOut' }}
+        className="absolute inset-0 rounded-full border border-primary/20"
+      />
+    </>
+  )
+}
+
 export default function SuccessScreen() {
   const navigate = useNavigate()
 
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6">
+      {/* Subtle background glow */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.2, duration: 0.8 }}
+        className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-radial from-primary/5 via-transparent to-transparent rounded-full pointer-events-none"
+      />
+
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="text-center max-w-lg"
+        className="text-center max-w-lg relative"
       >
-        {/* Checkmark */}
+        {/* Celebration particles */}
+        <CelebrationParticles />
+
+        {/* Checkmark with ring pulse */}
         <motion.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.4, type: 'spring', stiffness: 200 }}
           className="flex justify-center mb-8"
         >
-          <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
-            <CheckCircle2 className="w-10 h-10 text-primary" />
+          <div className="relative w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+            <RingPulse />
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.4, duration: 0.3, type: 'spring', stiffness: 300 }}
+            >
+              <CheckCircle2 className="w-10 h-10 text-primary" />
+            </motion.div>
           </div>
         </motion.div>
 
