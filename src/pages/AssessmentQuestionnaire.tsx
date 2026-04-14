@@ -26,6 +26,8 @@ import {
   Database,
   GripVertical,
   Trash2,
+  Bookmark,
+  Clock,
 } from 'lucide-react'
 import { privacyAssessmentSections, type Question } from '@/data/assessmentQuestions'
 import { dataSources } from '@/data/mockFlow'
@@ -506,6 +508,13 @@ export default function AssessmentQuestionnaire() {
   const [isGuideTyping, setIsGuideTyping] = useState(false)
   const [acceptedSuggestions, setAcceptedSuggestions] = useState<number>(0)
   
+  // Guide history - stores conversations per question with timestamps
+  type GuideSession = {
+    timestamp: Date
+    conversation: Array<{ role: 'user' | 'assistant'; content: string }>
+  }
+  const [guideHistory, setGuideHistory] = useState<Record<string, GuideSession[]>>({})
+  
   // Track if all residency suggestions accepted (3) and all systems questions answered (3)
   const systemsQuestionIds = ['q2-1', 'q2-3', 'q2-4']
   const systemsAnsweredCount = systemsQuestionIds.filter(id => answers[id]).length
@@ -791,6 +800,76 @@ export default function AssessmentQuestionnaire() {
                     ))}
                   </div>
 
+                  {/* Guide History Bookmarks */}
+                  {Object.entries(guideHistory).length > 0 && (
+                    <div className="space-y-3 mt-4">
+                      {Object.entries(guideHistory).map(([questionId, sessions]) => {
+                        const question = allQuestions.find(q => q.id === questionId)
+                        if (!question || sessions.length === 0) return null
+                        
+                        return (
+                          <motion.div
+                            key={questionId}
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="bg-gradient-to-r from-[#6673C7]/5 to-[#6673C7]/10 border border-[#6673C7]/20 rounded-xl overflow-hidden"
+                          >
+                            {/* Bookmark header */}
+                            <div className="flex items-center gap-2 px-3 py-2 bg-[#6673C7]/10 border-b border-[#6673C7]/10">
+                              <Bookmark className="w-3 h-3 text-[#6673C7] fill-[#6673C7]" />
+                              <span className="text-[10px] font-semibold text-[#6673C7] uppercase tracking-wide">Guide Session</span>
+                            </div>
+                            
+                            {/* Question context */}
+                            <div className="px-3 py-2 border-b border-[#6673C7]/10">
+                              <p className="text-[10px] text-gray-400">Question {question.number}</p>
+                              <p className="text-xs font-medium text-gray-800 truncate">{question.title}</p>
+                            </div>
+
+                            {/* Sessions */}
+                            <div className="divide-y divide-[#6673C7]/10">
+                              {sessions.map((session, sessionIdx) => (
+                                <div key={sessionIdx} className="px-3 py-2">
+                                  {/* Timestamp */}
+                                  <div className="flex items-center gap-1.5 mb-2">
+                                    <Clock className="w-2.5 h-2.5 text-gray-400" />
+                                    <span className="text-[10px] text-gray-400">
+                                      {session.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </span>
+                                  </div>
+                                  
+                                  {/* Conversation preview */}
+                                  <div className="space-y-1.5">
+                                    {session.conversation.slice(0, 4).map((msg, msgIdx) => (
+                                      <div key={msgIdx} className={`text-[11px] ${msg.role === 'user' ? 'text-gray-600 italic' : 'text-gray-700'}`}>
+                                        <span className="text-[10px] text-gray-400 mr-1">{msg.role === 'user' ? 'You:' : 'AI:'}</span>
+                                        <span className="line-clamp-2">{msg.content}</span>
+                                      </div>
+                                    ))}
+                                    {session.conversation.length > 4 && (
+                                      <p className="text-[10px] text-gray-400">+{session.conversation.length - 4} more messages</p>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+
+                            {/* Revisit button */}
+                            <button
+                              onClick={() => {
+                                setActiveGuide(question)
+                                handleQuestionSelect(question.id)
+                              }}
+                              className="w-full px-3 py-2 text-[10px] font-medium text-[#6673C7] bg-white/50 hover:bg-white transition-colors border-t border-[#6673C7]/10"
+                            >
+                              Continue this conversation
+                            </button>
+                          </motion.div>
+                        )
+                      })}
+                    </div>
+                  )}
+
                   {/* Guide tool — appears when Ask Copilot is clicked */}
                   <AnimatePresence>
                     {activeGuide && (
@@ -808,6 +887,19 @@ export default function AssessmentQuestionnaire() {
                           </div>
                           <button
                             onClick={() => {
+                              // Save conversation to history if there was any interaction
+                              if (guideConversation.length > 0 && activeGuide) {
+                                setGuideHistory(prev => ({
+                                  ...prev,
+                                  [activeGuide.id]: [
+                                    ...(prev[activeGuide.id] || []),
+                                    {
+                                      timestamp: new Date(),
+                                      conversation: guideConversation.map(m => ({ role: m.role, content: m.content }))
+                                    }
+                                  ]
+                                }))
+                              }
                               setActiveGuide(null)
                               setGuideConversation([])
                             }}
