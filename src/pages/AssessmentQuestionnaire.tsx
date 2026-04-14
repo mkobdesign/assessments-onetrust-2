@@ -124,6 +124,7 @@ function QuestionCard({
 }) {
   const [selected, setSelected] = useState(question.aiPrefilled ?? '')
   const [suggestionAccepted, setSuggestionAccepted] = useState(false)
+  const [suggestionDismissed, setSuggestionDismissed] = useState(false)
 
   const handleSelect = (value: string) => {
     setSelected(value)
@@ -222,7 +223,7 @@ function QuestionCard({
       </RadioGroup>
 
       {/* Suggested response box */}
-      {question.markedForReview && suggestedOption && !suggestionAccepted && (
+      {question.markedForReview && suggestedOption && !suggestionAccepted && !suggestionDismissed && (
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -250,6 +251,7 @@ function QuestionCard({
                   variant="ghost"
                   size="sm"
                   className="h-7 text-xs text-gray-500 hover:text-gray-700"
+                  onClick={() => setSuggestionDismissed(true)}
                 >
                   Dismiss
                 </Button>
