@@ -24,6 +24,8 @@ import {
   FileText,
   AlertTriangle,
   Database,
+  GripVertical,
+  Trash2,
 } from 'lucide-react'
 import { privacyAssessmentSections, type Question } from '@/data/assessmentQuestions'
 import { dataSources } from '@/data/mockFlow'
@@ -296,107 +298,191 @@ function QuestionCard({
   )
 }
 
-// Data Sources Card component with collapsible stats
+// Data Sources Card component with collapsible stats per item
 function DataSourcesCard() {
-  const [isExpanded, setIsExpanded] = useState(false)
-  
-  const documentStats = {
-    relevance: { score: 92, label: 'High', status: 'good' },
-    completeness: { score: 78, label: 'Good', status: 'warning' },
-    freshness: { score: 95, label: 'Current', status: 'good' },
-    contradictions: { score: 0, label: 'None found', status: 'good' },
+  const [isEditMode, setIsEditMode] = useState(false)
+  const [expandedSources, setExpandedSources] = useState<Record<string, boolean>>({})
+  const [localSources, setLocalSources] = useState(dataSources)
+
+  const toggleSourceExpanded = (id: string) => {
+    setExpandedSources(prev => ({ ...prev, [id]: !prev[id] }))
   }
 
-  const questionsAnswered = [
-    { id: 'q1-1', question: 'Where will data be stored geographically?', source: 'OpenAI_DPA_2024.pdf' },
-    { id: 'q1-2', question: 'Where are data subjects located?', source: 'Zendesk Risk Assessment' },
-    { id: 'q1-3', question: 'What transfer mechanisms are in place?', source: 'OpenAI_DPA_2024.pdf' },
-    { id: 'q2-1', question: 'Which systems process data?', source: 'Vendor_Security_Overview.pdf' },
-  ]
+  const handleDeleteSource = (id: string) => {
+    setLocalSources(prev => prev.filter(s => s.id !== id))
+  }
+
+  const handleCancel = () => {
+    setLocalSources(dataSources)
+    setIsEditMode(false)
+  }
+
+  // Per-source stats (mock data varying by source)
+  const getSourceStats = (sourceId: string) => {
+    const statsMap: Record<string, { relevance: string; completeness: string; freshness: string; contradictions: string }> = {
+      dpa: { relevance: 'High', completeness: 'Complete', freshness: 'Current', contradictions: 'None' },
+      security: { relevance: 'High', completeness: 'Good', freshness: 'Current', contradictions: 'None' },
+      architecture: { relevance: 'Medium', completeness: 'Partial', freshness: '6 months old', contradictions: 'None' },
+      prompts: { relevance: 'High', completeness: 'Complete', freshness: 'Current', contradictions: 'None' },
+      sop: { relevance: 'High', completeness: 'Good', freshness: 'Current', contradictions: 'None' },
+    }
+    return statsMap[sourceId] || { relevance: 'Unknown', completeness: 'Unknown', freshness: 'Unknown', contradictions: 'Unknown' }
+  }
+
+  const getSourceQuestions = (sourceId: string) => {
+    const questionsMap: Record<string, string[]> = {
+      dpa: ['Where will data be stored geographically?', 'What transfer mechanisms are in place?', 'What is the data retention period?'],
+      security: ['Which systems process data?', 'What security controls are in place?'],
+      architecture: ['Where are data subjects located?', 'What is the data flow architecture?'],
+      prompts: ['What types of prompts are used?', 'Is personal data included in prompts?'],
+      sop: ['Is human review required?', 'What is the escalation workflow?'],
+    }
+    return questionsMap[sourceId] || []
+  }
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
       {/* Header */}
-      <div className="px-3 py-2.5 border-b border-gray-100">
-        <p className="text-xs font-semibold text-gray-900">Data Sources</p>
-        <p className="text-[10px] text-gray-500 mt-0.5">Documents used to generate answers</p>
+      <div className="px-3 py-2.5 border-b border-gray-100 flex items-center justify-between">
+        <div>
+          <p className="text-xs font-semibold text-gray-900">Data Sources</p>
+          <p className="text-[10px] text-gray-500 mt-0.5">Documents used to generate answers</p>
+        </div>
+        {!isEditMode && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-6 text-[10px] px-2"
+            onClick={() => setIsEditMode(true)}
+          >
+            Edit
+          </Button>
+        )}
       </div>
       
-      {/* Document list */}
-      <div className="px-3 py-2 space-y-1.5">
-        {dataSources.map((source, i) => (
-          <div key={source.id} className="flex items-center gap-2 text-xs">
-            <span className="text-gray-400 w-4">{i + 1}.</span>
-            <FileText className="w-3 h-3 text-gray-400 flex-shrink-0" />
-            <span className="text-gray-700 truncate">{source.name}</span>
-          </div>
-        ))}
+      {/* Document list with per-item health */}
+      <div className="divide-y divide-gray-100">
+        {localSources.map((source, i) => {
+          const stats = getSourceStats(source.id)
+          const questions = getSourceQuestions(source.id)
+          const isExpanded = expandedSources[source.id]
+          const hasWarning = stats.completeness === 'Partial' || stats.freshness.includes('months')
+
+          return (
+            <div key={source.id}>
+              {/* Source row */}
+              <div className={`px-3 py-2.5 ${isEditMode ? 'bg-gray-50' : ''}`}>
+                <div className="flex items-center gap-2">
+                  {isEditMode && (
+                    <GripVertical className="w-3 h-3 text-gray-400 cursor-grab flex-shrink-0" />
+                  )}
+                  <span className="text-gray-400 text-xs w-4">{i + 1}.</span>
+                  <FileText className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-gray-800 truncate">{source.name}</p>
+                    <p className="text-[10px] text-gray-500">{source.type}</p>
+                  </div>
+                  {hasWarning && !isEditMode && (
+                    <AlertTriangle className="w-3 h-3 text-amber-500 flex-shrink-0" />
+                  )}
+                  {isEditMode ? (
+                    <button
+                      onClick={() => handleDeleteSource(source.id)}
+                      className="p-1 hover:bg-red-50 rounded transition-colors"
+                    >
+                      <Trash2 className="w-3 h-3 text-red-500" />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => toggleSourceExpanded(source.id)}
+                      className="p-1 hover:bg-gray-100 rounded transition-colors"
+                    >
+                      <ChevronDown className={`w-3 h-3 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Expanded health info */}
+              <AnimatePresence>
+                {isExpanded && !isEditMode && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.15 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="px-3 pb-3 pt-1 bg-gray-50/50 space-y-2">
+                      {/* Stats row */}
+                      <div className="grid grid-cols-2 gap-1.5">
+                        <div className="text-[10px]">
+                          <span className="text-gray-500">Relevance:</span>{' '}
+                          <span className={stats.relevance === 'High' ? 'text-green-600 font-medium' : 'text-amber-600 font-medium'}>{stats.relevance}</span>
+                        </div>
+                        <div className="text-[10px]">
+                          <span className="text-gray-500">Completeness:</span>{' '}
+                          <span className={stats.completeness === 'Complete' || stats.completeness === 'Good' ? 'text-green-600 font-medium' : 'text-amber-600 font-medium'}>{stats.completeness}</span>
+                        </div>
+                        <div className="text-[10px]">
+                          <span className="text-gray-500">Freshness:</span>{' '}
+                          <span className={stats.freshness === 'Current' ? 'text-green-600 font-medium' : 'text-amber-600 font-medium'}>{stats.freshness}</span>
+                        </div>
+                        <div className="text-[10px]">
+                          <span className="text-gray-500">Contradictions:</span>{' '}
+                          <span className="text-green-600 font-medium">{stats.contradictions}</span>
+                        </div>
+                      </div>
+
+                      {/* Questions answered */}
+                      {questions.length > 0 && (
+                        <div className="pt-1.5 border-t border-gray-200">
+                          <p className="text-[10px] text-gray-500 mb-1">Questions answered:</p>
+                          <div className="space-y-0.5">
+                            {questions.map((q, idx) => (
+                              <div key={idx} className="flex items-center gap-1.5 text-[10px]">
+                                <CheckCircle2 className="w-2.5 h-2.5 text-green-500 flex-shrink-0" />
+                                <span className="text-gray-700 truncate">{q}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )
+        })}
       </div>
 
-      {/* Expandable stats section */}
-      <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full px-3 py-2 border-t border-gray-100 bg-gray-50 flex items-center justify-between hover:bg-gray-100 transition-colors"
-      >
-        <span className="text-[10px] font-medium text-gray-500">Document health & coverage</span>
-        <ChevronDown className={`w-3 h-3 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
-      </button>
-
-      <AnimatePresence>
-        {isExpanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden"
-          >
-            <div className="px-3 py-3 border-t border-gray-100 space-y-3">
-              {/* Stats grid */}
-              <div className="grid grid-cols-2 gap-2">
-                {Object.entries(documentStats).map(([key, stat]) => (
-                  <div key={key} className="bg-gray-50 rounded-lg px-2.5 py-2">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-[10px] text-gray-500 capitalize">{key}</span>
-                      {stat.status === 'warning' && <AlertTriangle className="w-3 h-3 text-amber-500" />}
-                    </div>
-                    <p className={`text-xs font-semibold ${stat.status === 'good' ? 'text-green-600' : 'text-amber-600'}`}>
-                      {stat.label}
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Completeness gap alert */}
-              <div className="bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-2">
-                <div className="flex items-start gap-2">
-                  <AlertTriangle className="w-3 h-3 text-amber-500 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-[10px] font-medium text-amber-800">Gap in completeness</p>
-                    <p className="text-[10px] text-amber-700 mt-0.5">Missing documentation for data retention policies. Consider adding relevant documents.</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Questions answered */}
-              <div>
-                <p className="text-[10px] font-medium text-gray-500 mb-2">Questions answered by documents</p>
-                <div className="space-y-1.5">
-                  {questionsAnswered.map((q) => (
-                    <div key={q.id} className="flex items-start gap-2 text-[10px]">
-                      <CheckCircle2 className="w-3 h-3 text-green-500 flex-shrink-0 mt-0.5" />
-                      <div className="min-w-0">
-                        <p className="text-gray-700 truncate">{q.question}</p>
-                        <p className="text-gray-400">from {q.source}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Edit mode footer */}
+      {isEditMode && (
+        <div className="px-3 py-3 border-t border-gray-200 bg-amber-50/50 space-y-2">
+          <div className="flex items-start gap-2">
+            <AlertTriangle className="w-3 h-3 text-amber-500 flex-shrink-0 mt-0.5" />
+            <p className="text-[10px] text-amber-700">Changes may take up to 10 minutes to process and regenerate answers.</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              className="h-7 text-xs flex-1"
+              onClick={() => setIsEditMode(false)}
+            >
+              Confirm
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 text-xs"
+              onClick={handleCancel}
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -642,7 +728,7 @@ export default function AssessmentQuestionnaire() {
                 </TabsList>
               </div>
 
-              <TabsContent value="chat" className="flex flex-col flex-1 overflow-hidden mt-0">
+              <TabsContent value="chat" className="flex flex-col flex-1 overflow-hidden mt-0 data-[state=inactive]:hidden">
                 {/* Context badge */}
                 <div className="px-4 py-2 border-b border-gray-100 bg-gray-50/50">
                   <div className="flex items-center gap-1.5">
@@ -890,35 +976,34 @@ export default function AssessmentQuestionnaire() {
                 </div>
               </TabsContent>
 
-              <TabsContent value="tools" className="flex-1 overflow-y-auto mt-0 px-4 py-4">
+              <TabsContent value="tools" className="flex-1 overflow-y-auto mt-0 px-4 py-4 data-[state=inactive]:hidden">
                 <div className="space-y-4">
-                  <p className="text-xs text-gray-500 leading-relaxed">
-                    Use these tools to automatically generate or research answers for this assessment.
-                  </p>
-                  
-                  {/* Tools - aligned from top */}
-                  <div className="space-y-2">
-                    {[
-                      { icon: Search, label: 'Deep research', desc: 'Scan connected systems for relevant information' },
-                      { icon: MessageCircle, label: 'Guided walkthrough', desc: 'Let Copilot explain each question in plain language' },
-                    ].map(({ icon: Icon, label, desc }) => (
-                      <button
-                        key={label}
-                        className="w-full flex items-start gap-3 p-3 bg-white border border-gray-200 rounded-xl text-left hover:border-primary/40 hover:bg-primary/5 transition-all duration-150"
-                      >
-                        <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                          <Icon className="w-3.5 h-3.5 text-primary" />
-                        </div>
-                        <div>
-                          <p className="text-xs font-semibold text-gray-900">{label}</p>
-                          <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Data Sources Card */}
+                  {/* Data Sources Card - at top */}
                   <DataSourcesCard />
+
+                  {/* Tools section */}
+                  <div>
+                    <p className="text-[10px] text-gray-400 uppercase tracking-wide font-medium mb-2">Tools</p>
+                    <div className="space-y-2">
+                      {[
+                        { icon: Search, label: 'Deep research', desc: 'Scan connected systems for relevant information' },
+                        { icon: MessageCircle, label: 'Guided walkthrough', desc: 'Let Copilot explain each question in plain language' },
+                      ].map(({ icon: Icon, label, desc }) => (
+                        <button
+                          key={label}
+                          className="w-full flex items-start gap-3 p-3 bg-white border border-gray-200 rounded-xl text-left hover:border-primary/40 hover:bg-primary/5 transition-all duration-150"
+                        >
+                          <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                            <Icon className="w-3.5 h-3.5 text-primary" />
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-gray-900">{label}</p>
+                            <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </TabsContent>
             </Tabs>
