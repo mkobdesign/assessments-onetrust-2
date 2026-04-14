@@ -621,26 +621,21 @@ export default function AssessmentQuestionnaire() {
                                   <p className="text-xs text-gray-800">{msg.content}</p>
                                 </div>
                               ) : (
-                                <div className="flex items-start gap-2 max-w-[90%]">
-                                  <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
-                                    <span className="text-white text-[6px] font-bold">AI</span>
-                                  </div>
-                                  <div>
-                                    <p className="text-xs text-gray-700 leading-relaxed">{msg.content}</p>
-                                    {msg.options && (
-                                      <div className="mt-2 space-y-1.5">
-                                        {msg.options.map((opt, i) => (
-                                          <button
-                                            key={opt.id}
-                                            className="w-full text-left text-xs px-2.5 py-1.5 bg-white border border-gray-200 rounded-md hover:border-primary/40 hover:bg-primary/5 transition-colors"
-                                          >
-                                            <span className="text-gray-400 mr-1.5">{i + 1}.</span>
-                                            <span className="text-gray-700">{opt.label}</span>
-                                          </button>
-                                        ))}
-                                      </div>
-                                    )}
-                                  </div>
+                                <div className="max-w-[90%]">
+                                  <p className="text-xs text-gray-700 leading-relaxed">{msg.content}</p>
+                                  {msg.options && (
+                                    <div className="mt-2 space-y-1.5">
+                                      {msg.options.map((opt, i) => (
+                                        <button
+                                          key={opt.id}
+                                          className="w-full text-left text-xs px-2.5 py-1.5 bg-white border border-gray-200 rounded-md hover:border-primary/40 hover:bg-primary/5 transition-colors"
+                                        >
+                                          <span className="text-gray-400 mr-1.5">{i + 1}.</span>
+                                          <span className="text-gray-700">{opt.label}</span>
+                                        </button>
+                                      ))}
+                                    </div>
+                                  )}
                                 </div>
                               )}
                             </motion.div>
@@ -651,16 +646,11 @@ export default function AssessmentQuestionnaire() {
                             <motion.div
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
-                              className="flex items-start gap-2"
+                              className="flex items-center gap-1 px-2 py-1.5"
                             >
-                              <div className="w-4 h-4 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <span className="text-white text-[6px] font-bold">AI</span>
-                              </div>
-                              <div className="flex items-center gap-1 px-2 py-1.5">
-                                <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-                                <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-                                <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '300ms' }} />
-                              </div>
+                              <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                              <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                              <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '300ms' }} />
                             </motion.div>
                           )}
                         </div>
