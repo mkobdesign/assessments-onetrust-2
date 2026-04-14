@@ -211,10 +211,10 @@ function QuestionCard({
         {question.options.map(option => (
           <label
             key={option.id}
-            className={`flex items-start gap-3 p-3.5 rounded-lg border cursor-pointer transition-all duration-150 ${
+            className={`flex items-start gap-3 p-3.5 rounded-lg cursor-pointer transition-all duration-150 ${
               selected === option.id
-                ? 'border-primary bg-primary/5'
-                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                ? 'bg-primary/5'
+                : 'hover:bg-gray-50'
             }`}
           >
             <RadioGroupItem value={option.id} id={`${question.id}-${option.id}`} className="mt-0.5 flex-shrink-0" />
