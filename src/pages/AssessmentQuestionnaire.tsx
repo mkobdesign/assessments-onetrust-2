@@ -18,6 +18,7 @@ import {
   X,
   ChevronRight,
   ChevronDown,
+  ChevronUp,
   Bot,
   CheckCheck,
   Minus,
@@ -1040,16 +1041,41 @@ export default function AssessmentQuestionnaire() {
                         exit={{ opacity: 0, y: 4 }}
                         className="mb-2 bg-primary/5 border border-primary/20 rounded-lg px-3 py-2 flex items-center gap-2"
                       >
-                        <Bot className="w-3.5 h-3.5 text-primary flex-shrink-0" />
                         <p className="text-xs text-primary font-medium truncate">
-                          Chatting about: {activeGuide.title}
+                          Guiding: {activeGuide.title}
                         </p>
-                        <button onClick={() => {
-                          setActiveGuide(null)
-                          setGuideConversation([])
-                        }} className="ml-auto">
-                          <X className="w-3 h-3 text-primary/60" />
-                        </button>
+                        <div className="ml-auto flex items-center gap-1">
+                          <button 
+                            onClick={() => {
+                              const currentIndex = allQuestions.findIndex(q => q.id === activeGuide.id)
+                              if (currentIndex > 0) {
+                                const prevQuestion = allQuestions[currentIndex - 1]
+                                setActiveGuide(prevQuestion)
+                                setGuideConversation([])
+                              }
+                            }}
+                            disabled={allQuestions.findIndex(q => q.id === activeGuide.id) === 0}
+                            className="disabled:opacity-30 disabled:cursor-not-allowed"
+                          >
+                            <ChevronUp className="w-3 h-3 text-primary" />
+                          </button>
+                          <button onClick={() => {
+                            const currentIndex = allQuestions.findIndex(q => q.id === activeGuide.id)
+                            if (currentIndex < allQuestions.length - 1) {
+                              const nextQuestion = allQuestions[currentIndex + 1]
+                              setActiveGuide(nextQuestion)
+                              setGuideConversation([])
+                            }
+                          }}>
+                            <ChevronDown className="w-3 h-3 text-primary" />
+                          </button>
+                          <button onClick={() => {
+                            setActiveGuide(null)
+                            setGuideConversation([])
+                          }}>
+                            <X className="w-3 h-3 text-primary/60" />
+                          </button>
+                        </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
