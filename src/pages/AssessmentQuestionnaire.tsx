@@ -696,11 +696,60 @@ export default function AssessmentQuestionnaire() {
       return questionsMap[sourceId] || []
     }
 
-    // Set the guide conversation with simple explanation and sources as footer
+    // Get the suggested answer for this question
+    const suggestedOption = question.suggestedAnswer
+      ? question.options.find(opt => opt.id === question.suggestedAnswer)
+      : null
+
+    // Set the guide conversation with answer, reasoning, buttons, and sources as footer
     setGuideConversation([
       {
         role: 'assistant',
-        content: 'This answer was suggested based on privacy requirements in your DPA and security documentation. The high confidence reflects strong alignment with the assessment criteria.',
+        content: (
+          <div className="space-y-3">
+            {/* Suggested answer */}
+            {suggestedOption && (
+              <div>
+                <p className="text-sm font-medium text-gray-900">{suggestedOption.label}</p>
+              </div>
+            )}
+            
+            {/* Reasoning */}
+            <div>
+              <p className="text-[10px] uppercase tracking-wide text-gray-500 font-semibold mb-1">Reasoning</p>
+              <p className="text-xs text-gray-700 leading-relaxed">This answer was suggested based on privacy requirements in your DPA and security documentation. The high confidence reflects strong alignment with the assessment criteria.</p>
+            </div>
+            
+            {/* Action buttons */}
+            <div className="flex items-center gap-2 pt-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs text-gray-500 hover:text-gray-700"
+                onClick={() => {
+                  setActiveGuide(null)
+                  setGuideConversation([])
+                }}
+              >
+                Dismiss
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 text-xs border-primary text-primary hover:bg-primary/5"
+                onClick={() => {
+                  if (suggestedOption) {
+                    // Accept the suggestion - this would trigger the answer
+                  }
+                  setActiveGuide(null)
+                  setGuideConversation([])
+                }}
+              >
+                Accept
+              </Button>
+            </div>
+          </div>
+        ),
       },
       {
         role: 'assistant',
@@ -1076,13 +1125,8 @@ export default function AssessmentQuestionnaire() {
                     </div>
 
                     {/* Question context */}
-                    <div className="bg-white/60 rounded-lg px-2.5 py-2 mb-3">
-                      <p className="text-[10px] text-gray-400 uppercase tracking-wide font-semibold mb-0.5">Question {activeGuide.number}</p>
+                    <div className="mb-3">
                       <p className="text-xs font-semibold text-gray-800">{activeGuide.title}</p>
-                      <div className="flex items-center gap-1 mt-1">
-                        <MessageCircle className="w-3 h-3 fill-[#6673C7] text-[#6673C7]" />
-                        <span className="text-[10px] text-[#6673C7] font-medium">Review suggested answer</span>
-                      </div>
                     </div>
 
                     {/* Conversation (non-footer messages) */}
@@ -1138,9 +1182,9 @@ export default function AssessmentQuestionnaire() {
                       )}
                     </div>
 
-                    {/* Footer (sources) */}
+                    {/* Footer (sources) - full width */}
                     {guideConversation.filter(msg => msg.isFooter).map((msg, idx) => (
-                      <div key={`footer-${idx}`} className="mt-3 pt-3 border-t border-primary/10">
+                      <div key={`footer-${idx}`} className="mt-3 -mx-3 -mb-3">
                         {msg.content}
                       </div>
                     ))}
