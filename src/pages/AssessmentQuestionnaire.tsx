@@ -244,8 +244,8 @@ function QuestionCard({
           {/* Header row with title and buttons */}
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded bg-[#6673C7] flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-[9px] font-bold">AI</span>
+              <div className="w-5 h-5 rounded bg-[#6673C7] flex items-center justify-center flex-shrink-0">
+                <span className="text-white text-[11px] font-bold">AI</span>
               </div>
               <p className="text-sm font-semibold text-gray-900">Suggested Response</p>
             </div>
@@ -281,7 +281,11 @@ function QuestionCard({
           <div className="flex items-center justify-between pt-3 border-t border-gray-200">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1.5">
-                <BarChart2 className="w-4 h-4 text-[#6673C7]" />
+                <svg width="13" height="12" viewBox="0 0 13 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect y="8" width="3" height="4" fill="#6673C7"/>
+                  <rect x="5" y="4" width="3" height="8" fill="#6673C7"/>
+                  <rect x="10" width="3" height="12" fill="#CCCCCC"/>
+                </svg>
                 <span className="text-xs text-gray-600">Medium Confidence</span>
               </div>
               <button className="flex items-center gap-0.5 text-xs text-gray-600 hover:text-gray-900">
