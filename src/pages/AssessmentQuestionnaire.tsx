@@ -211,11 +211,11 @@ function QuestionCard({
       </p>
 
       {/* Options */}
-      <RadioGroup value={selected} onValueChange={handleSelect} className="space-y-1">
+      <RadioGroup value={selected} onValueChange={handleSelect} className="space-y-0">
         {question.options.map(option => (
           <label
             key={option.id}
-            className={`flex items-start gap-3 p-3.5 rounded-lg cursor-pointer transition-all duration-150 ${selected === option.id
+            className={`flex items-start gap-3 py-2.5 px-3 rounded-lg cursor-pointer transition-all duration-150 ${selected === option.id
               ? 'bg-primary/5'
               : 'hover:bg-gray-50'
               }`}
