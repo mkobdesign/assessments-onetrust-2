@@ -1160,6 +1160,10 @@ export default function AssessmentQuestionnaire() {
                             <div className="bg-gray-100 rounded-xl rounded-tr-sm px-3 py-2 max-w-[85%]">
                               <p className="text-xs text-gray-800">{msg.content}</p>
                             </div>
+                          ) : typeof msg.content === 'object' ? (
+                            <div className="w-full">
+                              {msg.content}
+                            </div>
                           ) : (
                             <div className="max-w-[90%]">
                               <p className="text-xs text-gray-700 leading-relaxed">{msg.content}</p>
