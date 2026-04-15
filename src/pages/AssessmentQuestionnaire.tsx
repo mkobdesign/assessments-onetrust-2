@@ -769,17 +769,15 @@ export default function AssessmentQuestionnaire() {
                   </div>
                 </div>
 
-                {/* Collapsible sections */}
-                <div className="px-4 py-3 border-b border-gray-200 space-y-1">
-                  <button className="w-full flex items-center gap-2 py-1 text-left group">
+                {/* Collapsible bookmark sections */}
+                <div className="border-b border-gray-200">
+                  <button className="w-full flex items-center gap-2 px-4 py-2.5 text-left border-b border-gray-100 hover:bg-gray-50">
                     <ChevronUp className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm text-gray-700">Onboarding</span>
-                    <div className="flex-1 border-t border-gray-200 ml-2" />
+                    <span className="text-sm text-gray-600">Onboarding</span>
                   </button>
-                  <button className="w-full flex items-center gap-2 py-1 text-left group">
+                  <button className="w-full flex items-center gap-2 px-4 py-2.5 text-left hover:bg-gray-50">
                     <ChevronDown className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm text-gray-700">Questionnaire</span>
-                    <div className="flex-1 border-t border-gray-200 ml-2" />
+                    <span className="text-sm text-gray-600">Questionnaire</span>
                   </button>
                 </div>
 
