@@ -678,14 +678,10 @@ export default function AssessmentQuestionnaire() {
                   <p className="text-sm text-gray-500 mb-2">Participants</p>
                   <div className="flex items-center gap-2">
                     <div className="flex items-center">
-                      {[
-                        { initials: 'RS', color: 'bg-teal-500' },
-                        { initials: 'MR', color: 'bg-purple-500' },
-                        { initials: 'KP', color: 'bg-pink-500' },
-                      ].map(({ initials, color }) => (
+                      {['RS', 'MR', 'KP'].map((initials) => (
                         <div
                           key={initials}
-                          className={`w-8 h-8 rounded-full ${color} text-white text-xs font-bold flex items-center justify-center border-2 border-white -ml-2 first:ml-0`}
+                          className="w-8 h-8 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center border-2 border-white -ml-2 first:ml-0"
                         >
                           {initials}
                         </div>
