@@ -548,7 +548,7 @@ export default function AssessmentQuestionnaire() {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [activeGuide, setActiveGuide] = useState<Question | null>(null)
   const [chatInput, setChatInput] = useState('')
-  const [guideConversation, setGuideConversation] = useState<Array<{ role: 'user' | 'assistant'; content: React.ReactNode; options?: Array<{ id: string; label: string }> }>>([])
+  const [guideConversation, setGuideConversation] = useState<Array<{ role: 'user' | 'assistant'; content: React.ReactNode; options?: Array<{ id: string; label: string }>; isFooter?: boolean }>>([])
   const [isGuideTyping, setIsGuideTyping] = useState(false)
   const [acceptedSuggestions, setAcceptedSuggestions] = useState<number>(0)
 
@@ -696,8 +696,12 @@ export default function AssessmentQuestionnaire() {
       return questionsMap[sourceId] || []
     }
 
-    // Set the guide conversation with the references using the SourcesList component
+    // Set the guide conversation with simple explanation and sources as footer
     setGuideConversation([
+      {
+        role: 'assistant',
+        content: 'This answer was suggested based on privacy requirements in your DPA and security documentation. The high confidence reflects strong alignment with the assessment criteria.',
+      },
       {
         role: 'assistant',
         content: (
@@ -707,15 +711,7 @@ export default function AssessmentQuestionnaire() {
             getQuestions={getRefSourceQuestions}
           />
         ),
-      },
-      {
-        role: 'assistant',
-        content: (
-          <div>
-            <p className="text-xs font-medium text-gray-800 mb-1">Why this answer was chosen:</p>
-            <p className="text-xs text-gray-600">Based on the analysis of these documents, this answer was selected because the data processing activities described align with the privacy requirements outlined in the DPA and security documentation. The confidence level reflects the strong alignment between your uploaded documents and the assessment criteria.</p>
-          </div>
-        ),
+        isFooter: true,
       },
     ])
 
@@ -1089,9 +1085,9 @@ export default function AssessmentQuestionnaire() {
                       </div>
                     </div>
 
-                    {/* Conversation */}
-                    <div className="space-y-3 max-h-[200px] overflow-y-auto">
-                      {guideConversation.map((msg, idx) => (
+                    {/* Conversation (non-footer messages) */}
+                    <div className="space-y-3 max-h-[150px] overflow-y-auto">
+                      {guideConversation.filter(msg => !msg.isFooter).map((msg, idx) => (
                         <motion.div
                           key={idx}
                           initial={{ opacity: 0, y: 4 }}
@@ -1141,6 +1137,13 @@ export default function AssessmentQuestionnaire() {
                         </motion.div>
                       )}
                     </div>
+
+                    {/* Footer (sources) */}
+                    {guideConversation.filter(msg => msg.isFooter).map((msg, idx) => (
+                      <div key={`footer-${idx}`} className="mt-3 pt-3 border-t border-primary/10">
+                        {msg.content}
+                      </div>
+                    ))}
                   </motion.div>
                 )}
               </AnimatePresence>
