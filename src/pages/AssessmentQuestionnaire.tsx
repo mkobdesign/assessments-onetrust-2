@@ -1130,7 +1130,7 @@ export default function AssessmentQuestionnaire() {
                     </div>
 
                     {/* Conversation (non-footer messages) */}
-                    <div className="space-y-3 max-h-[150px] overflow-y-auto">
+                    <div className="space-y-3 max-h-[158px] overflow-y-auto">
                       {guideConversation.filter(msg => !msg.isFooter).map((msg, idx) => (
                         <motion.div
                           key={idx}
