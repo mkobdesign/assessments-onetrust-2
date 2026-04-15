@@ -284,7 +284,7 @@ const initialCopilotMessages: {
           <br /><br />
           It&apos;s a new mobile app that will track users&apos; locations and analyze their browsing patterns and personal preferences to deliver customized personalized content experiences.
           <br /><br />
-          The point of this assessment is to ensure compliance regarding the following topics;
+          The point of this assessment is to ensure compliance regarding the data categories below.
         </>
       ),
     },
