@@ -109,7 +109,7 @@ function QuestionNav({
                 </div>
                 <div className="min-w-0">
                   <span className="text-xs text-gray-400 font-mono">{q.number}</span>
-                  <p className={`text-xs leading-snug truncate mt-0.5 ${isCurrent ? 'font-semibold text-gray-900' : isAnswered || isMarkedForReview ? 'text-gray-500' : 'text-gray-700'}`}>
+                  <p className={`text-xs leading-snug truncate mt-0.5 text-gray-700 ${isCurrent ? 'font-semibold' : ''}`}>
                     {q.title}
                   </p>
                 </div>
@@ -665,7 +665,7 @@ export default function AssessmentQuestionnaire() {
               </div>
 
               {/* Participants */}
-              <div className="pt-4 flex items-start justify-between">
+              <div className="pt-6 flex items-start justify-between">
                 {/* Participants */}
                 <div>
                   <p className="text-xs text-gray-400 mb-2">Participants</p>
