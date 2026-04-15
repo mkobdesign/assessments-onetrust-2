@@ -262,7 +262,6 @@ const initialCopilotMessages: {
   id: string
   role: 'assistant' | 'user'
   content: string
-  projectInfo?: { name: string; description: string }
   progressInfo?: {
     percentComplete: number
     questionsAnswered: number
@@ -279,11 +278,7 @@ const initialCopilotMessages: {
   {
     id: 'm2',
     role: 'assistant' as const,
-    content: '',
-    projectInfo: {
-      name: 'Magellan Mobile App',
-      description: "It's a new mobile app that will track users' locations and analyze their browsing patterns and personal preferences to deliver customized personalized content experiences.",
-    },
+    content: "The project is the Magellan Mobile App.\n\nIt's a new mobile app that will track users' locations and analyze their browsing patterns and personal preferences to deliver customized personalized content experiences.\n\nThe point of this assessment is to ensure compliance regarding the following topics;",
   },
   {
     id: 'm3',
@@ -293,7 +288,7 @@ const initialCopilotMessages: {
       percentComplete: 72,
       questionsAnswered: 18,
       totalQuestions: 25,
-      remainingCategories: ['Residency Information', 'Systems', 'Data Processing', 'Third-Party Sharing'],
+      remainingCategories: ['Data residency', 'Retention policy', 'Data architecture', 'Data transfer'],
       progressAudit: [
         { agent: 'Document Agent', action: 'pre-filled', count: 12, timeAgo: '2m ago' },
         { agent: 'Reuse Agent', action: 'added from past work', count: 6, timeAgo: '1m ago' },
@@ -528,15 +523,8 @@ export default function AssessmentPreLaunch() {
                         </div>
                         <div className="flex-1">
                           {msg.content && (
-                            <div className="text-sm text-gray-700 leading-relaxed">
+                            <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
                               {msg.content}
-                            </div>
-                          )}
-                          {msg.projectInfo && (
-                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mt-1">
-                              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Project</p>
-                              <p className="text-sm font-semibold text-gray-900 mb-1">{msg.projectInfo.name}</p>
-                              <p className="text-xs text-gray-600 leading-relaxed">{msg.projectInfo.description}</p>
                             </div>
                           )}
                           {msg.progressInfo && (
