@@ -651,66 +651,31 @@ export default function AssessmentQuestionnaire() {
 
         <div className="flex flex-1 overflow-hidden">
           {/* Left: Question nav */}
-          <aside className="w-[220px] border-r border-gray-100 flex-shrink-0 overflow-hidden flex flex-col">
-            {/* Details section */}
+          <aside className="w-[300px] border-r border-gray-100 flex-shrink-0 overflow-hidden flex flex-col">
+            {/* Status row */}
             <div className="px-4 py-3 border-b border-gray-100">
-              {/* Header with status */}
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-lg font-bold text-gray-900">Details</h3>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-2 h-2 rounded-full bg-blue-500" />
-                  <span className="text-sm text-gray-600">In progress</span>
-                </div>
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-2 h-2 rounded-full bg-blue-500" />
+                <span className="text-xs font-semibold text-gray-700">In progress</span>
               </div>
-              
-              {/* Progress bar */}
-              <div className="w-full h-3 rounded-full border-2 border-blue-500 mb-4">
-                <div 
-                  className="h-full bg-blue-500 rounded-full" 
-                  style={{ width: `${progress}%` }} 
-                />
-              </div>
+              <Progress value={progress} className="mb-1" />
+              <p className="text-xs text-gray-500">{progress}% complete</p>
+            </div>
 
-              {/* Participants and Tools row */}
-              <div className="flex items-start justify-between">
-                {/* Participants */}
-                <div>
-                  <p className="text-sm text-gray-500 mb-2">Participants</p>
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center">
-                      {['RS', 'MR', 'KP'].map((initials) => (
-                        <div
-                          key={initials}
-                          className="w-8 h-8 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center border-2 border-white -ml-2 first:ml-0"
-                        >
-                          {initials}
-                        </div>
-                      ))}
-                      <div className="w-8 h-8 rounded-full bg-gray-300 text-gray-600 text-xs font-bold flex items-center justify-center border-2 border-white -ml-2">
-                        +2
-                      </div>
-                    </div>
-                    <button className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600">
-                      <Plus className="w-6 h-6" />
-                    </button>
+            {/* Participants */}
+            <div className="px-4 py-2.5 border-b border-gray-100">
+              <p className="text-xs text-gray-400 mb-2">Participants</p>
+              <div className="flex items-center gap-1">
+                {['RS', 'MR', 'KP'].map(initials => (
+                  <div
+                    key={initials}
+                    className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[9px] font-bold flex items-center justify-center border-2 border-white -ml-1 first:ml-0"
+                  >
+                    {initials}
                   </div>
-                </div>
-
-                {/* Tools */}
-                <div>
-                  <p className="text-sm text-gray-500 mb-2">Tools</p>
-                  <div className="flex items-center gap-3">
-                    <button className="text-gray-500 hover:text-gray-700">
-                      <Paperclip className="w-5 h-5" />
-                    </button>
-                    <button className="text-gray-500 hover:text-gray-700">
-                      <CheckCheck className="w-5 h-5" />
-                    </button>
-                    <button className="text-gray-500 hover:text-gray-700 relative">
-                      <MessageCircle className="w-5 h-5" />
-                      <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-pink-500 rounded-full" />
-                    </button>
-                  </div>
+                ))}
+                <div className="w-6 h-6 rounded-full bg-gray-100 text-gray-500 text-[9px] font-bold flex items-center justify-center border-2 border-white -ml-1">
+                  +2
                 </div>
               </div>
             </div>
