@@ -34,7 +34,6 @@ import {
   ThumbsDown,
   Plus,
   ExternalLink,
-  BarChart2,
 } from 'lucide-react'
 import { privacyAssessmentSections, type Question } from '@/data/assessmentQuestions'
 import { dataSources } from '@/data/mockFlow'
