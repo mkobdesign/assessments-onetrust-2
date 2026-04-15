@@ -654,6 +654,7 @@ export default function AssessmentQuestionnaire() {
           <aside className="w-[300px] border-r border-gray-100 flex-shrink-0 overflow-hidden flex flex-col">
             {/* Status row */}
             <div className="px-4 py-3 border-b border-gray-100">
+              <h2 className="text-lg font-bold text-gray-900 mb-2">Details</h2>
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-2 h-2 rounded-full bg-blue-500" />
                 <span className="text-xs font-semibold text-gray-700">In progress</span>
