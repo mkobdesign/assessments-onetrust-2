@@ -795,7 +795,7 @@ export default function AssessmentQuestionnaire() {
                   </div>
 
                   {/* Tool buttons with green icon backgrounds */}
-                  <div className="space-y-2.5">
+                  <div className="flex flex-col items-start gap-2.5">
                     {[
                       { icon: Database, label: 'Edit data sources' },
                       { icon: Sparkles, label: 'Kick off deep research' },
@@ -803,7 +803,7 @@ export default function AssessmentQuestionnaire() {
                     ].map(({ icon: Icon, label }) => (
                       <button
                         key={label}
-                        className="w-full flex items-center gap-0 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:border-primary/40 transition-all duration-150 text-left overflow-hidden"
+                        className="inline-flex items-center gap-0 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:border-primary/40 transition-all duration-150 text-left overflow-hidden"
                         onClick={label === 'Guide me through answering questions' ? () => {
                           setActiveGuide(allQuestions[0])
                           handleQuestionSelect(allQuestions[0].id)
