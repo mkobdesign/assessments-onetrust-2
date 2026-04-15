@@ -34,6 +34,7 @@ import {
   ThumbsDown,
   Plus,
   ExternalLink,
+  BarChart2,
 } from 'lucide-react'
 import { privacyAssessmentSections, type Question } from '@/data/assessmentQuestions'
 import { dataSources } from '@/data/mockFlow'
@@ -238,34 +239,65 @@ function QuestionCard({
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-5 bg-[#6673C7]/5 border border-[#6673C7]/20 rounded-xl p-4"
+          className="mt-5 bg-gray-50 border border-gray-200 rounded-lg p-4"
         >
-          <div className="flex items-start gap-3">
-            <div className="w-6 h-6 rounded-full bg-[#6673C7] flex items-center justify-center flex-shrink-0">
-              <Sparkles className="w-3 h-3 text-white" />
+          {/* Header row with title and buttons */}
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded bg-[#6673C7] flex items-center justify-center flex-shrink-0">
+                <span className="text-white text-[9px] font-bold">AI</span>
+              </div>
+              <p className="text-sm font-semibold text-gray-900">Suggested Response</p>
             </div>
-            <div className="flex-1">
-              <p className="text-xs font-semibold text-[#6673C7] mb-1">Suggested response</p>
-              <p className="text-sm font-medium text-gray-900 mb-1">{suggestedOption.label}</p>
-              {suggestedOption.description && (
-                <p className="text-xs text-gray-600 leading-relaxed">{suggestedOption.description}</p>
-              )}
-              <div className="flex items-center gap-2 mt-3">
-                <Button
-                  size="sm"
-                  className="h-7 text-xs bg-[#6673C7] hover:bg-[#6673C7]/90"
-                  onClick={handleAcceptSuggestion}
-                >
-                  Accept
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 text-xs text-gray-500 hover:text-gray-700"
-                  onClick={() => setSuggestionDismissed(true)}
-                >
-                  Dismiss
-                </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 text-sm text-primary hover:text-primary/80 font-medium"
+                onClick={() => setSuggestionDismissed(true)}
+              >
+                Dismiss
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 text-sm border-primary text-primary hover:bg-primary/5 font-medium"
+                onClick={handleAcceptSuggestion}
+              >
+                Accept
+              </Button>
+            </div>
+          </div>
+
+          {/* Answer content */}
+          <div className="mb-4">
+            <p className="text-sm text-gray-900">{suggestedOption.label}</p>
+            {suggestedOption.description && (
+              <p className="text-xs text-gray-600 leading-relaxed mt-1">{suggestedOption.description}</p>
+            )}
+          </div>
+
+          {/* Bottom row with confidence, references, note, and voting */}
+          <div className="flex items-center justify-between pt-3 border-t border-gray-200">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1.5">
+                <BarChart2 className="w-4 h-4 text-[#6673C7]" />
+                <span className="text-xs text-gray-600">Medium Confidence</span>
+              </div>
+              <button className="flex items-center gap-0.5 text-xs text-gray-600 hover:text-gray-900">
+                2 References
+                <ChevronRight className="w-3 h-3" />
+              </button>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-gray-400">Content may contain inaccuracies.</span>
+              <div className="flex items-center gap-1">
+                <button className="text-gray-400 hover:text-gray-600">
+                  <ThumbsUp className="w-4 h-4" />
+                </button>
+                <button className="text-gray-400 hover:text-gray-600">
+                  <ThumbsDown className="w-4 h-4" />
+                </button>
               </div>
             </div>
           </div>
