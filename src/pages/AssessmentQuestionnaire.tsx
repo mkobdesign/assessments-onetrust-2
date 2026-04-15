@@ -130,6 +130,8 @@ function QuestionCard({
   isActive,
   onAcceptSuggestion,
   onShowReferences,
+  onDismissSuggestion,
+  suggestionState,
 }: {
   question: Question
   onAnswer: (questionId: string, answerId: string) => void
@@ -137,10 +139,12 @@ function QuestionCard({
   isActive: boolean
   onAcceptSuggestion?: () => void
   onShowReferences?: () => void
+  onDismissSuggestion?: () => void
+  suggestionState?: 'accepted' | 'dismissed' | null
 }) {
   const [selected, setSelected] = useState(question.aiPrefilled ?? '')
-  const [suggestionAccepted, setSuggestionAccepted] = useState(false)
-  const [suggestionDismissed, setSuggestionDismissed] = useState(false)
+  const suggestionAccepted = suggestionState === 'accepted'
+  const suggestionDismissed = suggestionState === 'dismissed'
 
   const handleSelect = (value: string) => {
     setSelected(value)
@@ -151,7 +155,6 @@ function QuestionCard({
     if (question.suggestedAnswer) {
       setSelected(question.suggestedAnswer)
       onAnswer(question.id, question.suggestedAnswer)
-      setSuggestionAccepted(true)
       onAcceptSuggestion?.()
     }
   }
@@ -256,7 +259,7 @@ function QuestionCard({
                 variant="ghost"
                 size="sm"
                 className="h-8 text-sm text-primary hover:text-primary/80 font-medium"
-                onClick={() => setSuggestionDismissed(true)}
+                onClick={() => onDismissSuggestion?.()}
               >
                 Dismiss
               </Button>
@@ -566,6 +569,7 @@ export default function AssessmentQuestionnaire() {
   const chatBottomRef = useRef<HTMLDivElement>(null)
   const mainContentRef = useRef<HTMLElement>(null)
   const [isCopilotOpen, setIsCopilotOpen] = useState(true)
+  const [suggestionStates, setSuggestionStates] = useState<Record<string, 'accepted' | 'dismissed' | null>>({})
 
   // Scroll-based active question tracking
   useEffect(() => {
@@ -727,6 +731,7 @@ export default function AssessmentQuestionnaire() {
                 size="sm"
                 className="h-7 text-xs text-gray-500 hover:text-gray-700"
                 onClick={() => {
+                  setSuggestionStates(prev => ({ ...prev, [question.id]: 'dismissed' }))
                   setActiveGuide(null)
                   setGuideConversation([])
                 }}
@@ -739,7 +744,9 @@ export default function AssessmentQuestionnaire() {
                 className="h-7 text-xs border-primary text-primary hover:bg-primary/5"
                 onClick={() => {
                   if (suggestedOption) {
-                    // Accept the suggestion - this would trigger the answer
+                    handleAnswer(question.id, suggestedOption.id)
+                    handleAcceptSuggestion()
+                    setSuggestionStates(prev => ({ ...prev, [question.id]: 'accepted' }))
                   }
                   setActiveGuide(null)
                   setGuideConversation([])
@@ -886,7 +893,12 @@ export default function AssessmentQuestionnaire() {
                   onAnswer={handleAnswer}
                   onClarify={handleClarify}
                   isActive={question.id === currentQuestionId}
-                  onAcceptSuggestion={handleAcceptSuggestion}
+                  onAcceptSuggestion={() => {
+                    handleAcceptSuggestion()
+                    setSuggestionStates(prev => ({ ...prev, [question.id]: 'accepted' }))
+                  }}
+                  onDismissSuggestion={() => setSuggestionStates(prev => ({ ...prev, [question.id]: 'dismissed' }))}
+                  suggestionState={suggestionStates[question.id]}
                   onShowReferences={() => handleShowReferences(question)}
                 />
               ))}
@@ -905,6 +917,12 @@ export default function AssessmentQuestionnaire() {
                   onAnswer={handleAnswer}
                   onClarify={handleClarify}
                   isActive={question.id === currentQuestionId}
+                  onAcceptSuggestion={() => {
+                    handleAcceptSuggestion()
+                    setSuggestionStates(prev => ({ ...prev, [question.id]: 'accepted' }))
+                  }}
+                  onDismissSuggestion={() => setSuggestionStates(prev => ({ ...prev, [question.id]: 'dismissed' }))}
+                  suggestionState={suggestionStates[question.id]}
                   onShowReferences={() => handleShowReferences(question)}
                 />
               ))}
