@@ -674,12 +674,12 @@ export default function AssessmentQuestionnaire() {
                       {['RS', 'MR', 'KP'].map(initials => (
                         <div
                           key={initials}
-                          className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[9px] font-bold flex items-center justify-center border-2 border-white -ml-1 first:ml-0"
+                          className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[10px] font-bold flex items-center justify-center border-2 border-white -ml-1 first:ml-0"
                         >
                           {initials}
                         </div>
                       ))}
-                      <div className="w-6 h-6 rounded-full bg-gray-100 text-gray-500 text-[9px] font-bold flex items-center justify-center border-2 border-white -ml-1">
+                      <div className="w-6 h-6 rounded-full bg-gray-100 text-gray-500 text-[10px] font-bold flex items-center justify-center border-2 border-white -ml-1">
                         +2
                       </div>
                     </div>
