@@ -299,7 +299,7 @@ const initialCopilotMessages: {
         remainingCategories: ['Data residency', 'Retention policy', 'Data architecture', 'Data transfer'],
         progressAudit: [
           { agent: 'Document Agent', action: 'pre-filled', count: 12, timeAgo: '2m ago' },
-          { agent: 'Privacy Agent', action: 'added 1 assessment', count: 6, timeAgo: '1m ago' },
+          { agent: 'Privacy Agent', action: 'pre-filled', count: 6, timeAgo: '1m ago' },
         ],
       },
     },
