@@ -537,8 +537,8 @@ export default function AssessmentPreLaunch() {
                           )}
                           {msg.progressInfo && (
                             <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mt-1">
-                              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Assessment Progress</p>
-                              <div className="flex items-center gap-3 mb-3">
+                              <p className="text-xs font-medium text-gray-500 mb-2">Assessment Progress</p>
+                              <div className="flex items-center gap-3 mb-4">
                                 <div className="flex items-center gap-2">
                                   <span className="text-2xl font-bold text-primary">{msg.progressInfo.percentComplete}%</span>
                                   <span className="text-sm text-gray-500">complete</span>
@@ -548,8 +548,8 @@ export default function AssessmentPreLaunch() {
                                   <span className="font-medium text-gray-900">{msg.progressInfo.questionsAnswered}</span>/{msg.progressInfo.totalQuestions} questions answered
                                 </div>
                               </div>
-                              <div className="mb-3">
-                                <p className="text-xs font-medium text-gray-500 mb-1.5">Categories remaining:</p>
+                              <div className="mb-4">
+                                <p className="text-xs font-medium text-gray-500 mb-1.5">Categories remaining</p>
                                 <div className="flex flex-wrap gap-1.5">
                                   {msg.progressInfo.remainingCategories.map((cat) => (
                                     <span key={cat} className="px-2 py-0.5 bg-white border border-gray-200 rounded text-xs text-gray-600">{cat}</span>
@@ -557,7 +557,7 @@ export default function AssessmentPreLaunch() {
                                 </div>
                               </div>
                               <div className="border-t border-gray-200 pt-3">
-                                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Progress Audit</p>
+                                <p className="text-xs font-medium text-gray-500 mb-2">Progress Audit</p>
                                 <div className="relative pl-4">
                                   <div className="absolute left-[9px] top-1 bottom-1 w-px bg-gray-200" />
                                   <div className="space-y-2">
