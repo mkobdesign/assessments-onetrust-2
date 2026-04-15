@@ -796,6 +796,7 @@ export default function AssessmentQuestionnaire() {
     <div className="flex h-screen bg-gray-50 overflow-hidden">
       <Sidebar />
 
+      {/* Main content area (header + content) */}
       <div className="flex flex-col flex-1 overflow-hidden">
         <TopBar
           title="Privacy Review Request for Magellan Mobile App"
@@ -808,7 +809,7 @@ export default function AssessmentQuestionnaire() {
 
         <div className="flex flex-1 overflow-hidden">
           {/* Left: Question nav */}
-          <aside className="w-[300px] border-r border-gray-100 flex-shrink-0 overflow-hidden flex flex-col">
+          <aside className="w-[300px] border-r border-gray-100 flex-shrink-0 overflow-hidden flex flex-col bg-white">
             {/* Status row */}
             <div className="px-4 py-6  border-b border-gray-100">
               <h2 className="text-base font-semibold text-gray-900 mb-3">Details</h2>
@@ -918,22 +919,24 @@ export default function AssessmentQuestionnaire() {
               ))}
             </div>
           </main>
+        </div>
+      </div>
 
-          {/* Right: Copilot drawer */}
-          <aside className="w-[440px] flex flex-col bg-white border-l border-gray-200 flex-shrink-0">
+      {/* Right: Copilot drawer - full height beside all content */}
+      <aside className="w-[440px] flex flex-col bg-white border-l border-gray-200 flex-shrink-0">
             <Tabs defaultValue="chat" className="flex flex-col h-full">
-              {/* Tabs header */}
-              <div className="flex-shrink-0">
-                <TabsList className="w-full bg-transparent p-0 gap-0 h-auto rounded-none">
+              {/* Tabs header - h-14 to match TopBar height */}
+              <div className="flex-shrink-0 h-14 border-b border-gray-200">
+                <TabsList className="w-full bg-transparent p-0 gap-0 h-full rounded-none">
                   <TabsTrigger
                     value="chat"
-                    className="flex-1 rounded-none border-b border-gray-200 bg-white data-[state=active]:bg-white data-[state=active]:shadow-none data-[state=inactive]:bg-gray-100 text-sm py-3 font-medium text-gray-900"
+                    className="flex-1 h-full rounded-none border-b-2 border-transparent bg-white data-[state=active]:bg-white data-[state=active]:border-b-primary data-[state=active]:shadow-none data-[state=inactive]:bg-gray-100 text-sm font-medium text-gray-900"
                   >
                     Copilot chat
                   </TabsTrigger>
                   <TabsTrigger
                     value="tools"
-                    className="flex-1 rounded-none border-b border-gray-200 bg-white data-[state=active]:bg-white data-[state=active]:shadow-none data-[state=inactive]:bg-gray-100 text-sm py-3 font-medium text-gray-900"
+                    className="flex-1 h-full rounded-none border-b-2 border-transparent bg-white data-[state=active]:bg-white data-[state=active]:border-b-primary data-[state=active]:shadow-none data-[state=inactive]:bg-gray-100 text-sm font-medium text-gray-900"
                   >
                     <span className="inline-flex items-center justify-center w-5 h-5 rounded bg-[#6673C7] text-white text-[10px] font-bold mr-2">AI</span>
                     Answer Generation Tools
@@ -1359,8 +1362,6 @@ export default function AssessmentQuestionnaire() {
               </TabsContent>
             </Tabs>
           </aside>
-        </div>
-      </div>
     </div>
   )
 }
