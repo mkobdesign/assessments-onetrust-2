@@ -671,26 +671,31 @@ export default function AssessmentQuestionnaire() {
     // Get the first two data sources as references
     const referencedSources = dataSources.slice(0, 2)
     
-    // Set the guide conversation with the references using JSX
+    // Set the guide conversation with the references using JSX matching Data Sources accordion style
     setGuideConversation([
       {
         role: 'assistant',
-        content: `Here are the sources I used to suggest an answer for "${question.title}":`,
-      },
-      {
-        role: 'assistant',
         content: (
-          <div className="space-y-2">
-            {referencedSources.map((source, idx) => (
-              <div key={source.id} className="flex items-start gap-2 p-2 bg-white border border-gray-200 rounded-lg">
-                <span className="text-gray-400 text-xs w-4">{idx + 1}.</span>
-                <FileText className="w-3.5 h-3.5 text-gray-400 flex-shrink-0 mt-0.5" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium text-gray-800">{source.name}</p>
-                  <p className="text-[10px] text-gray-500">{source.type}</p>
+          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+            {/* Header */}
+            <div className="px-3 py-2.5 border-b border-gray-100">
+              <p className="text-xs font-semibold text-gray-900">Sources used</p>
+            </div>
+            {/* Document list */}
+            <div className="divide-y divide-gray-100">
+              {referencedSources.map((source, idx) => (
+                <div key={source.id} className="px-3 py-2.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-400 text-xs w-4">{idx + 1}.</span>
+                    <FileText className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-gray-800 truncate">{source.name}</p>
+                      <p className="text-[10px] text-gray-500">{source.type}</p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         ),
       },
@@ -704,6 +709,11 @@ export default function AssessmentQuestionnaire() {
         ),
       },
     ])
+    
+    // Scroll to bottom of chat after a short delay to ensure content is rendered
+    setTimeout(() => {
+      chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }, 100)
   }
 
   const handleQuestionSelect = (questionId: string) => {
