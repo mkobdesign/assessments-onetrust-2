@@ -283,9 +283,9 @@ function QuestionCard({
                 <svg width="13" height="12" viewBox="0 0 13 12" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <rect y="8" width="3" height="4" fill="#6673C7"/>
                   <rect x="5" y="4" width="3" height="8" fill="#6673C7"/>
-                  <rect x="10" width="3" height="12" fill="#CCCCCC"/>
+                  <rect x="10" width="3" height="12" fill="#6673C7"/>
                 </svg>
-                <span className="text-xs text-gray-600">Medium Confidence</span>
+                <span className="text-xs text-gray-600">High Confidence</span>
               </div>
               <button className="flex items-center gap-0.5 text-xs text-gray-600 hover:text-gray-900">
                 2 References
