@@ -90,9 +90,8 @@ function QuestionNav({
               <button
                 key={q.id}
                 onClick={() => onSelect(q.id)}
-                className={`w-full flex items-center gap-2.5 px-4 py-2 text-left transition-all duration-150 ${
-                  isCurrent ? 'bg-primary/5 border-l-2 border-primary' : 'hover:bg-gray-50 border-l-2 border-transparent'
-                }`}
+                className={`w-full flex items-center gap-2.5 px-4 py-2 text-left transition-all duration-150 ${isCurrent ? 'bg-primary/5 border-l-2 border-primary' : 'hover:bg-gray-50 border-l-2 border-transparent'
+                  }`}
                 aria-current={isCurrent ? 'step' : undefined}
               >
                 <div className="flex-shrink-0">
@@ -154,7 +153,7 @@ function QuestionCard({
     }
   }
 
-  const suggestedOption = question.suggestedAnswer 
+  const suggestedOption = question.suggestedAnswer
     ? question.options.find(opt => opt.id === question.suggestedAnswer)
     : null
 
@@ -163,9 +162,8 @@ function QuestionCard({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
-      className={`bg-white border rounded-xl p-6 mb-4 transition-all duration-200 ${
-        isActive ? 'border-primary/30 shadow-sm shadow-primary/5 border-l-2 border-l-primary' : 'border-gray-200'
-      }`}
+      className={`bg-white border rounded-xl p-6 mb-4 transition-all duration-200 ${isActive ? 'border-primary/30 shadow-sm shadow-primary/5 border-l-2 border-l-primary' : 'border-gray-200'
+        }`}
       id={`question-${question.id}`}
     >
       {/* Question header */}
@@ -217,11 +215,10 @@ function QuestionCard({
         {question.options.map(option => (
           <label
             key={option.id}
-            className={`flex items-start gap-3 p-3.5 rounded-lg cursor-pointer transition-all duration-150 ${
-              selected === option.id
+            className={`flex items-start gap-3 p-3.5 rounded-lg cursor-pointer transition-all duration-150 ${selected === option.id
                 ? 'bg-primary/5'
                 : 'hover:bg-gray-50'
-            }`}
+              }`}
           >
             <RadioGroupItem value={option.id} id={`${question.id}-${option.id}`} className="mt-0.5 flex-shrink-0" />
             <div>
@@ -376,7 +373,7 @@ function DataSourcesCard() {
           </Button>
         )}
       </div>
-      
+
       {/* Document list with per-item health */}
       <div className="divide-y divide-gray-100">
         {localSources.map((source, i) => {
@@ -513,14 +510,14 @@ export default function AssessmentQuestionnaire() {
   const [guideConversation, setGuideConversation] = useState<Array<{ role: 'user' | 'assistant'; content: string; options?: Array<{ id: string; label: string }> }>>([])
   const [isGuideTyping, setIsGuideTyping] = useState(false)
   const [acceptedSuggestions, setAcceptedSuggestions] = useState<number>(0)
-  
+
   // Guide history - stores conversations per question with timestamps
   type GuideSession = {
     timestamp: Date
     conversation: Array<{ role: 'user' | 'assistant'; content: string }>
   }
   const [guideHistory, setGuideHistory] = useState<Record<string, GuideSession[]>>({})
-  
+
   // Track if all residency suggestions accepted (3) and all systems questions answered (3)
   const systemsQuestionIds = ['q2-1', 'q2-3', 'q2-4']
   const systemsAnsweredCount = systemsQuestionIds.filter(id => answers[id]).length
@@ -534,13 +531,13 @@ export default function AssessmentQuestionnaire() {
     if (!mainContent) return
 
     const allQuestionIds = privacyAssessmentSections.flatMap(s => s.questions.map(q => q.id))
-    
+
     const observer = new IntersectionObserver(
       (entries) => {
         const visibleEntries = entries.filter(entry => entry.isIntersecting)
         if (visibleEntries.length > 0) {
           // Find the topmost visible question
-          const topEntry = visibleEntries.reduce((prev, curr) => 
+          const topEntry = visibleEntries.reduce((prev, curr) =>
             prev.boundingClientRect.top < curr.boundingClientRect.top ? prev : curr
           )
           const questionId = topEntry.target.id.replace('question-', '')
@@ -654,7 +651,7 @@ export default function AssessmentQuestionnaire() {
 
         <div className="flex flex-1 overflow-hidden">
           {/* Left: Question nav */}
-          <aside className="w-[220px] bg-white border-r border-gray-100 flex-shrink-0 overflow-hidden flex flex-col">
+          <aside className="w-[220px] border-r border-gray-100 flex-shrink-0 overflow-hidden flex flex-col">
             {/* Status row */}
             <div className="px-4 py-3 border-b border-gray-100">
               <div className="flex items-center gap-2 mb-2">
@@ -683,11 +680,11 @@ export default function AssessmentQuestionnaire() {
               </div>
             </div>
 
-                <QuestionNav
-                  sections={privacyAssessmentSections}
-                  currentQuestionId={currentQuestionId}
-                  onSelect={handleQuestionSelect}
-                />
+            <QuestionNav
+              sections={privacyAssessmentSections}
+              currentQuestionId={currentQuestionId}
+              onSelect={handleQuestionSelect}
+            />
           </aside>
 
           {/* Main: Questions */}
@@ -832,7 +829,7 @@ export default function AssessmentQuestionnaire() {
                       {Object.entries(guideHistory).map(([questionId, sessions]) => {
                         const question = allQuestions.find(q => q.id === questionId)
                         if (!question || sessions.length === 0) return null
-                        
+
                         return (
                           <motion.div
                             key={questionId}
@@ -845,7 +842,7 @@ export default function AssessmentQuestionnaire() {
                               <Bookmark className="w-3 h-3 text-[#6673C7] fill-[#6673C7]" />
                               <span className="text-[10px] font-semibold text-[#6673C7] uppercase tracking-wide">Guide Session</span>
                             </div>
-                            
+
                             {/* Question context */}
                             <div className="px-3 py-2 border-b border-[#6673C7]/10">
                               <p className="text-[10px] text-gray-400">Question {question.number}</p>
@@ -863,7 +860,7 @@ export default function AssessmentQuestionnaire() {
                                       {session.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                     </span>
                                   </div>
-                                  
+
                                   {/* Conversation preview */}
                                   <div className="space-y-1.5">
                                     {session.conversation.slice(0, 4).map((msg, msgIdx) => (
@@ -1066,7 +1063,7 @@ export default function AssessmentQuestionnaire() {
                           Guiding: {activeGuide.title}
                         </p>
                         <div className="ml-auto flex items-center gap-1">
-                          <button 
+                          <button
                             onClick={() => {
                               const currentIndex = allQuestions.findIndex(q => q.id === activeGuide.id)
                               if (currentIndex > 0) {
