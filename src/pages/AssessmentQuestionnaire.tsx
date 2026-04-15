@@ -128,12 +128,14 @@ function QuestionCard({
   onClarify,
   isActive,
   onAcceptSuggestion,
+  onShowReferences,
 }: {
   question: Question
   onAnswer: (questionId: string, answerId: string) => void
   onClarify: (question: Question) => void
   isActive: boolean
   onAcceptSuggestion?: () => void
+  onShowReferences?: () => void
 }) {
   const [selected, setSelected] = useState(question.aiPrefilled ?? '')
   const [suggestionAccepted, setSuggestionAccepted] = useState(false)
@@ -287,7 +289,10 @@ function QuestionCard({
                 </svg>
                 <span className="text-xs text-gray-600">High Confidence</span>
               </div>
-              <button className="flex items-center gap-0.5 text-xs text-gray-600 hover:text-gray-900">
+              <button 
+                onClick={onShowReferences}
+                className="flex items-center gap-0.5 text-xs text-gray-600 hover:text-gray-900"
+              >
                 2 References
                 <ChevronRight className="w-3 h-3" />
               </button>
@@ -659,6 +664,37 @@ export default function AssessmentQuestionnaire() {
     setAcceptedSuggestions(prev => prev + 1)
   }
 
+  const handleShowReferences = (question: Question) => {
+    // Set the active guide to the current question
+    setActiveGuide(question)
+    
+    // Get the first two data sources as references
+    const referencedSources = dataSources.slice(0, 2)
+    
+    // Build the references message with sources and reasoning
+    const sourcesMessage = referencedSources.map((source, idx) => 
+      `**${idx + 1}. ${source.name}**\n${source.type} — ${source.note}`
+    ).join('\n\n')
+    
+    const reasoningMessage = `Based on the analysis of these documents, this answer was selected because the data processing activities described align with the privacy requirements outlined in the DPA and security documentation. The confidence level reflects the strong alignment between your uploaded documents and the assessment criteria.`
+    
+    // Set the guide conversation with the references
+    setGuideConversation([
+      {
+        role: 'assistant',
+        content: `Here are the sources I used to suggest an answer for "${question.title}":`,
+      },
+      {
+        role: 'assistant',
+        content: sourcesMessage,
+      },
+      {
+        role: 'assistant',
+        content: `**Why this answer was chosen:**\n${reasoningMessage}`,
+      },
+    ])
+  }
+
   const handleQuestionSelect = (questionId: string) => {
     setCurrentQuestionId(questionId)
     const element = document.getElementById(`question-${questionId}`)
@@ -773,6 +809,7 @@ export default function AssessmentQuestionnaire() {
                   onClarify={handleClarify}
                   isActive={question.id === currentQuestionId}
                   onAcceptSuggestion={handleAcceptSuggestion}
+                  onShowReferences={() => handleShowReferences(question)}
                 />
               ))}
 
@@ -790,6 +827,7 @@ export default function AssessmentQuestionnaire() {
                   onAnswer={handleAnswer}
                   onClarify={handleClarify}
                   isActive={question.id === currentQuestionId}
+                  onShowReferences={() => handleShowReferences(question)}
                 />
               ))}
             </div>
