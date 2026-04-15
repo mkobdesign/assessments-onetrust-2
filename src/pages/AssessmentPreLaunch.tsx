@@ -258,11 +258,47 @@ const previousWorkItems = [
 ]
 
 // Chat messages for the copilot
-const initialCopilotMessages = [
+const initialCopilotMessages: {
+  id: string
+  role: 'assistant' | 'user'
+  content: string
+  projectInfo?: { name: string; description: string }
+  progressInfo?: {
+    percentComplete: number
+    questionsAnswered: number
+    totalQuestions: number
+    remainingCategories: string[]
+    progressAudit: { agent: string; action: string; count: number; timeAgo: string }[]
+  }
+}[] = [
   {
     id: 'm1',
     role: 'assistant' as const,
     content: "I've identified 5 relevant sources for this assessment based on your organization's documents and previous reviews. You can reorder or remove sources before starting.",
+  },
+  {
+    id: 'm2',
+    role: 'assistant' as const,
+    content: '',
+    projectInfo: {
+      name: 'Magellan Mobile App',
+      description: "It's a new mobile app that will track users' locations and analyze their browsing patterns and personal preferences to deliver customized personalized content experiences.",
+    },
+  },
+  {
+    id: 'm3',
+    role: 'assistant' as const,
+    content: '',
+    progressInfo: {
+      percentComplete: 72,
+      questionsAnswered: 18,
+      totalQuestions: 25,
+      remainingCategories: ['Residency Information', 'Systems', 'Data Processing', 'Third-Party Sharing'],
+      progressAudit: [
+        { agent: 'Document Agent', action: 'pre-filled', count: 12, timeAgo: '2m ago' },
+        { agent: 'Reuse Agent', action: 'added from past work', count: 6, timeAgo: '1m ago' },
+      ],
+    },
   },
 ]
 
@@ -385,40 +421,11 @@ export default function AssessmentPreLaunch() {
                   <Button
                     variant="outline"
                     onClick={() => setFileBrowserOpen(true)}
-                    className="w-full border-dashed text-gray-500 hover:text-gray-800 hover:border-gray-400 mb-10"
+                    className="w-full border-dashed text-gray-500 hover:text-gray-800 hover:border-gray-400 mb-6"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Add Files
                   </Button>
-
-                  {/* Assessment Progress Audit - compact timeline */}
-                  <div className="mb-8">
-                    <p className="text-[12px] text-gray-700 uppercase tracking-wide mb-2">Progress audit</p>
-                    <div className="relative pl-4">
-                      {/* Timeline line */}
-                      <div className="absolute left-[9px] top-1 bottom-1 w-px bg-gray-200" />
-
-                      <div className="space-y-2">
-                        {/* Agent 1 */}
-                        <div className="flex items-center gap-2 relative">
-                          <div className="absolute left-[-12px] w-3 h-3 rounded-full bg-gray-300 flex items-center justify-center">
-                            <FileText className="w-1.5 h-1.5 text-white" />
-                          </div>
-                          <span className="text-[11px] text-gray-500 ml-2">Document Agent pre-filled <span className="text-gray-700 font-medium">12 questions</span></span>
-                          <span className="text-[10px] text-gray-400">2m ago</span>
-                        </div>
-
-                        {/* Agent 2 */}
-                        <div className="flex items-center gap-2 relative">
-                          <div className="absolute left-[-12px] w-3 h-3 rounded-full bg-gray-300 flex items-center justify-center">
-                            <Shield className="w-1.5 h-1.5 text-white" />
-                          </div>
-                          <span className="text-[11px] text-gray-500 ml-2">Reuse Agent added <span className="text-gray-700 font-medium">6 questions</span> from past work</span>
-                          <span className="text-[10px] text-gray-400">1m ago</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
 
                   {/* CTA */}
                   <div className="bg-white border border-gray-200 rounded-xl p-6">
@@ -515,12 +522,67 @@ export default function AssessmentPreLaunch() {
                         </div>
                       </div>
                     ) : (
-                      <div className="max-w-[85%] flex items-start gap-2.5">
+                      <div className="max-w-[95%] flex items-start gap-2.5">
                         <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
                           <span className="text-white text-[9px] font-bold">AI</span>
                         </div>
-                        <div className="text-sm text-gray-700 leading-relaxed">
-                          {msg.content}
+                        <div className="flex-1">
+                          {msg.content && (
+                            <div className="text-sm text-gray-700 leading-relaxed">
+                              {msg.content}
+                            </div>
+                          )}
+                          {msg.projectInfo && (
+                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mt-1">
+                              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1">Project</p>
+                              <p className="text-sm font-semibold text-gray-900 mb-1">{msg.projectInfo.name}</p>
+                              <p className="text-xs text-gray-600 leading-relaxed">{msg.projectInfo.description}</p>
+                            </div>
+                          )}
+                          {msg.progressInfo && (
+                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mt-1">
+                              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-2">Assessment Progress</p>
+                              <div className="flex items-center gap-3 mb-3">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-2xl font-bold text-primary">{msg.progressInfo.percentComplete}%</span>
+                                  <span className="text-xs text-gray-500">complete</span>
+                                </div>
+                                <div className="h-4 w-px bg-gray-200" />
+                                <div className="text-xs text-gray-600">
+                                  <span className="font-medium text-gray-900">{msg.progressInfo.questionsAnswered}</span>/{msg.progressInfo.totalQuestions} questions
+                                </div>
+                              </div>
+                              <div className="mb-3">
+                                <p className="text-[10px] font-medium text-gray-500 mb-1.5">Categories remaining:</p>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {msg.progressInfo.remainingCategories.map((cat) => (
+                                    <span key={cat} className="px-2 py-0.5 bg-white border border-gray-200 rounded text-[10px] text-gray-600">{cat}</span>
+                                  ))}
+                                </div>
+                              </div>
+                              <div className="border-t border-gray-200 pt-3">
+                                <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-2">Progress Audit</p>
+                                <div className="relative pl-4">
+                                  <div className="absolute left-[5px] top-1 bottom-1 w-px bg-gray-200" />
+                                  <div className="space-y-2">
+                                    {msg.progressInfo.progressAudit.map((audit, idx) => (
+                                      <div key={idx} className="flex items-center gap-2 relative">
+                                        <div className="absolute left-[-12px] w-3 h-3 rounded-full bg-gray-300 flex items-center justify-center">
+                                          {idx === 0 ? (
+                                            <FileText className="w-1.5 h-1.5 text-white" />
+                                          ) : (
+                                            <Shield className="w-1.5 h-1.5 text-white" />
+                                          )}
+                                        </div>
+                                        <span className="text-[11px] text-gray-500 ml-2">{audit.agent} {audit.action} <span className="text-gray-700 font-medium">{audit.count} questions</span></span>
+                                        <span className="text-[10px] text-gray-400">{audit.timeAgo}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}
