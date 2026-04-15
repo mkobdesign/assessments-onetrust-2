@@ -665,18 +665,23 @@ export default function AssessmentQuestionnaire() {
             {/* Participants */}
             <div className="px-4 py-2.5 border-b border-gray-100">
               <p className="text-xs text-gray-400 mb-2">Participants</p>
-              <div className="flex items-center gap-1">
-                {['RS', 'MR', 'KP'].map(initials => (
-                  <div
-                    key={initials}
-                    className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[9px] font-bold flex items-center justify-center border-2 border-white -ml-1 first:ml-0"
-                  >
-                    {initials}
+              <div className="flex items-center">
+                <div className="flex items-center">
+                  {['RS', 'MR', 'KP'].map(initials => (
+                    <div
+                      key={initials}
+                      className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[9px] font-bold flex items-center justify-center border-2 border-white -ml-1 first:ml-0"
+                    >
+                      {initials}
+                    </div>
+                  ))}
+                  <div className="w-6 h-6 rounded-full bg-gray-100 text-gray-500 text-[9px] font-bold flex items-center justify-center border-2 border-white -ml-1">
+                    +2
                   </div>
-                ))}
-                <div className="w-6 h-6 rounded-full bg-gray-100 text-gray-500 text-[9px] font-bold flex items-center justify-center border-2 border-white -ml-1">
-                  +2
                 </div>
+                <button className="ml-2 w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600">
+                  <Plus className="w-4 h-4" />
+                </button>
               </div>
             </div>
 
