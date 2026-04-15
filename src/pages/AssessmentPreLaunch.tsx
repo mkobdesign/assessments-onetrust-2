@@ -537,27 +537,27 @@ export default function AssessmentPreLaunch() {
                           )}
                           {msg.progressInfo && (
                             <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mt-1">
-                              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-2">Assessment Progress</p>
+                              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Assessment Progress</p>
                               <div className="flex items-center gap-3 mb-3">
                                 <div className="flex items-center gap-2">
                                   <span className="text-2xl font-bold text-primary">{msg.progressInfo.percentComplete}%</span>
-                                  <span className="text-xs text-gray-500">complete</span>
+                                  <span className="text-sm text-gray-500">complete</span>
                                 </div>
                                 <div className="h-4 w-px bg-gray-200" />
-                                <div className="text-xs text-gray-600">
+                                <div className="text-sm text-gray-600">
                                   <span className="font-medium text-gray-900">{msg.progressInfo.questionsAnswered}</span>/{msg.progressInfo.totalQuestions} questions answered
                                 </div>
                               </div>
                               <div className="mb-3">
-                                <p className="text-[10px] font-medium text-gray-500 mb-1.5">Categories remaining:</p>
+                                <p className="text-xs font-medium text-gray-500 mb-1.5">Categories remaining:</p>
                                 <div className="flex flex-wrap gap-1.5">
                                   {msg.progressInfo.remainingCategories.map((cat) => (
-                                    <span key={cat} className="px-2 py-0.5 bg-white border border-gray-200 rounded text-[10px] text-gray-600">{cat}</span>
+                                    <span key={cat} className="px-2 py-0.5 bg-white border border-gray-200 rounded text-xs text-gray-600">{cat}</span>
                                   ))}
                                 </div>
                               </div>
                               <div className="border-t border-gray-200 pt-3">
-                                <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-2">Progress Audit</p>
+                                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Progress Audit</p>
                                 <div className="relative pl-4">
                                   <div className="absolute left-[9px] top-1 bottom-1 w-px bg-gray-200" />
                                   <div className="space-y-2">
@@ -570,8 +570,8 @@ export default function AssessmentPreLaunch() {
                                             <Shield className="w-1.5 h-1.5 text-white" />
                                           )}
                                         </div>
-                                        <span className="text-[11px] text-gray-500 ml-2">{audit.agent} {audit.action} <span className="text-gray-700 font-medium">{audit.count} questions</span></span>
-                                        <span className="text-[10px] text-gray-400">{audit.timeAgo}</span>
+                                        <span className="text-xs text-gray-500 ml-2">{audit.agent} {audit.action} <span className="text-gray-700 font-medium">{audit.count} questions</span></span>
+                                        <span className="text-xs text-gray-400">{audit.timeAgo}</span>
                                       </div>
                                     ))}
                                   </div>
