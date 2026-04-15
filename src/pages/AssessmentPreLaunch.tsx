@@ -270,40 +270,40 @@ const initialCopilotMessages: {
     progressAudit: { agent: string; action: string; count: number; timeAgo: string }[]
   }
 }[] = [
-  {
-    id: 'm1',
-    role: 'assistant' as const,
-    content: "I've identified 5 relevant sources for this assessment based on your organization's documents and previous reviews. You can reorder or remove sources before starting.",
-  },
-  {
-    id: 'm2',
-    role: 'assistant' as const,
-    content: (
-      <>
-        The project is the <span className="font-semibold">Magellan Mobile App</span>.
-        <br /><br />
-        It&apos;s a new mobile app that will track users&apos; locations and analyze their browsing patterns and personal preferences to deliver customized personalized content experiences.
-        <br /><br />
-        The point of this assessment is to ensure compliance regarding the following topics;
-      </>
-    ),
-  },
-  {
-    id: 'm3',
-    role: 'assistant' as const,
-    content: '',
-    progressInfo: {
-      percentComplete: 72,
-      questionsAnswered: 18,
-      totalQuestions: 25,
-      remainingCategories: ['Data residency', 'Retention policy', 'Data architecture', 'Data transfer'],
-      progressAudit: [
-        { agent: 'Document Agent', action: 'pre-filled', count: 12, timeAgo: '2m ago' },
-        { agent: 'Reuse Agent', action: 'added from past work', count: 6, timeAgo: '1m ago' },
-      ],
+    {
+      id: 'm1',
+      role: 'assistant' as const,
+      content: "I've identified 5 relevant sources for this assessment based on your organization's documents and previous reviews. You can reorder or remove sources before starting.",
     },
-  },
-]
+    {
+      id: 'm2',
+      role: 'assistant' as const,
+      content: (
+        <>
+          The project is the <span className="font-semibold">Magellan Mobile App</span>.
+          <br /><br />
+          It&apos;s a new mobile app that will track users&apos; locations and analyze their browsing patterns and personal preferences to deliver customized personalized content experiences.
+          <br /><br />
+          The point of this assessment is to ensure compliance regarding the following topics;
+        </>
+      ),
+    },
+    {
+      id: 'm3',
+      role: 'assistant' as const,
+      content: '',
+      progressInfo: {
+        percentComplete: 72,
+        questionsAnswered: 18,
+        totalQuestions: 25,
+        remainingCategories: ['Data residency', 'Retention policy', 'Data architecture', 'Data transfer'],
+        progressAudit: [
+          { agent: 'Document Agent', action: 'pre-filled', count: 12, timeAgo: '2m ago' },
+          { agent: 'Privacy Agent', action: 'added 1 assessment', count: 6, timeAgo: '1m ago' },
+        ],
+      },
+    },
+  ]
 
 export default function AssessmentPreLaunch() {
   const navigate = useNavigate()
@@ -545,7 +545,7 @@ export default function AssessmentPreLaunch() {
                                 </div>
                                 <div className="h-4 w-px bg-gray-200" />
                                 <div className="text-xs text-gray-600">
-                                  <span className="font-medium text-gray-900">{msg.progressInfo.questionsAnswered}</span>/{msg.progressInfo.totalQuestions} questions
+                                  <span className="font-medium text-gray-900">{msg.progressInfo.questionsAnswered}</span>/{msg.progressInfo.totalQuestions} questions answered
                                 </div>
                               </div>
                               <div className="mb-3">
@@ -559,7 +559,7 @@ export default function AssessmentPreLaunch() {
                               <div className="border-t border-gray-200 pt-3">
                                 <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-2">Progress Audit</p>
                                 <div className="relative pl-4">
-                                  <div className="absolute left-[5px] top-1 bottom-1 w-px bg-gray-200" />
+                                  <div className="absolute left-[9px] top-1 bottom-1 w-px bg-gray-200" />
                                   <div className="space-y-2">
                                     {msg.progressInfo.progressAudit.map((audit, idx) => (
                                       <div key={idx} className="flex items-center gap-2 relative">
