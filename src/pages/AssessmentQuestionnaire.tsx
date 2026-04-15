@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { TopBar } from '@/components/layout/TopBar'
+import { SourcesList } from '@/components/SourcesList'
 import { Button } from '@/components/ui/button'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
@@ -29,6 +30,11 @@ import {
   Trash2,
   Bookmark,
   Clock,
+  Menu,
+  ThumbsUp,
+  ThumbsDown,
+  Plus,
+  ExternalLink,
 } from 'lucide-react'
 import { privacyAssessmentSections, type Question } from '@/data/assessmentQuestions'
 import { dataSources } from '@/data/mockFlow'
@@ -85,9 +91,8 @@ function QuestionNav({
               <button
                 key={q.id}
                 onClick={() => onSelect(q.id)}
-                className={`w-full flex items-center gap-2.5 px-4 py-2 text-left transition-all duration-150 ${
-                  isCurrent ? 'bg-primary/5 border-l-2 border-primary' : 'hover:bg-gray-50 border-l-2 border-transparent'
-                }`}
+                className={`w-full flex items-center gap-2.5 px-4 py-2 text-left transition-all duration-150 ${isCurrent ? 'bg-primary/5 border-l-2 border-primary' : 'hover:bg-gray-50 border-l-2 border-transparent'
+                  }`}
                 aria-current={isCurrent ? 'step' : undefined}
               >
                 <div className="flex-shrink-0">
@@ -105,7 +110,7 @@ function QuestionNav({
                 </div>
                 <div className="min-w-0">
                   <span className="text-xs text-gray-400 font-mono">{q.number}</span>
-                  <p className={`text-xs leading-snug truncate mt-0.5 ${isCurrent ? 'font-semibold text-gray-900' : isAnswered || isMarkedForReview ? 'text-gray-500' : 'text-gray-700'}`}>
+                  <p className={`text-xs leading-snug truncate mt-0.5 text-gray-700 ${isCurrent ? 'font-semibold' : ''}`}>
                     {q.title}
                   </p>
                 </div>
@@ -124,12 +129,14 @@ function QuestionCard({
   onClarify,
   isActive,
   onAcceptSuggestion,
+  onShowReferences,
 }: {
   question: Question
   onAnswer: (questionId: string, answerId: string) => void
   onClarify: (question: Question) => void
   isActive: boolean
   onAcceptSuggestion?: () => void
+  onShowReferences?: () => void
 }) {
   const [selected, setSelected] = useState(question.aiPrefilled ?? '')
   const [suggestionAccepted, setSuggestionAccepted] = useState(false)
@@ -149,7 +156,7 @@ function QuestionCard({
     }
   }
 
-  const suggestedOption = question.suggestedAnswer 
+  const suggestedOption = question.suggestedAnswer
     ? question.options.find(opt => opt.id === question.suggestedAnswer)
     : null
 
@@ -158,9 +165,8 @@ function QuestionCard({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
-      className={`bg-white border rounded-xl p-6 mb-4 transition-all duration-200 ${
-        isActive ? 'border-primary/30 shadow-sm shadow-primary/5 border-l-2 border-l-primary' : 'border-gray-200'
-      }`}
+      className={`bg-white border rounded-xl p-6 mb-4 transition-all duration-200 ${isActive ? 'border-primary/30 shadow-sm shadow-primary/5 border-l-2 border-l-primary' : 'border-gray-200'
+        }`}
       id={`question-${question.id}`}
     >
       {/* Question header */}
@@ -208,15 +214,14 @@ function QuestionCard({
       </p>
 
       {/* Options */}
-      <RadioGroup value={selected} onValueChange={handleSelect} className="space-y-1">
+      <RadioGroup value={selected} onValueChange={handleSelect} className="space-y-0">
         {question.options.map(option => (
           <label
             key={option.id}
-            className={`flex items-start gap-3 p-3.5 rounded-lg cursor-pointer transition-all duration-150 ${
-              selected === option.id
-                ? 'bg-primary/5'
-                : 'hover:bg-gray-50'
-            }`}
+            className={`flex items-start gap-3 py-2.5 px-3 rounded-lg cursor-pointer transition-all duration-150 ${selected === option.id
+              ? 'bg-primary/5'
+              : 'hover:bg-gray-50'
+              }`}
           >
             <RadioGroupItem value={option.id} id={`${question.id}-${option.id}`} className="mt-0.5 flex-shrink-0" />
             <div>
@@ -236,34 +241,72 @@ function QuestionCard({
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-5 bg-[#6673C7]/5 border border-[#6673C7]/20 rounded-xl p-4"
+          className="mt-5 bg-gray-50 border border-gray-200 rounded-lg p-4"
         >
-          <div className="flex items-start gap-3">
-            <div className="w-6 h-6 rounded-full bg-[#6673C7] flex items-center justify-center flex-shrink-0">
-              <Sparkles className="w-3 h-3 text-white" />
+          {/* Header row with title and buttons */}
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <div className="w-5 h-5 rounded bg-[#6673C7] flex items-center justify-center flex-shrink-0">
+                <span className="text-white text-[11px] font-bold">AI</span>
+              </div>
+              <p className="text-sm font-semibold text-gray-900">Suggested Response</p>
             </div>
-            <div className="flex-1">
-              <p className="text-xs font-semibold text-[#6673C7] mb-1">Suggested response</p>
-              <p className="text-sm font-medium text-gray-900 mb-1">{suggestedOption.label}</p>
-              {suggestedOption.description && (
-                <p className="text-xs text-gray-600 leading-relaxed">{suggestedOption.description}</p>
-              )}
-              <div className="flex items-center gap-2 mt-3">
-                <Button
-                  size="sm"
-                  className="h-7 text-xs bg-[#6673C7] hover:bg-[#6673C7]/90"
-                  onClick={handleAcceptSuggestion}
-                >
-                  Accept
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 text-xs text-gray-500 hover:text-gray-700"
-                  onClick={() => setSuggestionDismissed(true)}
-                >
-                  Dismiss
-                </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 text-sm text-primary hover:text-primary/80 font-medium"
+                onClick={() => setSuggestionDismissed(true)}
+              >
+                Dismiss
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 text-sm border-primary text-primary hover:bg-primary/5 font-medium"
+                onClick={handleAcceptSuggestion}
+              >
+                Accept
+              </Button>
+            </div>
+          </div>
+
+          {/* Answer content */}
+          <div className="mb-4">
+            <p className="text-sm text-gray-900">{suggestedOption.label}</p>
+            {suggestedOption.description && (
+              <p className="text-xs text-gray-600 leading-relaxed mt-1">{suggestedOption.description}</p>
+            )}
+          </div>
+
+          {/* Bottom row with confidence, references, note, and voting */}
+          <div className="flex items-center justify-between pt-3 border-t border-gray-200">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1.5">
+                <svg width="13" height="12" viewBox="0 0 13 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect y="8" width="3" height="4" fill="#6673C7" />
+                  <rect x="5" y="4" width="3" height="8" fill="#6673C7" />
+                  <rect x="10" width="3" height="12" fill="#6673C7" />
+                </svg>
+                <span className="text-xs text-gray-600">High Confidence</span>
+              </div>
+              <button
+                onClick={onShowReferences}
+                className="flex items-center gap-0.5 text-xs text-gray-600 hover:text-gray-900"
+              >
+                2 References
+                <ChevronRight className="w-3 h-3" />
+              </button>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-gray-400">Content may contain inaccuracies.</span>
+              <div className="flex items-center gap-1">
+                <button className="text-gray-400 hover:text-gray-600">
+                  <ThumbsUp className="w-4 h-4" />
+                </button>
+                <button className="text-gray-400 hover:text-gray-600">
+                  <ThumbsDown className="w-4 h-4" />
+                </button>
               </div>
             </div>
           </div>
@@ -371,7 +414,7 @@ function DataSourcesCard() {
           </Button>
         )}
       </div>
-      
+
       {/* Document list with per-item health */}
       <div className="divide-y divide-gray-100">
         {localSources.map((source, i) => {
@@ -505,23 +548,24 @@ export default function AssessmentQuestionnaire() {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [activeGuide, setActiveGuide] = useState<Question | null>(null)
   const [chatInput, setChatInput] = useState('')
-  const [guideConversation, setGuideConversation] = useState<Array<{ role: 'user' | 'assistant'; content: string; options?: Array<{ id: string; label: string }> }>>([])
+  const [guideConversation, setGuideConversation] = useState<Array<{ role: 'user' | 'assistant'; content: React.ReactNode; options?: Array<{ id: string; label: string }> }>>([])
   const [isGuideTyping, setIsGuideTyping] = useState(false)
   const [acceptedSuggestions, setAcceptedSuggestions] = useState<number>(0)
-  
+
   // Guide history - stores conversations per question with timestamps
   type GuideSession = {
     timestamp: Date
     conversation: Array<{ role: 'user' | 'assistant'; content: string }>
   }
   const [guideHistory, setGuideHistory] = useState<Record<string, GuideSession[]>>({})
-  
+
   // Track if all residency suggestions accepted (3) and all systems questions answered (3)
   const systemsQuestionIds = ['q2-1', 'q2-3', 'q2-4']
   const systemsAnsweredCount = systemsQuestionIds.filter(id => answers[id]).length
   const showGovernanceReadiness = acceptedSuggestions >= 3 && systemsAnsweredCount >= 3
   const chatBottomRef = useRef<HTMLDivElement>(null)
   const mainContentRef = useRef<HTMLElement>(null)
+  const [isCopilotOpen, setIsCopilotOpen] = useState(true)
 
   // Scroll-based active question tracking
   useEffect(() => {
@@ -529,13 +573,13 @@ export default function AssessmentQuestionnaire() {
     if (!mainContent) return
 
     const allQuestionIds = privacyAssessmentSections.flatMap(s => s.questions.map(q => q.id))
-    
+
     const observer = new IntersectionObserver(
       (entries) => {
         const visibleEntries = entries.filter(entry => entry.isIntersecting)
         if (visibleEntries.length > 0) {
           // Find the topmost visible question
-          const topEntry = visibleEntries.reduce((prev, curr) => 
+          const topEntry = visibleEntries.reduce((prev, curr) =>
             prev.boundingClientRect.top < curr.boundingClientRect.top ? prev : curr
           )
           const questionId = topEntry.target.id.replace('question-', '')
@@ -622,6 +666,65 @@ export default function AssessmentQuestionnaire() {
     setAcceptedSuggestions(prev => prev + 1)
   }
 
+  const handleShowReferences = (question: Question) => {
+    // Set the active guide to the current question
+    setActiveGuide(question)
+
+    // Get the first two data sources as references
+    const referencedSources = dataSources.slice(0, 2)
+
+    // Get stats and questions for the referenced sources
+    const getRefSourceStats = (sourceId: string) => {
+      const statsMap: Record<string, { relevance: string; completeness: string; freshness: string; contradictions: string }> = {
+        dpa: { relevance: 'High', completeness: 'Complete', freshness: 'Current', contradictions: 'None' },
+        security: { relevance: 'High', completeness: 'Good', freshness: 'Current', contradictions: 'None' },
+        architecture: { relevance: 'Medium', completeness: 'Partial', freshness: '6 months old', contradictions: 'None' },
+        prompts: { relevance: 'High', completeness: 'Complete', freshness: 'Current', contradictions: 'None' },
+        sop: { relevance: 'High', completeness: 'Good', freshness: 'Current', contradictions: 'None' },
+      }
+      return statsMap[sourceId] || { relevance: 'Unknown', completeness: 'Unknown', freshness: 'Unknown', contradictions: 'Unknown' }
+    }
+
+    const getRefSourceQuestions = (sourceId: string) => {
+      const questionsMap: Record<string, string[]> = {
+        dpa: ['Where will data be stored geographically?', 'What transfer mechanisms are in place?'],
+        security: ['Which systems process data?', 'What security controls are in place?'],
+        architecture: ['Where are data subjects located?'],
+        prompts: ['What types of prompts are used?'],
+        sop: ['Is human review required?'],
+      }
+      return questionsMap[sourceId] || []
+    }
+
+    // Set the guide conversation with the references using the SourcesList component
+    setGuideConversation([
+      {
+        role: 'assistant',
+        content: (
+          <SourcesList
+            sources={referencedSources}
+            getStats={getRefSourceStats}
+            getQuestions={getRefSourceQuestions}
+          />
+        ),
+      },
+      {
+        role: 'assistant',
+        content: (
+          <div>
+            <p className="text-xs font-medium text-gray-800 mb-1">Why this answer was chosen:</p>
+            <p className="text-xs text-gray-600">Based on the analysis of these documents, this answer was selected because the data processing activities described align with the privacy requirements outlined in the DPA and security documentation. The confidence level reflects the strong alignment between your uploaded documents and the assessment criteria.</p>
+          </div>
+        ),
+      },
+    ])
+
+    // Scroll to bottom of chat after a short delay to ensure content is rendered
+    setTimeout(() => {
+      chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }, 100)
+  }
+
   const handleQuestionSelect = (questionId: string) => {
     setCurrentQuestionId(questionId)
     const element = document.getElementById(`question-${questionId}`)
@@ -637,6 +740,7 @@ export default function AssessmentQuestionnaire() {
     <div className="flex h-screen bg-gray-50 overflow-hidden">
       <Sidebar />
 
+      {/* Main content area (header + content) */}
       <div className="flex flex-col flex-1 overflow-hidden">
         <TopBar
           title="Privacy Review Request for Magellan Mobile App"
@@ -645,44 +749,76 @@ export default function AssessmentQuestionnaire() {
               Submit for review
             </Button>
           }
+          isCopilotOpen={isCopilotOpen}
+          onToggleCopilot={() => setIsCopilotOpen(!isCopilotOpen)}
         />
 
         <div className="flex flex-1 overflow-hidden">
           {/* Left: Question nav */}
-          <aside className="w-[220px] bg-white border-r border-gray-100 flex-shrink-0 overflow-hidden flex flex-col">
+          <aside className="w-[300px] border-r border-gray-100 flex-shrink-0 overflow-hidden flex flex-col">
             {/* Status row */}
-            <div className="px-4 py-3 border-b border-gray-100">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-2 h-2 rounded-full bg-blue-500" />
-                <span className="text-xs font-semibold text-gray-700">In progress</span>
+            <div className="px-4 py-6  border-b border-gray-100">
+              <h2 className="text-base font-semibold text-gray-900 mb-3">Details</h2>
+              <Progress value={progress} className="mb-2" />
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2 h-2 rounded-full bg-blue-500" />
+                  <span className="text-xs text-gray-600">In progress</span>
+                </div>
+                <p className="text-xs text-gray-500">{progress}% complete</p>
               </div>
-              <Progress value={progress} className="mb-1" />
-              <p className="text-xs text-gray-500">{progress}% complete</p>
-            </div>
 
-            {/* Participants */}
-            <div className="px-4 py-2.5 border-b border-gray-100">
-              <p className="text-xs text-gray-400 mb-2">Participants</p>
-              <div className="flex items-center gap-1">
-                {['RS', 'MR', 'KP'].map(initials => (
-                  <div
-                    key={initials}
-                    className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[9px] font-bold flex items-center justify-center border-2 border-white -ml-1 first:ml-0"
-                  >
-                    {initials}
+              {/* Participants */}
+              <div className="pt-6 flex items-start justify-between">
+                {/* Participants */}
+                <div>
+                  <p className="text-xs text-gray-400 mb-2">Participants</p>
+                  <div className="flex items-center">
+                    <div className="flex items-center">
+                      {['RS', 'MR', 'KP'].map(initials => (
+                        <div
+                          key={initials}
+                          className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[10px] font-bold flex items-center justify-center border-2 border-white -ml-1 first:ml-0"
+                        >
+                          {initials}
+                        </div>
+                      ))}
+                      <div className="w-6 h-6 rounded-full bg-gray-100 text-gray-500 text-[10px] font-bold flex items-center justify-center border-2 border-white -ml-1">
+                        +2
+                      </div>
+                    </div>
+                    <button className="ml-2 w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600">
+                      <Plus className="w-4 h-4" />
+                    </button>
                   </div>
-                ))}
-                <div className="w-6 h-6 rounded-full bg-gray-100 text-gray-500 text-[9px] font-bold flex items-center justify-center border-2 border-white -ml-1">
-                  +2
+                </div>
+
+                {/* Tools */}
+                <div>
+                  <p className="text-xs text-gray-400 mb-2">Tools</p>
+                  <div className="flex items-center gap-2">
+                    <button className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-gray-700">
+                      <Paperclip className="w-4 h-4" />
+                    </button>
+                    <button className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-gray-700">
+                      <CheckCheck className="w-4 h-4" />
+                    </button>
+                    <button className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-gray-700 relative">
+                      <MessageCircle className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
+
             </div>
 
-                <QuestionNav
-                  sections={privacyAssessmentSections}
-                  currentQuestionId={currentQuestionId}
-                  onSelect={handleQuestionSelect}
-                />
+
+
+            <QuestionNav
+              sections={privacyAssessmentSections}
+              currentQuestionId={currentQuestionId}
+              onSelect={handleQuestionSelect}
+            />
           </aside>
 
           {/* Main: Questions */}
@@ -706,6 +842,7 @@ export default function AssessmentQuestionnaire() {
                   onClarify={handleClarify}
                   isActive={question.id === currentQuestionId}
                   onAcceptSuggestion={handleAcceptSuggestion}
+                  onShowReferences={() => handleShowReferences(question)}
                 />
               ))}
 
@@ -723,434 +860,460 @@ export default function AssessmentQuestionnaire() {
                   onAnswer={handleAnswer}
                   onClarify={handleClarify}
                   isActive={question.id === currentQuestionId}
+                  onShowReferences={() => handleShowReferences(question)}
                 />
               ))}
             </div>
           </main>
+        </div>
+      </div>
 
-          {/* Right: Copilot drawer */}
-          <aside className="w-[440px] flex flex-col bg-white border-l border-gray-100 flex-shrink-0">
-            <Tabs defaultValue="chat" className="flex flex-col h-full">
-              {/* Tabs header */}
-              <div className="border-b border-gray-100 px-2 pt-2 flex-shrink-0">
-                <TabsList className="w-full bg-transparent p-0 gap-0 h-auto">
-                  <TabsTrigger
-                    value="chat"
-                    className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-xs py-2.5 font-semibold"
-                  >
-                    Copilot chat
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="tools"
-                    className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none text-xs py-2.5 font-semibold"
-                  >
-                    <Sparkles className="w-3 h-3 mr-1" />
-                    Answer Generation
-                  </TabsTrigger>
-                </TabsList>
+      {/* Right: Copilot drawer - full height beside all content */}
+      {isCopilotOpen && (
+      <aside className="w-[440px] flex flex-col bg-white border-l border-gray-200 flex-shrink-0">
+        <Tabs defaultValue="chat" className="flex flex-col h-full">
+          {/* Tabs header - h-14 to match TopBar height */}
+          <div className="flex-shrink-0 h-14 border-b border-gray-200">
+            <TabsList className="w-full bg-transparent p-0 gap-0 h-full rounded-none">
+              <TabsTrigger
+                value="chat"
+                className="flex-1 h-full rounded-none border-b-2 border-transparent bg-white data-[state=active]:bg-white data-[state=active]:border-b-primary data-[state=active]:shadow-none data-[state=inactive]:bg-gray-100 text-sm font-medium text-gray-900"
+              >
+                Copilot chat
+              </TabsTrigger>
+              <TabsTrigger
+                value="tools"
+                className="flex-1 h-full rounded-none border-b-2 border-transparent bg-white data-[state=active]:bg-white data-[state=active]:border-b-primary data-[state=active]:shadow-none data-[state=inactive]:bg-gray-100 text-sm font-medium text-gray-900"
+              >
+                <span className="inline-flex items-center justify-center w-5 h-5 rounded bg-[#6673C7] text-white text-[10px] font-bold mr-2">AI</span>
+                Answer Generation Tools
+              </TabsTrigger>
+            </TabsList>
+          </div>
+
+          <TabsContent value="chat" className="flex flex-col flex-1 overflow-hidden mt-0 data-[state=inactive]:hidden">
+            {/* Context header with hamburger menu and New chat button */}
+            <div className="px-4 py-3 border-b border-gray-200">
+              <div className="flex items-center gap-3">
+                <button className="text-gray-600 hover:text-gray-900">
+                  <Menu className="w-5 h-5" />
+                </button>
+                <span className="text-sm font-medium text-primary">Assessment, Magellan Mobile</span>
+                <Button variant="outline" size="sm" className="ml-auto text-xs h-8 px-3 text-primary border-primary/30 hover:bg-primary/5">
+                  New chat
+                </Button>
+              </div>
+            </div>
+
+            {/* Collapsible bookmark sections */}
+            <div className="border-b border-gray-200">
+              <button className="w-full flex items-center gap-2 px-4 py-2.5 text-left border-b border-gray-100 hover:bg-gray-50">
+                <ChevronUp className="w-4 h-4 text-gray-400" />
+                <span className="text-sm text-gray-600">Onboarding</span>
+              </button>
+              <button className="w-full flex items-center gap-2 px-4 py-2.5 text-left hover:bg-gray-50">
+                <ChevronDown className="w-4 h-4 text-gray-400" />
+                <span className="text-sm text-gray-600">Questionnaire</span>
+              </button>
+            </div>
+
+            {/* AI messages */}
+            <div className="flex-1 overflow-y-auto scrollbar-thin px-4 py-4 space-y-4">
+              {/* Static progress message */}
+              <div className="text-sm text-gray-700 leading-relaxed">
+                <strong className="text-gray-900">Good progress</strong>, 6 of 10 questions are complete. It&apos;s 62% ready for privacy approval thanks to the documents and assessments you selected.
               </div>
 
-              <TabsContent value="chat" className="flex flex-col flex-1 overflow-hidden mt-0 data-[state=inactive]:hidden">
-                {/* Context badge */}
-                <div className="px-4 py-2 border-b border-gray-100 bg-gray-50/50">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs text-gray-500">Assessment,</span>
-                    <span className="text-xs font-semibold text-gray-700">Magellan Mobile</span>
-                    <Button variant="ghost" size="icon" className="h-4 w-4 ml-auto">
-                      <X className="w-3 h-3 text-gray-400" />
-                    </Button>
-                  </div>
-                </div>
+              <div className="text-sm text-gray-700 leading-relaxed">
+                You can use these tools to generate answers, or have me guide you through the experience.
+              </div>
 
-                {/* AI messages */}
-                <div className="flex-1 overflow-y-auto scrollbar-thin px-4 py-4 space-y-3">
-                  {/* Static progress message */}
-                  <div className="flex items-start gap-2">
-                    <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-white text-[8px] font-bold">AI</span>
+              {/* Tool buttons with green icon backgrounds */}
+              <div className="flex flex-col items-start gap-2.5">
+                {[
+                  { icon: Database, label: 'Edit data sources' },
+                  { icon: Sparkles, label: 'Kick off deep research' },
+                  { icon: MessageCircle, label: 'Guide me through answering questions' },
+                ].map(({ icon: Icon, label }) => (
+                  <button
+                    key={label}
+                    className="inline-flex items-center gap-0 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:border-primary/40 transition-all duration-150 text-left overflow-hidden"
+                    onClick={label === 'Guide me through answering questions' ? () => {
+                      setActiveGuide(allQuestions[0])
+                      handleQuestionSelect(allQuestions[0].id)
+                    } : undefined}
+                  >
+                    <div className="w-9 h-9 bg-primary flex items-center justify-center flex-shrink-0">
+                      <Icon className="w-4 h-4 text-white" />
                     </div>
-                    <div className="text-xs text-gray-700 leading-relaxed">
-                      <strong className="text-gray-900">Good progress</strong>, 6 of 10 questions are complete. It's 62% ready for privacy approval thanks to the documents and assessments you selected.
-                    </div>
-                  </div>
+                    <span className="px-3">{label}</span>
+                  </button>
+                ))}
+              </div>
 
-                  <div className="flex items-start gap-2">
-                    <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-white text-[8px] font-bold">AI</span>
-                    </div>
-                    <div className="text-xs text-gray-700 leading-relaxed">
-                      You can use these tools to generate answers, or have me guide you through the experience.
-                    </div>
-                  </div>
+              {/* Thumbs up/down feedback */}
+              <div className="flex items-center gap-2">
+                <button className="text-gray-400 hover:text-gray-600">
+                  <ThumbsUp className="w-4 h-4" />
+                </button>
+                <button className="text-gray-400 hover:text-gray-600">
+                  <ThumbsDown className="w-4 h-4" />
+                </button>
+              </div>
 
-                  {/* Tool buttons */}
-                  <div className="space-y-2 pl-7">
-                    {[
-                      { icon: Database, label: 'Edit data sources' },
-                      { icon: Search, label: 'Kick off deep research' },
-                      { icon: MessageCircle, label: 'Guide me through answering questions' },
-                    ].map(({ icon: Icon, label }) => (
-                      <button
-                        key={label}
-                        className="w-full flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-700 hover:border-primary/40 hover:bg-primary/5 hover:text-primary transition-all duration-150 text-left"
-                        onClick={label === 'Guide me through answering questions' ? () => {
-                          setActiveGuide(allQuestions[0])
-                          handleQuestionSelect(allQuestions[0].id)
-                        } : undefined}
-                      >
-                        <Icon className="w-3.5 h-3.5 flex-shrink-0" />
-                        {label}
-                      </button>
-                    ))}
-                  </div>
+              {/* Guide History Bookmarks */}
+              {console.log('[v0] Rendering bookmarks, guideHistory:', guideHistory)}
+              {Object.entries(guideHistory).length > 0 && (
+                <div className="space-y-3 mt-4">
+                  {Object.entries(guideHistory).map(([questionId, sessions]) => {
+                    const question = allQuestions.find(q => q.id === questionId)
+                    if (!question || sessions.length === 0) return null
 
-                  {/* Guide History Bookmarks */}
-                  {console.log('[v0] Rendering bookmarks, guideHistory:', guideHistory)}
-                  {Object.entries(guideHistory).length > 0 && (
-                    <div className="space-y-3 mt-4">
-                      {Object.entries(guideHistory).map(([questionId, sessions]) => {
-                        const question = allQuestions.find(q => q.id === questionId)
-                        if (!question || sessions.length === 0) return null
-                        
-                        return (
-                          <motion.div
-                            key={questionId}
-                            initial={{ opacity: 0, y: 8 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="bg-gradient-to-r from-[#6673C7]/5 to-[#6673C7]/10 border border-[#6673C7]/20 rounded-xl overflow-hidden"
-                          >
-                            {/* Bookmark header */}
-                            <div className="flex items-center gap-2 px-3 py-2 bg-[#6673C7]/10 border-b border-[#6673C7]/10">
-                              <Bookmark className="w-3 h-3 text-[#6673C7] fill-[#6673C7]" />
-                              <span className="text-[10px] font-semibold text-[#6673C7] uppercase tracking-wide">Guide Session</span>
-                            </div>
-                            
-                            {/* Question context */}
-                            <div className="px-3 py-2 border-b border-[#6673C7]/10">
-                              <p className="text-[10px] text-gray-400">Question {question.number}</p>
-                              <p className="text-xs font-medium text-gray-800 truncate">{question.title}</p>
-                            </div>
-
-                            {/* Sessions */}
-                            <div className="divide-y divide-[#6673C7]/10">
-                              {sessions.map((session, sessionIdx) => (
-                                <div key={sessionIdx} className="px-3 py-2">
-                                  {/* Timestamp */}
-                                  <div className="flex items-center gap-1.5 mb-2">
-                                    <Clock className="w-2.5 h-2.5 text-gray-400" />
-                                    <span className="text-[10px] text-gray-400">
-                                      {session.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                    </span>
-                                  </div>
-                                  
-                                  {/* Conversation preview */}
-                                  <div className="space-y-1.5">
-                                    {session.conversation.slice(0, 4).map((msg, msgIdx) => (
-                                      <div key={msgIdx} className={`text-[11px] ${msg.role === 'user' ? 'text-gray-600 italic' : 'text-gray-700'}`}>
-                                        <span className="text-[10px] text-gray-400 mr-1">{msg.role === 'user' ? 'You:' : 'AI:'}</span>
-                                        <span className="line-clamp-2">{msg.content}</span>
-                                      </div>
-                                    ))}
-                                    {session.conversation.length > 4 && (
-                                      <p className="text-[10px] text-gray-400">+{session.conversation.length - 4} more messages</p>
-                                    )}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-
-                            {/* Revisit button */}
-                            <button
-                              onClick={() => {
-                                setActiveGuide(question)
-                                handleQuestionSelect(question.id)
-                              }}
-                              className="w-full px-3 py-2 text-[10px] font-medium text-[#6673C7] bg-white/50 hover:bg-white transition-colors border-t border-[#6673C7]/10"
-                            >
-                              Continue this conversation
-                            </button>
-                          </motion.div>
-                        )
-                      })}
-                    </div>
-                  )}
-
-                  {/* Guide tool — appears when Ask Copilot is clicked */}
-                  <AnimatePresence>
-                    {activeGuide && (
+                    return (
                       <motion.div
-                        initial={{ opacity: 0, y: 8, scale: 0.97 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 4, scale: 0.97 }}
-                        transition={{ duration: 0.25 }}
-                        className="bg-primary/5 border border-primary/20 rounded-xl p-3"
+                        key={questionId}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-gradient-to-r from-[#6673C7]/5 to-[#6673C7]/10 border border-[#6673C7]/20 rounded-xl overflow-hidden"
                       >
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center gap-1.5">
-                            <Bot className="w-3.5 h-3.5 text-primary" />
-                            <span className="text-xs font-semibold text-primary">Ask Copilot</span>
-                          </div>
-                          <button
-                            onClick={() => {
-                              console.log('[v0] Closing guide, conversation length:', guideConversation.length, 'activeGuide:', activeGuide?.id)
-                              // Save conversation to history if there was any user interaction (more than just AI intro)
-                              const hasUserMessages = guideConversation.some(m => m.role === 'user')
-                              console.log('[v0] Has user messages:', hasUserMessages)
-                              if (hasUserMessages && activeGuide) {
-                                console.log('[v0] Saving to history for question:', activeGuide.id)
-                                setGuideHistory(prev => {
-                                  const updated = {
-                                    ...prev,
-                                    [activeGuide.id]: [
-                                      ...(prev[activeGuide.id] || []),
-                                      {
-                                        timestamp: new Date(),
-                                        conversation: guideConversation.map(m => ({ role: m.role, content: m.content }))
-                                      }
-                                    ]
-                                  }
-                                  console.log('[v0] Updated guide history:', updated)
-                                  return updated
-                                })
-                              }
-                              setActiveGuide(null)
-                              setGuideConversation([])
-                            }}
-                            className="text-gray-400 hover:text-gray-600"
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
+                        {/* Bookmark header */}
+                        <div className="flex items-center gap-2 px-3 py-2 bg-[#6673C7]/10 border-b border-[#6673C7]/10">
+                          <Bookmark className="w-3 h-3 text-[#6673C7] fill-[#6673C7]" />
+                          <span className="text-[10px] font-semibold text-[#6673C7] uppercase tracking-wide">Guide Session</span>
                         </div>
 
                         {/* Question context */}
-                        <div className="bg-white/60 rounded-lg px-2.5 py-2 mb-3">
-                          <p className="text-[10px] text-gray-400 uppercase tracking-wide font-semibold mb-0.5">Question {activeGuide.number}</p>
-                          <p className="text-xs font-semibold text-gray-800">{activeGuide.title}</p>
-                          <div className="flex items-center gap-1 mt-1">
-                            <MessageCircle className="w-3 h-3 fill-[#6673C7] text-[#6673C7]" />
-                            <span className="text-[10px] text-[#6673C7] font-medium">Review suggested answer</span>
-                          </div>
+                        <div className="px-3 py-2 border-b border-[#6673C7]/10">
+                          <p className="text-[10px] text-gray-400">Question {question.number}</p>
+                          <p className="text-xs font-medium text-gray-800 truncate">{question.title}</p>
                         </div>
 
-                        {/* Conversation */}
-                        <div className="space-y-3 max-h-[200px] overflow-y-auto">
-                          {guideConversation.map((msg, idx) => (
-                            <motion.div
-                              key={idx}
-                              initial={{ opacity: 0, y: 4 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ duration: 0.2 }}
-                              className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                            >
-                              {msg.role === 'user' ? (
-                                <div className="bg-gray-100 rounded-xl rounded-tr-sm px-3 py-2 max-w-[85%]">
-                                  <p className="text-xs text-gray-800">{msg.content}</p>
-                                </div>
-                              ) : (
-                                <div className="max-w-[90%]">
-                                  <p className="text-xs text-gray-700 leading-relaxed">{msg.content}</p>
-                                  {msg.options && (
-                                    <div className="mt-2 space-y-1.5">
-                                      {msg.options.map((opt, i) => (
-                                        <button
-                                          key={opt.id}
-                                          className="w-full text-left text-xs px-2.5 py-1.5 bg-white border border-gray-200 rounded-md hover:border-primary/40 hover:bg-primary/5 transition-colors"
-                                        >
-                                          <span className="text-gray-400 mr-1.5">{i + 1}.</span>
-                                          <span className="text-gray-700">{opt.label}</span>
-                                        </button>
-                                      ))}
-                                    </div>
-                                  )}
-                                </div>
-                              )}
-                            </motion.div>
-                          ))}
+                        {/* Sessions */}
+                        <div className="divide-y divide-[#6673C7]/10">
+                          {sessions.map((session, sessionIdx) => (
+                            <div key={sessionIdx} className="px-3 py-2">
+                              {/* Timestamp */}
+                              <div className="flex items-center gap-1.5 mb-2">
+                                <Clock className="w-2.5 h-2.5 text-gray-400" />
+                                <span className="text-[10px] text-gray-400">
+                                  {session.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </span>
+                              </div>
 
-                          {/* Typing indicator */}
-                          {isGuideTyping && (
-                            <motion.div
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              className="flex items-center gap-1 px-2 py-1.5"
-                            >
-                              <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-                              <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-                              <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '300ms' }} />
-                            </motion.div>
-                          )}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
-                  {/* Readiness summary - shows after all 3 suggestions accepted AND all 3 systems questions answered */}
-                  <AnimatePresence>
-                    {showGovernanceReadiness && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4, ease: 'easeOut' }}
-                        className="bg-white border border-gray-200 rounded-xl p-4 mt-2"
-                      >
-                        <div className="flex items-center gap-2 mb-3">
-                          <CheckCheck className="w-4 h-4 text-primary" />
-                          <p className="text-xs font-semibold text-gray-900">Governance readiness</p>
-                        </div>
-                        <div className="space-y-1.5 mb-4">
-                          {[
-                            `${readinessSummary.records} linked records created`,
-                            `${readinessSummary.assessments} assessments launched`,
-                            `${readinessSummary.complete}% complete automatically`,
-                            `${readinessSummary.followUps} follow-ups remaining`,
-                          ].map(line => (
-                            <div key={line} className="flex items-center gap-2">
-                              <div className="w-1 h-1 rounded-full bg-primary flex-shrink-0" />
-                              <p className="text-xs text-gray-700">{line}</p>
+                              {/* Conversation preview */}
+                              <div className="space-y-1.5">
+                                {session.conversation.slice(0, 4).map((msg, msgIdx) => (
+                                  <div key={msgIdx} className={`text-[11px] ${msg.role === 'user' ? 'text-gray-600 italic' : 'text-gray-700'}`}>
+                                    <span className="text-[10px] text-gray-400 mr-1">{msg.role === 'user' ? 'You:' : 'AI:'}</span>
+                                    <span className="line-clamp-2">{msg.content}</span>
+                                  </div>
+                                ))}
+                                {session.conversation.length > 4 && (
+                                  <p className="text-[10px] text-gray-400">+{session.conversation.length - 4} more messages</p>
+                                )}
+                              </div>
                             </div>
                           ))}
-                          <div className="pt-1">
-                            <p className="text-xs font-semibold text-primary">
-                              Recommendation: {readinessSummary.recommendation}
-                            </p>
-                          </div>
                         </div>
-                        <Button
-                          className="w-full text-xs h-8"
-                          size="sm"
-                          onClick={() => navigate('/success')}
-                        >
-                          Submit for governance approval
-                          <ChevronRight className="w-3.5 h-3.5 ml-1" />
-                        </Button>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
 
-                  <div ref={chatBottomRef} />
-                </div>
-
-                {/* Input */}
-                <div className="px-4 py-3 border-t border-gray-100 flex-shrink-0">
-                  {/* Guide tool mini card above input */}
-                  <AnimatePresence>
-                    {activeGuide && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 4 }}
-                        className="mb-2 bg-primary/5 border border-primary/20 rounded-lg px-3 py-2 flex items-center gap-2"
-                      >
-                        <p className="text-xs text-primary font-medium truncate">
-                          Guiding: {activeGuide.title}
-                        </p>
-                        <div className="ml-auto flex items-center gap-1">
-                          <button 
-                            onClick={() => {
-                              const currentIndex = allQuestions.findIndex(q => q.id === activeGuide.id)
-                              if (currentIndex > 0) {
-                                const prevQuestion = allQuestions[currentIndex - 1]
-                                setActiveGuide(prevQuestion)
-                                setGuideConversation([])
-                                handleQuestionSelect(prevQuestion.id)
-                              }
-                            }}
-                            disabled={allQuestions.findIndex(q => q.id === activeGuide.id) === 0}
-                            className="disabled:opacity-30 disabled:cursor-not-allowed"
-                          >
-                            <ChevronUp className="w-3 h-3 text-primary" />
-                          </button>
-                          <button onClick={() => {
-                            const currentIndex = allQuestions.findIndex(q => q.id === activeGuide.id)
-                            if (currentIndex < allQuestions.length - 1) {
-                              const nextQuestion = allQuestions[currentIndex + 1]
-                              setActiveGuide(nextQuestion)
-                              setGuideConversation([])
-                              handleQuestionSelect(nextQuestion.id)
-                            }
-                          }}>
-                            <ChevronDown className="w-3 h-3 text-primary" />
-                          </button>
-                          <button onClick={() => {
-                            setActiveGuide(null)
-                            setGuideConversation([])
-                          }}>
-                            <X className="w-3 h-3 text-primary/60" />
-                          </button>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
-                  <div className="relative bg-gray-50 border border-gray-200 rounded-xl focus-within:border-primary transition-colors duration-150">
-                    <textarea
-                      value={chatInput}
-                      onChange={e => setChatInput(e.target.value)}
-                      onKeyDown={e => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault()
-                          activeGuide ? handleGuideChatSend() : handleChatSend()
-                        }
-                      }}
-                      placeholder="Ask Copilot"
-                      rows={2}
-                      className="w-full resize-none bg-transparent px-3 pt-2.5 pb-1 text-xs text-gray-800 placeholder:text-gray-400 focus:outline-none leading-relaxed"
-                    />
-                    <div className="flex items-center justify-between px-2 pb-2">
-                      <Button variant="ghost" size="icon" className="h-6 w-6 text-gray-400">
-                        <Paperclip className="w-3 h-3" />
-                      </Button>
-                      <Button
-                        onClick={activeGuide ? handleGuideChatSend : handleChatSend}
-                        size="icon"
-                        className="h-6 w-6 rounded-md bg-primary hover:bg-primary/90 disabled:opacity-30"
-                        disabled={!chatInput.trim()}
-                      >
-                        <ArrowUp className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  </div>
-                  <p className="text-[10px] text-gray-400 mt-1.5 text-center">
-                    AI can make mistakes. Verify info.{' '}
-                    <button className="text-primary hover:underline">Learn more</button>
-                  </p>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="tools" className="flex-1 overflow-y-auto mt-0 px-4 py-4 data-[state=inactive]:hidden">
-                <div className="space-y-4">
-                  {/* Data Sources Card - at top */}
-                  <DataSourcesCard />
-
-                  {/* Tools section */}
-                  <div>
-                    <p className="text-[10px] text-gray-400 uppercase tracking-wide font-medium mb-2">Tools</p>
-                    <div className="space-y-2">
-                      {[
-                        { icon: Search, label: 'Deep research', desc: 'Scan connected systems for relevant information' },
-                        { icon: MessageCircle, label: 'Guided walkthrough', desc: 'Let Copilot explain each question in plain language' },
-                      ].map(({ icon: Icon, label, desc }) => (
+                        {/* Revisit button */}
                         <button
-                          key={label}
-                          className="w-full flex items-start gap-3 p-3 bg-white border border-gray-200 rounded-xl text-left hover:border-primary/40 hover:bg-primary/5 transition-all duration-150"
+                          onClick={() => {
+                            setActiveGuide(question)
+                            handleQuestionSelect(question.id)
+                          }}
+                          className="w-full px-3 py-2 text-[10px] font-medium text-[#6673C7] bg-white/50 hover:bg-white transition-colors border-t border-[#6673C7]/10"
                         >
-                          <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                            <Icon className="w-3.5 h-3.5 text-primary" />
-                          </div>
-                          <div>
-                            <p className="text-xs font-semibold text-gray-900">{label}</p>
-                            <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
-                          </div>
+                          Continue this conversation
                         </button>
-                      ))}
-                    </div>
-                  </div>
+                      </motion.div>
+                    )
+                  })}
                 </div>
+              )}
+
+              {/* Guide tool — appears when Ask Copilot is clicked */}
+              <AnimatePresence>
+                {activeGuide && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 4, scale: 0.97 }}
+                    transition={{ duration: 0.25 }}
+                    className="bg-primary/5 border border-primary/20 rounded-xl p-3"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-1.5">
+                        <Bot className="w-3.5 h-3.5 text-primary" />
+                        <span className="text-xs font-semibold text-primary">Ask Copilot</span>
+                      </div>
+                      <button
+                        onClick={() => {
+                          console.log('[v0] Closing guide, conversation length:', guideConversation.length, 'activeGuide:', activeGuide?.id)
+                          // Save conversation to history if there was any user interaction (more than just AI intro)
+                          const hasUserMessages = guideConversation.some(m => m.role === 'user')
+                          console.log('[v0] Has user messages:', hasUserMessages)
+                          if (hasUserMessages && activeGuide) {
+                            console.log('[v0] Saving to history for question:', activeGuide.id)
+                            setGuideHistory(prev => {
+                              const updated = {
+                                ...prev,
+                                [activeGuide.id]: [
+                                  ...(prev[activeGuide.id] || []),
+                                  {
+                                    timestamp: new Date(),
+                                    conversation: guideConversation.map(m => ({ role: m.role, content: m.content }))
+                                  }
+                                ]
+                              }
+                              console.log('[v0] Updated guide history:', updated)
+                              return updated
+                            })
+                          }
+                          setActiveGuide(null)
+                          setGuideConversation([])
+                        }}
+                        className="text-gray-400 hover:text-gray-600"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+
+                    {/* Question context */}
+                    <div className="bg-white/60 rounded-lg px-2.5 py-2 mb-3">
+                      <p className="text-[10px] text-gray-400 uppercase tracking-wide font-semibold mb-0.5">Question {activeGuide.number}</p>
+                      <p className="text-xs font-semibold text-gray-800">{activeGuide.title}</p>
+                      <div className="flex items-center gap-1 mt-1">
+                        <MessageCircle className="w-3 h-3 fill-[#6673C7] text-[#6673C7]" />
+                        <span className="text-[10px] text-[#6673C7] font-medium">Review suggested answer</span>
+                      </div>
+                    </div>
+
+                    {/* Conversation */}
+                    <div className="space-y-3 max-h-[200px] overflow-y-auto">
+                      {guideConversation.map((msg, idx) => (
+                        <motion.div
+                          key={idx}
+                          initial={{ opacity: 0, y: 4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                        >
+                          {msg.role === 'user' ? (
+                            <div className="bg-gray-100 rounded-xl rounded-tr-sm px-3 py-2 max-w-[85%]">
+                              <p className="text-xs text-gray-800">{msg.content}</p>
+                            </div>
+                          ) : typeof msg.content === 'object' ? (
+                            <div className="w-full">
+                              {msg.content}
+                            </div>
+                          ) : (
+                            <div className="max-w-[90%]">
+                              <p className="text-xs text-gray-700 leading-relaxed">{msg.content}</p>
+                              {msg.options && (
+                                <div className="mt-2 space-y-1.5">
+                                  {msg.options.map((opt, i) => (
+                                    <button
+                                      key={opt.id}
+                                      className="w-full text-left text-xs px-2.5 py-1.5 bg-white border border-gray-200 rounded-md hover:border-primary/40 hover:bg-primary/5 transition-colors"
+                                    >
+                                      <span className="text-gray-400 mr-1.5">{i + 1}.</span>
+                                      <span className="text-gray-700">{opt.label}</span>
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </motion.div>
+                      ))}
+
+                      {/* Typing indicator */}
+                      {isGuideTyping && (
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="flex items-center gap-1 px-2 py-1.5"
+                        >
+                          <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                        </motion.div>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Readiness summary - shows after all 3 suggestions accepted AND all 3 systems questions answered */}
+              <AnimatePresence>
+                {showGovernanceReadiness && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, ease: 'easeOut' }}
+                    className="bg-white border border-gray-200 rounded-xl p-4 mt-2"
+                  >
+                    <div className="flex items-center gap-2 mb-3">
+                      <CheckCheck className="w-4 h-4 text-primary" />
+                      <p className="text-xs font-semibold text-gray-900">Governance readiness</p>
+                    </div>
+                    <div className="space-y-1.5 mb-4">
+                      {[
+                        `${readinessSummary.records} linked records created`,
+                        `${readinessSummary.assessments} assessments launched`,
+                        `${readinessSummary.complete}% complete automatically`,
+                        `${readinessSummary.followUps} follow-ups remaining`,
+                      ].map(line => (
+                        <div key={line} className="flex items-center gap-2">
+                          <div className="w-1 h-1 rounded-full bg-primary flex-shrink-0" />
+                          <p className="text-xs text-gray-700">{line}</p>
+                        </div>
+                      ))}
+                      <div className="pt-1">
+                        <p className="text-xs font-semibold text-primary">
+                          Recommendation: {readinessSummary.recommendation}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      className="w-full text-xs h-8"
+                      size="sm"
+                      onClick={() => navigate('/success')}
+                    >
+                      Submit for governance approval
+                      <ChevronRight className="w-3.5 h-3.5 ml-1" />
+                    </Button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <div ref={chatBottomRef} />
+            </div>
+
+            {/* Input */}
+            <div className="px-4 py-3 border-t border-gray-100 flex-shrink-0">
+              {/* Guide tool mini card above input */}
+              <AnimatePresence>
+                {activeGuide && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 4 }}
+                    className="mb-2 bg-primary/5 border border-primary/20 rounded-lg px-3 py-2 flex items-center gap-2"
+                  >
+                    <p className="text-xs text-primary font-medium truncate">
+                      Guiding: {activeGuide.title}
+                    </p>
+                    <div className="ml-auto flex items-center gap-1">
+                      <button
+                        onClick={() => {
+                          const currentIndex = allQuestions.findIndex(q => q.id === activeGuide.id)
+                          if (currentIndex > 0) {
+                            const prevQuestion = allQuestions[currentIndex - 1]
+                            setActiveGuide(prevQuestion)
+                            setGuideConversation([])
+                            handleQuestionSelect(prevQuestion.id)
+                          }
+                        }}
+                        disabled={allQuestions.findIndex(q => q.id === activeGuide.id) === 0}
+                        className="disabled:opacity-30 disabled:cursor-not-allowed"
+                      >
+                        <ChevronUp className="w-3 h-3 text-primary" />
+                      </button>
+                      <button onClick={() => {
+                        const currentIndex = allQuestions.findIndex(q => q.id === activeGuide.id)
+                        if (currentIndex < allQuestions.length - 1) {
+                          const nextQuestion = allQuestions[currentIndex + 1]
+                          setActiveGuide(nextQuestion)
+                          setGuideConversation([])
+                          handleQuestionSelect(nextQuestion.id)
+                        }
+                      }}>
+                        <ChevronDown className="w-3 h-3 text-primary" />
+                      </button>
+                      <button onClick={() => {
+                        setActiveGuide(null)
+                        setGuideConversation([])
+                      }}>
+                        <X className="w-3 h-3 text-primary/60" />
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <div className="relative border border-gray-300 rounded-lg focus-within:border-gray-400 transition-colors duration-150">
+                <textarea
+                  value={chatInput}
+                  onChange={e => setChatInput(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault()
+                      activeGuide ? handleGuideChatSend() : handleChatSend()
+                    }
+                  }}
+                  placeholder="Ask Copilot"
+                  rows={2}
+                  className="w-full resize-none bg-transparent px-3 pt-3 pb-1 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none leading-relaxed"
+                />
+                <div className="flex items-center justify-between px-2 pb-2">
+                  <Button variant="ghost" size="icon" className="h-7 w-7 text-gray-500 hover:text-gray-700">
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    onClick={activeGuide ? handleGuideChatSend : handleChatSend}
+                    size="icon"
+                    className="h-7 w-7 rounded-md bg-gray-200 hover:bg-gray-300 text-gray-600 disabled:opacity-30"
+                    disabled={!chatInput.trim()}
+                  >
+                    <ArrowUp className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mt-2 text-center">
+                AI can make mistakes. Verify info.{' '}
+                <a href="#" className="text-primary hover:underline inline-flex items-center gap-0.5">
+                  Learn more
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </p>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="tools" className="flex-1 overflow-y-auto mt-0 px-4 py-4 data-[state=inactive]:hidden">
+            <div className="space-y-4">
+              {/* Data Sources Card - at top */}
+              <DataSourcesCard />
+
+              {/* Tools section */}
+              <div>
+                <p className="text-[10px] text-gray-400 uppercase tracking-wide font-medium mb-2">Tools</p>
+                <div className="space-y-2">
+                  {[
+                    { icon: Search, label: 'Deep research', desc: 'Scan connected systems for relevant information' },
+                    { icon: MessageCircle, label: 'Guided walkthrough', desc: 'Let Copilot explain each question in plain language' },
+                  ].map(({ icon: Icon, label, desc }) => (
+                    <button
+                      key={label}
+                      className="w-full flex items-start gap-3 p-3 bg-white border border-gray-200 rounded-xl text-left hover:border-primary/40 hover:bg-primary/5 transition-all duration-150"
+                    >
+                      <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <Icon className="w-3.5 h-3.5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-gray-900">{label}</p>
+                        <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
               </TabsContent>
             </Tabs>
           </aside>
-        </div>
-      </div>
+      )}
     </div>
   )
 }

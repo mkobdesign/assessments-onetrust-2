@@ -62,9 +62,10 @@ export default {
         },
       },
       borderRadius: {
+        xl: "var(--radius)",
         lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        md: "var(--radius)",
+        sm: "calc(var(--radius) - 2px)",
       },
       spacing: {
         '4.5': '1.125rem',
