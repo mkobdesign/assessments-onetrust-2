@@ -1052,6 +1052,7 @@ export default function AssessmentQuestionnaire() {
                                 const prevQuestion = allQuestions[currentIndex - 1]
                                 setActiveGuide(prevQuestion)
                                 setGuideConversation([])
+                                handleQuestionSelect(prevQuestion.id)
                               }
                             }}
                             disabled={allQuestions.findIndex(q => q.id === activeGuide.id) === 0}
@@ -1065,6 +1066,7 @@ export default function AssessmentQuestionnaire() {
                               const nextQuestion = allQuestions[currentIndex + 1]
                               setActiveGuide(nextQuestion)
                               setGuideConversation([])
+                              handleQuestionSelect(nextQuestion.id)
                             }
                           }}>
                             <ChevronDown className="w-3 h-3 text-primary" />
