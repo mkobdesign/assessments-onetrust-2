@@ -547,7 +547,7 @@ export default function AssessmentQuestionnaire() {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [activeGuide, setActiveGuide] = useState<Question | null>(null)
   const [chatInput, setChatInput] = useState('')
-  const [guideConversation, setGuideConversation] = useState<Array<{ role: 'user' | 'assistant'; content: string; options?: Array<{ id: string; label: string }> }>>([])
+  const [guideConversation, setGuideConversation] = useState<Array<{ role: 'user' | 'assistant'; content: React.ReactNode; options?: Array<{ id: string; label: string }> }>>([])
   const [isGuideTyping, setIsGuideTyping] = useState(false)
   const [acceptedSuggestions, setAcceptedSuggestions] = useState<number>(0)
 
@@ -671,14 +671,7 @@ export default function AssessmentQuestionnaire() {
     // Get the first two data sources as references
     const referencedSources = dataSources.slice(0, 2)
     
-    // Build the references message with sources and reasoning
-    const sourcesMessage = referencedSources.map((source, idx) => 
-      `**${idx + 1}. ${source.name}**\n${source.type} — ${source.note}`
-    ).join('\n\n')
-    
-    const reasoningMessage = `Based on the analysis of these documents, this answer was selected because the data processing activities described align with the privacy requirements outlined in the DPA and security documentation. The confidence level reflects the strong alignment between your uploaded documents and the assessment criteria.`
-    
-    // Set the guide conversation with the references
+    // Set the guide conversation with the references using JSX
     setGuideConversation([
       {
         role: 'assistant',
@@ -686,11 +679,29 @@ export default function AssessmentQuestionnaire() {
       },
       {
         role: 'assistant',
-        content: sourcesMessage,
+        content: (
+          <div className="space-y-2">
+            {referencedSources.map((source, idx) => (
+              <div key={source.id} className="flex items-start gap-2 p-2 bg-white border border-gray-200 rounded-lg">
+                <span className="text-gray-400 text-xs w-4">{idx + 1}.</span>
+                <FileText className="w-3.5 h-3.5 text-gray-400 flex-shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium text-gray-800">{source.name}</p>
+                  <p className="text-[10px] text-gray-500">{source.type}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ),
       },
       {
         role: 'assistant',
-        content: `**Why this answer was chosen:**\n${reasoningMessage}`,
+        content: (
+          <div>
+            <p className="text-xs font-medium text-gray-800 mb-1">Why this answer was chosen:</p>
+            <p className="text-xs text-gray-600">Based on the analysis of these documents, this answer was selected because the data processing activities described align with the privacy requirements outlined in the DPA and security documentation. The confidence level reflects the strong alignment between your uploaded documents and the assessment criteria.</p>
+          </div>
+        ),
       },
     ])
   }
