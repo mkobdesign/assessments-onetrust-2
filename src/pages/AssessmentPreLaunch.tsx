@@ -261,7 +261,7 @@ const previousWorkItems = [
 const initialCopilotMessages: {
   id: string
   role: 'assistant' | 'user'
-  content: string
+  content: React.ReactNode
   progressInfo?: {
     percentComplete: number
     questionsAnswered: number
@@ -278,7 +278,15 @@ const initialCopilotMessages: {
   {
     id: 'm2',
     role: 'assistant' as const,
-    content: "The project is the Magellan Mobile App.\n\nIt's a new mobile app that will track users' locations and analyze their browsing patterns and personal preferences to deliver customized personalized content experiences.\n\nThe point of this assessment is to ensure compliance regarding the following topics;",
+    content: (
+      <>
+        The project is the <span className="font-semibold">Magellan Mobile App</span>.
+        <br /><br />
+        It&apos;s a new mobile app that will track users&apos; locations and analyze their browsing patterns and personal preferences to deliver customized personalized content experiences.
+        <br /><br />
+        The point of this assessment is to ensure compliance regarding the following topics;
+      </>
+    ),
   },
   {
     id: 'm3',
