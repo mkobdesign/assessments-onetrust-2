@@ -537,7 +537,7 @@ export default function AssessmentPreLaunch() {
                           )}
                           {msg.progressInfo && (
                             <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mt-1">
-                              <p className="text-xs font-medium text-gray-500 mb-2">Assessment Progress</p>
+                              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Assessment Progress</p>
                               <div className="flex items-start gap-6 mb-4">
                                 <div className="flex flex-col">
                                   <span className="text-2xl font-bold text-primary">{msg.progressInfo.percentComplete}%</span>
