@@ -538,14 +538,14 @@ export default function AssessmentPreLaunch() {
                           {msg.progressInfo && (
                             <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mt-1">
                               <p className="text-xs font-medium text-gray-500 mb-2">Assessment Progress</p>
-                              <div className="flex items-center gap-3 mb-4">
-                                <div className="flex items-center gap-2">
+                              <div className="flex items-start gap-6 mb-4">
+                                <div className="flex flex-col">
                                   <span className="text-2xl font-bold text-primary">{msg.progressInfo.percentComplete}%</span>
-                                  <span className="text-sm text-gray-500">complete</span>
+                                  <span className="text-xs text-gray-500">complete</span>
                                 </div>
-                                <div className="h-4 w-px bg-gray-200" />
-                                <div className="text-sm text-gray-600">
-                                  <span className="font-medium text-gray-900">{msg.progressInfo.questionsAnswered}</span>/{msg.progressInfo.totalQuestions} questions answered
+                                <div className="flex flex-col">
+                                  <span className="text-2xl font-bold text-gray-900">{msg.progressInfo.questionsAnswered}/{msg.progressInfo.totalQuestions}</span>
+                                  <span className="text-xs text-gray-500">questions answered</span>
                                 </div>
                               </div>
                               <div className="mb-4">
