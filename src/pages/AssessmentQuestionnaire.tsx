@@ -926,6 +926,7 @@ export default function AssessmentQuestionnaire() {
       </div>
 
       {/* Right: Copilot drawer - full height beside all content */}
+      {isCopilotOpen && (
       <aside className="w-[440px] flex flex-col bg-white border-l border-gray-200 flex-shrink-0">
         <Tabs defaultValue="chat" className="flex flex-col h-full">
           {/* Tabs header - h-14 to match TopBar height */}
@@ -1362,9 +1363,10 @@ export default function AssessmentQuestionnaire() {
                 </div>
               </div>
             </div>
-          </TabsContent>
-        </Tabs>
-      </aside>
+              </TabsContent>
+            </Tabs>
+          </aside>
+      )}
     </div>
   )
 }
