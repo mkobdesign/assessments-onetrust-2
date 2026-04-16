@@ -926,6 +926,30 @@ export default function AssessmentQuestionnaire() {
                   onShowReferences={() => handleShowReferences(question)}
                 />
               ))}
+
+              {/* Completion card - shows when all questions are complete */}
+              {progress === 100 && (
+                <div className="mt-8 p-6 bg-primary/5 border border-primary/20 rounded-xl">
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <CheckCircle2 className="w-5 h-5 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-base font-semibold text-gray-900 mb-1">All questions complete</h3>
+                      <p className="text-sm text-gray-600 mb-4">
+                        You&apos;ve answered all questions in this assessment. Review your answers and submit for privacy review when ready.
+                      </p>
+                      <Button 
+                        size="sm" 
+                        className="text-sm"
+                        onClick={() => navigate('/success')}
+                      >
+                        Submit for review
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </main>
         </div>

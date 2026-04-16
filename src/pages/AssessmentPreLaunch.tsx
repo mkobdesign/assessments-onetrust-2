@@ -448,7 +448,7 @@ export default function AssessmentPreLaunch() {
                   </Button>
 
                   {/* CTA */}
-                  <div className="bg-white border border-gray-200 rounded-xl p-6">
+                  <div className="bg-white border border-gray-200 rounded-xl p-6 mt-6">
                     <h3 className="text-sm font-semibold text-gray-900 mb-1">Ready to start?</h3>
                     <p className="text-xs text-gray-500 mb-4 leading-relaxed">
                       Copilot will use these sources to pre-fill answers across the assessment. You&apos;ll be able to review and confirm each one.
