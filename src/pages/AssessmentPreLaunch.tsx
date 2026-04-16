@@ -542,7 +542,12 @@ export default function AssessmentPreLaunch() {
                         </div>
                       </div>
                     ) : msg.isWaiting ? (
-                      <div className="text-sm text-gray-400 italic">
+                      <div className="flex items-center gap-2 text-sm text-gray-400 italic">
+                        <div className="flex items-center gap-1">
+                          <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                        </div>
                         <span className="inline-block animate-pulse bg-gradient-to-r from-gray-400 via-gray-300 to-gray-400 bg-[length:200%_100%] bg-clip-text text-transparent" style={{ animation: 'shimmer 2s infinite linear' }}>
                           {msg.waitingText}
                         </span>
