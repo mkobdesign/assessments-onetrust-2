@@ -981,7 +981,7 @@ export default function AssessmentQuestionnaire() {
               </div>
 
               {/* AI messages */}
-              <div className="flex-1 overflow-y-auto scrollbar-thin px-4 py-4 space-y-4">
+              <div className="flex-1 overflow-y-auto scrollbar-thin px-4 py-4 space-y-6">
                 {/* Static progress message */}
                 <div className="text-sm text-gray-700 leading-relaxed">
                   <strong className="text-gray-900">Good progress</strong>, 6 of 10 questions are complete. It&apos;s 62% ready for privacy approval thanks to the documents and assessments you selected.
