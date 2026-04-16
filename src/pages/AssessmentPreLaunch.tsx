@@ -531,6 +531,18 @@ export default function AssessmentPreLaunch() {
                           {msg.content}
                         </div>
                       </div>
+                    ) : msg.isWaiting ? (
+                      <div className="text-sm text-gray-400 italic">
+                        <span className="inline-block animate-pulse bg-gradient-to-r from-gray-400 via-gray-300 to-gray-400 bg-[length:200%_100%] bg-clip-text text-transparent" style={{ animation: 'shimmer 2s infinite linear' }}>
+                          {msg.waitingText}
+                        </span>
+                        <style>{`
+                          @keyframes shimmer {
+                            0% { background-position: 200% 0; }
+                            100% { background-position: -200% 0; }
+                          }
+                        `}</style>
+                      </div>
                     ) : (
                       <div className="max-w-[95%] flex items-start gap-2.5">
                         <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
