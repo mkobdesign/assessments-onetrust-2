@@ -988,22 +988,6 @@ export default function AssessmentQuestionnaire() {
                 </div>
 
                 <div className="text-sm text-gray-700 leading-relaxed">
-                  I&apos;ve identified 5 relevant sources for this assessment based on your organization&apos;s documents and previous reviews. You can reorder or remove sources before starting.
-                  <br /><br />
-                  <strong>Do you have any other documents you want to add? Do this to the left.</strong>
-                </div>
-
-                {/* Waiting message */}
-                <div className="flex items-center gap-2 text-sm text-gray-500 italic">
-                  <div className="flex items-center gap-1">
-                    <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-pulse" />
-                    <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-pulse" style={{ animationDelay: '150ms' }} />
-                    <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-pulse" style={{ animationDelay: '300ms' }} />
-                  </div>
-                  <span>Waiting for the user to confirm documents & start the assessment...</span>
-                </div>
-
-                <div className="text-sm text-gray-700 leading-relaxed">
                   You can use these tools to generate answers, or have me guide you through the experience.
                 </div>
 

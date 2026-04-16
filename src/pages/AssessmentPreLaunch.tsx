@@ -303,6 +303,31 @@ const initialCopilotMessages: {
         ],
       },
     },
+    {
+      id: 'm4',
+      role: 'assistant' as const,
+      content: (
+        <>
+          I&apos;ve identified 5 relevant sources for this assessment based on your organization&apos;s documents and previous reviews. You can reorder or remove sources before starting.
+          <br /><br />
+          <strong>Do you have any other documents you want to add? Do this to the left.</strong>
+        </>
+      ),
+    },
+    {
+      id: 'm5',
+      role: 'assistant' as const,
+      content: (
+        <span className="flex items-center gap-2 text-gray-500 italic">
+          <span className="flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-pulse" style={{ animationDelay: '150ms' }} />
+            <span className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-pulse" style={{ animationDelay: '300ms' }} />
+          </span>
+          Waiting for the user to confirm documents & start the assessment...
+        </span>
+      ),
+    },
   ]
 
 export default function AssessmentPreLaunch() {
