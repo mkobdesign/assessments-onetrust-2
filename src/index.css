@@ -49,6 +49,10 @@
     scroll-behavior: smooth;
   }
 
+  .text-xxs {
+    font-size: .65em;
+  }
+
   /* Focus ring */
   :focus-visible {
     outline: 2px solid #2C6145;
@@ -91,17 +95,15 @@
     inset: -2px;
     border-radius: 4px;
     padding: 2px;
-    background: linear-gradient(
-      90deg,
-      #22c55e 0%,
-      #86efac 25%,
-      #22c55e 50%,
-      #86efac 75%,
-      #22c55e 100%
-    );
+    background: linear-gradient(90deg,
+        #22c55e 0%,
+        #86efac 25%,
+        #22c55e 50%,
+        #86efac 75%,
+        #22c55e 100%);
     background-size: 200% 100%;
-    -webkit-mask: 
-      linear-gradient(#fff 0 0) content-box, 
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
       linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
@@ -112,6 +114,7 @@
     0% {
       background-position: 0% 0%;
     }
+
     100% {
       background-position: 200% 0%;
     }
