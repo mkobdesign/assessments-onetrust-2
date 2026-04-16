@@ -273,11 +273,6 @@ const initialCopilotMessages: {
     {
       id: 'm1',
       role: 'assistant' as const,
-      content: "I've identified 5 relevant sources for this assessment based on your organization's documents and previous reviews. You can reorder or remove sources before starting.",
-    },
-    {
-      id: 'm2',
-      role: 'assistant' as const,
       content: (
         <>
           The project is the <span className="font-semibold">Magellan Mobile App</span>.
@@ -289,7 +284,7 @@ const initialCopilotMessages: {
       ),
     },
     {
-      id: 'm3',
+      id: 'm2',
       role: 'assistant' as const,
       content: '',
       progressInfo: {
@@ -302,6 +297,11 @@ const initialCopilotMessages: {
           { agent: 'Privacy Agent', action: 'pre-filled', count: 6, timeAgo: '1m ago' },
         ],
       },
+    },
+    {
+      id: 'm3',
+      role: 'assistant' as const,
+      content: "I've identified 5 relevant sources for this assessment based on your organization's documents and previous reviews. You can reorder or remove sources before starting.",
     },
     {
       id: 'm4',
