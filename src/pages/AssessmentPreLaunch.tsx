@@ -301,7 +301,17 @@ const initialCopilotMessages: {
     {
       id: 'm3',
       role: 'assistant' as const,
-      content: "I've identified 5 relevant sources for this assessment based on your organization's documents and previous reviews. You can reorder or remove sources before starting.",
+      content: (
+        <>
+          I&apos;ve identified 5 relevant sources for this assessment based on your organization&apos;s documents and previous reviews. You can reorder or remove sources before starting.
+          <br /><br />
+          <strong>Do you have any documents to add?</strong>
+        </>
+      ),
+      buttons: [
+        { id: 'no-start', label: 'No, start assessment', variant: 'outline' as const },
+        { id: 'yes-add', label: 'Yes, add a file', variant: 'outline' as const },
+      ],
     },
     {
       id: 'm4',
@@ -552,6 +562,25 @@ export default function AssessmentPreLaunch() {
                           {msg.content && (
                             <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
                               {msg.content}
+                            </div>
+                          )}
+                          {msg.buttons && (
+                            <div className="flex items-center gap-2 mt-3">
+                              {msg.buttons.map((btn) => (
+                                <Button
+                                  key={btn.id}
+                                  variant={btn.variant}
+                                  size="sm"
+                                  className="text-xs"
+                                  onClick={() => {
+                                    if (btn.id === 'no-start') {
+                                      navigate('/questionnaire')
+                                    }
+                                  }}
+                                >
+                                  {btn.label}
+                                </Button>
+                              ))}
                             </div>
                           )}
                           {msg.progressInfo && (
