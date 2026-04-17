@@ -34,7 +34,7 @@ export function SourcesList({ sources, getStats, getQuestions }: SourcesListProp
   }
 
   return (
-    <div className="w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
+    <div className="w-full bg-white border-t border-gray-200 overflow-hidden">
       {/* Header */}
       <div className="px-3 py-2.5 border-b border-gray-100">
         <p className="text-xs font-semibold text-gray-900">Sources used</p>

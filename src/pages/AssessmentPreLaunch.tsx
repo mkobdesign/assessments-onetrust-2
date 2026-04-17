@@ -273,11 +273,6 @@ const initialCopilotMessages: {
     {
       id: 'm1',
       role: 'assistant' as const,
-      content: "I've identified 5 relevant sources for this assessment based on your organization's documents and previous reviews. You can reorder or remove sources before starting.",
-    },
-    {
-      id: 'm2',
-      role: 'assistant' as const,
       content: (
         <>
           The project is the <span className="font-semibold">Magellan Mobile App</span>.
@@ -289,7 +284,7 @@ const initialCopilotMessages: {
       ),
     },
     {
-      id: 'm3',
+      id: 'm2',
       role: 'assistant' as const,
       content: '',
       progressInfo: {
@@ -302,6 +297,28 @@ const initialCopilotMessages: {
           { agent: 'Privacy Agent', action: 'pre-filled', count: 6, timeAgo: '1m ago' },
         ],
       },
+    },
+    {
+      id: 'm3',
+      role: 'assistant' as const,
+      content: (
+        <>
+          I&apos;ve identified 5 relevant sources for this assessment based on your organization&apos;s documents and previous reviews. You can reorder or remove sources before starting.
+          <br /><br />
+          <strong>Do you have any documents to add?</strong>
+        </>
+      ),
+      buttons: [
+        { id: 'no-start', label: 'No, start assessment', variant: 'outline' as const },
+        { id: 'yes-add', label: 'Yes, add a file', variant: 'outline' as const },
+      ],
+    },
+    {
+      id: 'm4',
+      role: 'assistant' as const,
+      content: null,
+      isWaiting: true,
+      waitingText: 'Waiting for the user to start the assessment',
     },
   ]
 
@@ -431,7 +448,7 @@ export default function AssessmentPreLaunch() {
                   </Button>
 
                   {/* CTA */}
-                  <div className="bg-white border border-gray-200 rounded-xl p-6">
+                  <div className="bg-white border border-gray-200 rounded-xl p-6 mt-6">
                     <h3 className="text-sm font-semibold text-gray-900 mb-1">Ready to start?</h3>
                     <p className="text-xs text-gray-500 mb-4 leading-relaxed">
                       Copilot will use these sources to pre-fill answers across the assessment. You&apos;ll be able to review and confirm each one.
@@ -509,7 +526,7 @@ export default function AssessmentPreLaunch() {
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+              <div className="flex-1 overflow-y-auto px-5 py-4 space-y-6">
                 {copilotMessages.map(msg => (
                   <motion.div
                     key={msg.id}
@@ -524,6 +541,23 @@ export default function AssessmentPreLaunch() {
                           {msg.content}
                         </div>
                       </div>
+                    ) : msg.isWaiting ? (
+                      <div className="flex items-center gap-2 text-sm text-gray-400 italic">
+                        <div className="flex items-center gap-1">
+                          <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                        </div>
+                        <span className="inline-block animate-pulse bg-gradient-to-r from-gray-400 via-gray-300 to-gray-400 bg-[length:200%_100%] bg-clip-text text-transparent" style={{ animation: 'shimmer 2s infinite linear' }}>
+                          {msg.waitingText}
+                        </span>
+                        <style>{`
+                          @keyframes shimmer {
+                            0% { background-position: 200% 0; }
+                            100% { background-position: -200% 0; }
+                          }
+                        `}</style>
+                      </div>
                     ) : (
                       <div className="max-w-[95%] flex items-start gap-2.5">
                         <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -533,6 +567,25 @@ export default function AssessmentPreLaunch() {
                           {msg.content && (
                             <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
                               {msg.content}
+                            </div>
+                          )}
+                          {msg.buttons && (
+                            <div className="flex items-center gap-2 mt-3">
+                              {msg.buttons.map((btn) => (
+                                <Button
+                                  key={btn.id}
+                                  variant={btn.variant}
+                                  size="sm"
+                                  className="text-xs"
+                                  onClick={() => {
+                                    if (btn.id === 'no-start') {
+                                      navigate('/questionnaire')
+                                    }
+                                  }}
+                                >
+                                  {btn.label}
+                                </Button>
+                              ))}
                             </div>
                           )}
                           {msg.progressInfo && (
